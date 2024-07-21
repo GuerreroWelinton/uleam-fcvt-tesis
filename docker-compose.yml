@@ -1,0 +1,50 @@
+services:
+  mongo-db:
+    image: mongo:6.0.6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo-user
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    volumes:
+      - ./databases/mongo:/data/db
+    ports:
+      - 27017:27017
+    restart: always
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    expose:
+      - "3000" # NGINX se encargará de hacer el proxy a este puerto
+    depends_on:
+      - mongo-db
+    environment:
+      MONGO_URL: mongodb://mongo-user:123456@mongo-db:27017/uleam-fcvt?authSource=admin
+      PORT: 3000
+      MONGO_DB_NAME: uleam-fcvt
+      JWT_SEED: 57ed230b88787a77d8e4a13a11378174bbf12c88f354669c8208b3b24e2e2b2b
+      JWT_EXPIRES_IN: 24h
+    # restart: always
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    expose:
+      - "80" # Cambiamos a 80 para que coincida con el proxy en NGINX
+    depends_on:
+      - backend
+    # restart: always
+
+  nginx:
+    build: ./nginx # Asegúrate de que el Dockerfile y nginx.conf estén en este directorio
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    restart: always
+
+networks:
+  default:
+    driver: bridge

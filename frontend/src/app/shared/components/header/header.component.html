@@ -1,0 +1,142 @@
+<header
+  class="header-area bg-white border-radius transition"
+  [ngClass]="{ active: (isSidebarToggled$ | async), sticky: isSticky }"
+  [class.component-dark-theme]="themeService.isDark()"
+>
+  <!-- d-md-flex -->
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="header-left-side d-flex align-items-center">
+      <div
+        class="burger-menu cursor-pointer transition d-xl-none"
+        [ngClass]="{ active: (isSidebarToggled$ | async) }"
+        (click)="toggle()"
+      >
+        <span class="top-bar d-block bg-black transition"></span>
+        <span class="middle-bar d-block bg-black transition"></span>
+        <span class="bottom-bar d-block bg-black transition"></span>
+      </div>
+    </div>
+
+    <ul
+      class="header-right-side d-flex align-items-center mt-0 mb-0 pl-0 list-unstyled"
+    >
+      <!-- Dark Mode -->
+      <li>
+        <button mat-button class="dark-swtich-btn" (click)="toggleTheme()">
+          <i class="material-symbols-outlined"> dark_mode </i>
+        </button>
+      </li>
+
+      <!-- Notifications -->
+      <li>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="notificationsMenu"
+          class="notifications-menu-btn p-0"
+        >
+          <i class="material-symbols-outlined"> notifications </i>
+          <span class="daxa-badge"> 1 </span>
+        </button>
+        <mat-menu
+          class="notifications-menu-dropdown"
+          #notificationsMenu="matMenu"
+          xPosition="before"
+        >
+          <div [class.dark-menu]="themeService.isDark()">
+            <div
+              class="title d-flex align-items-center justify-content-between"
+            >
+              <span class="fw-medium">
+                Notificaciones
+                <span class="text-body fw-normal">(01)</span>
+              </span>
+              <a routerLink="/notifications" class="link-btn text-daxa">
+                Limpiar todas
+              </a>
+            </div>
+            <ul class="menu-body pl-0 mt-0 list-unstyled">
+              <li class="position-relative">
+                <div
+                  class="icon rounded-circle position-absolute text-center transition"
+                >
+                  <i class="material-symbols-outlined"> mark_email_unread </i>
+                </div>
+                <span class="sub-title d-block">
+                  Tienes una nueva solicitud de
+                  <strong class="fw-medium">reserva</strong>
+                </span>
+                <span class="time d-block text-body"> Hace 2 horas </span>
+                <a
+                  routerLink="/notifications"
+                  class="d-block link-btn position-absolute"
+                ></a>
+              </li>
+            </ul>
+            <div class="menu-footer text-center">
+              <a
+                routerLink="/notifications"
+                class="link-btn text-daxa d-inline-block fw-medium"
+              >
+                Ver todas las notificaciones
+              </a>
+            </div>
+          </div>
+        </mat-menu>
+      </li>
+
+      <!-- Profile -->
+      <li>
+        <button
+          mat-button
+          class="profile-menu-btn"
+          [matMenuTriggerFor]="profileMenu"
+        >
+          <img src="assets/images/admin1.png" alt="profile-image" />
+          <span
+            class="status d-inline-block rounded-circle position-absolute"
+          ></span>
+        </button>
+
+        <mat-menu
+          class="profile-menu-dropdown"
+          #profileMenu="matMenu"
+          xPosition="before"
+        >
+          <div [class.dark-menu]="themeService.isDark()">
+            <div class="menu-header d-flex align-items-center">
+              <img src="assets/images/admin1.png" alt="profile-image" />
+              <div class="title">
+                <a routerLink="/my-profile" class="d-inline-block fw-medium">
+                  {{ (profile$ | async)?.name }}
+                </a>
+                <span class="designation d-block text-body">
+                  @for (role of (profile$ | async)?.roles; track $index) {
+                  {{ ROLE_TEXTS[role] }}
+                  }
+                </span>
+              </div>
+            </div>
+            <ul class="menu-body pl-0 mb-0 mt-0 list-unstyled">
+              <li class="position-relative transition fw-medium">
+                <i class="material-symbols-outlined"> person </i>
+                Mi perfil
+                <a
+                  routerLink="/my-profile"
+                  class="link-btn d-block position-absolute"
+                ></a>
+              </li>
+              <li class="position-relative transition fw-medium">
+                <i class="material-symbols-outlined"> logout </i>
+                Cerrar sesión
+                <a
+                  class="link-btn d-block position-absolute"
+                  (click)="logout()"
+                ></a>
+              </li>
+            </ul>
+          </div>
+        </mat-menu>
+      </li>
+    </ul>
+  </div>
+</header>

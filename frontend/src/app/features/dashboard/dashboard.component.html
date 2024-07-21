@@ -1,0 +1,26 @@
+<!-- Breadcrumb -->
+<div
+  class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-between"
+>
+  <h5 class="mb-0">Tablero</h5>
+  <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
+    <li class="breadcrumb-item position-relative">
+      <a routerLink="/" class="d-inline-block position-relative">
+        <!-- <i class="ri-home-8-line"></i> -->
+        Principal
+      </a>
+    </li>
+    <li class="breadcrumb-item position-relative">Tablero</li>
+  </ol>
+</div>
+
+<mat-card class="daxa-card mb-25 border-radius bg-white border-none d-block">
+  <mat-card-header>
+    <mat-card-title>
+      <h5 class="mt-0 mb-0">Datos del usuario</h5>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <pre>{{ profile$ | async | json }}</pre>
+  </mat-card-content>
+</mat-card>

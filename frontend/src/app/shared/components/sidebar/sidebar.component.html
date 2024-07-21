@@ -1,0 +1,123 @@
+<div
+  class="sidebar-area bg-white active"
+  [ngClass]="{ active: (isSidebarToggled$ | async) }"
+  [class.component-dark-theme]="themeService.isDark()"
+>
+  <div class="logo bg-white">
+    <a routerLink="/" class="d-flex align-items-center">
+      <img src="assets/images/uleam-icon.svg" alt="logo-icon" />
+      <span class="fw-semibold">Uleam</span>
+    </a>
+  </div>
+  <div
+    (click)="toggle()"
+    class="burger-menu"
+    [ngClass]="{ active: (isSidebarToggled$ | async) }"
+  >
+    <span class="top-bar"></span>
+    <span class="middle-bar"></span>
+    <span class="bottom-bar"></span>
+  </div>
+  <ng-scrollbar visibility="hover">
+    <div class="sidebar-inner">
+      <div class="sidebar-menu">
+        <mat-accordion>
+          <span class="sub-title text-body"> PRINCIPAL </span>
+          <a
+            routerLink="/dashboard"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Tablero </span>
+          </a>
+
+          <span class="sub-title text-body"> FUNCIONES </span>
+          <a
+            routerLink="/educational-spaces"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="material-symbols-outlined"> chat </i>
+            <span class="title"> Mis espacios </span>
+          </a>
+          <a
+            routerLink="/users"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Usuarios </span>
+          </a>
+
+          <!-- Configuración -->
+          <span
+            class="sub-title text-body"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            CONFIGURACIÓN
+          </span>
+
+          <a
+            routerLink="/periods"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Periodos </span>
+          </a>
+
+          <a
+            routerLink="/buildings"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Edificios </span>
+          </a>
+
+          <a
+            routerLink="/careers"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Carreras </span>
+          </a>
+
+          <a
+            routerLink="/subjects"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Asignaturas </span>
+          </a>
+
+          <!-- Ayuda -->
+          <span class="sub-title text-body"> AYUDA </span>
+          <a
+            routerLink="/tutorials"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Tutoriales </span>
+          </a>
+        </mat-accordion>
+      </div>
+    </div>
+  </ng-scrollbar>
+</div>

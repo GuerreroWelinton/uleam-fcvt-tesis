@@ -1,0 +1,33 @@
+🟢 Flujo de ejecución
+- Route
+- Controller 🏷️
+- Use case 🏷️
+- Repository implementation 🏷️
+- Datasource implementation 🏷️
+
+🟢 FLUJO DE DESARROLLO
+Data / MondoDB 🕹️ 
+- Model
+Domain 🕹️ 
+- Interface 
+- Entity
+- DTO
+- Datasource
+- Repository
+- Use case
+Infrastructe 🕹️ 
+- Mapper
+- Impl Repository
+- Impl Datasource
+Presentation 🕹️ 
+- Controller
+- Route
+- Main Routes
+
+🏷️ En las rutas de cada módulo puedo inyectar dependencias a mis datasourcesImpl
+🏷️ En los controladores de cada módulo puedo inyectar dependencias a mi useCases
+🏷️ Una posible mejora es manejar toda la lógica en useCases y que mis 
+   datasourcesImpl solo me devuelvan mis entidades o en caso de consultas null
+   y en useCases lanzar errores y con el poder de ponerle en el constructor otros
+   repositories y en la función async execute() los parámetros tipados con los dtos que 
+   necesiten los repositories inyectados.

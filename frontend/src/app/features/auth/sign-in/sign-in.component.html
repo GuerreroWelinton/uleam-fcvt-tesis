@@ -1,0 +1,92 @@
+<div class="sign-in-area">
+  <div class="d-table">
+    <div class="d-table-cell">
+      <div
+        class="daxa-form ml-auto mr-auto border-radius bg-white"
+        [class.card-borderd-theme]="themeService.isCardBorder()"
+        [class.component-dark-theme]="themeService.isDark()"
+      >
+        <div class="title text-center">
+          <img src="assets/images/uleam-icon.svg" alt="logo-icon" />
+
+          <h3>Uleam</h3>
+          <p class="text-black">
+            Si no tienes una cuenta para acceder a este sistema, por favor
+            contacta al administrador para solicitar una. El administrador te
+            proporcionará los pasos necesarios para crear tu cuenta y te dará
+            acceso a los recursos que necesitas.
+          </p>
+        </div>
+
+        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label class="main-label d-block lh-1 text-black"> Email </label>
+            <mat-form-field>
+              <mat-label> Ingrese su email </mat-label>
+              <input matInput type="email" id="email" formControlName="email" />
+            </mat-form-field>
+            @if (signInForm.get('email')!.hasError('required') &&
+            signInForm.get('email')!.touched) {
+            <div class="error text-danger">El email es requerido.</div>
+            } @if(signInForm.get('email')!.hasError('email') &&
+            signInForm.get('email')!.touched) {
+            <div class="error text-danger">
+              Por favor ingresa un correo válido.
+            </div>
+            }
+          </div>
+
+          <div clas class="form-group">
+            <label class="main-label d-block lh-1 text-black">
+              Contraseña
+            </label>
+            <mat-form-field>
+              <mat-label> Ingrese su contraseña </mat-label>
+              <input
+                matInput
+                [type]="passwordHidden ? 'password' : 'text'"
+                id="password"
+                formControlName="password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="passwordHidden = !passwordHidden"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="passwordHidden"
+              >
+                <span class="material-symbols-outlined">
+                  {{ passwordHidden ? "visibility_off" : "visibility" }}
+                </span>
+              </button>
+            </mat-form-field>
+            @if (signInForm.get('password')!.hasError('required') &&
+            signInForm.get('password')!.touched) {
+            <div class="error text-danger">La contraseña es requerida.</div>
+            } @if (signInForm.get('password')!.hasError('minlength') &&
+            signInForm.get('password')!.touched) {
+            <div class="error text-danger">
+              La contraseña debe tener al menos 8 caracteres.
+            </div>
+            } @else if (signInForm.get('password')!.hasError('pattern') &&
+            signInForm.get('password')!.touched) {
+            <div class="error text-danger">
+              La contraseña debe contener al menos una letra mayúscula, una
+              letra minúscula y un número.
+            </div>
+            }
+          </div>
+
+          <button
+            mat-button
+            class="btn"
+            type="submit"
+            [disabled]="signInForm.invalid"
+          >
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
