@@ -17,6 +17,16 @@ import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { PeriodInterceptor } from './core/interceptors/period.interceptor';
 import { TokenInterceptor } from './core/interceptors/token.interceptor';
 
+const devtools = isDevMode()
+  ? [
+      provideStoreDevtools({
+        maxAge: 25,
+        logOnly: !isDevMode(),
+        autoPause: true,
+      }),
+    ]
+  : [];
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
@@ -26,6 +36,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     provideStore(reducers, { metaReducers }),
     provideEffects(effects),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+    ...devtools,
   ],
 };
