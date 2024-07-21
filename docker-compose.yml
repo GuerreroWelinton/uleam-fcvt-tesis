@@ -43,6 +43,11 @@ services:
     depends_on:
       - frontend
       - backend
+      - nginx-proxy
+      - letsencrypt
+     environment:
+      - VIRTUAL_HOST=uleam-fcvt.site, www.uleam-fcvt.site
+      - LETSENCRYPT_HOST=uleam-fcvt.site, www.uleam-fcvt.site
     restart: always
 
   nginx-proxy:
