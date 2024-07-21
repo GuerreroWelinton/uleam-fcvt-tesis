@@ -15,7 +15,7 @@ services:
     build:
       context: ./backend
     expose:
-      - "3000" # NGINX se encargará de hacer el proxy a este puerto
+      - "3000"
     depends_on:
       - mongo-db
     environment:
@@ -24,26 +24,56 @@ services:
       MONGO_DB_NAME: uleam-fcvt
       JWT_SEED: 57ed230b88787a77d8e4a13a11378174bbf12c88f354669c8208b3b24e2e2b2b
       JWT_EXPIRES_IN: 24h
-    # restart: always
+    restart: always
 
   frontend:
     container_name: frontend
     build:
       context: ./frontend
     expose:
-      - "80" # Cambiamos a 80 para que coincida con el proxy en NGINX
+      - "80"
     depends_on:
       - backend
-    # restart: always
+    restart: always
 
   nginx:
-    build: ./nginx # Asegúrate de que el Dockerfile y nginx.conf estén en este directorio
-    ports:
-      - "80:80"
+    build: ./nginx
+    expose:
+      - "80"
     depends_on:
       - frontend
       - backend
     restart: always
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    restart: always
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    restart: always
+
+volumes:
+  certs:
+  html:
+  vhostd:
 
 networks:
   default:
