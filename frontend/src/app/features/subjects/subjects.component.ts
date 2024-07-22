@@ -16,16 +16,19 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileUploadModule, FileUploadValidators } from '@iplab/ngx-file-upload';
 import { catchError, first, forkJoin, map, Observable, of } from 'rxjs';
+
 import {
   BASE_STATES_MAT_SELECT,
   BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
-  TEMPLATE_FILE_ROUTES,
-} from '../../core/constants/common.constant';
-import { BASE_RECORD_STATES } from '../../core/enums/common.enum';
-import { TABLE_ACTIONS } from '../../core/enums/table.enum';
-import { ITableAction } from '../../core/interfaces/common.interface';
-import { IMatSelectOption } from '../../core/interfaces/component.interface';
+} from '../../core/constants/component.constant';
+import { TEMPLATE_FILE_ROUTES } from '../../core/constants/general.constant';
+import { TABLE_ACTIONS } from '../../core/enums/component.enum';
+import { BASE_RECORD_STATES } from '../../core/enums/general.enum';
+import {
+  IMatSelectOption,
+  ITableAction,
+} from '../../core/interfaces/component.interface';
 import { DataComparisonService } from '../../core/services/data-comparison.service';
 import { ExcelService } from '../../core/services/excel.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
@@ -83,8 +86,8 @@ export default class SubjectsComponent implements OnInit {
 
   // FORM
   public subjectForm: FormGroup;
-  public careers$: Observable<IMatSelectOption[]>;
-  public BASE_STATES_MAT_SELECT: IMatSelectOption[] = BASE_STATES_MAT_SELECT;
+  public careers$: Observable<IMatSelectOption<string>[]>;
+  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
   public FILE_NAME: string = FILE_NAME_SUBJECTS;
   public TEMPLATE_FILE_ROUTES: string = TEMPLATE_FILE_ROUTES;
   private subjectSelected: ISubjectTable = {} as ISubjectTable;
@@ -189,7 +192,7 @@ export default class SubjectsComponent implements OnInit {
     });
   }
 
-  private setCareers(): Observable<IMatSelectOption[]> {
+  private setCareers(): Observable<IMatSelectOption<string>[]> {
     return this._careersService.list().pipe(
       map((res) => res.data?.result ?? []),
       map((careers) =>

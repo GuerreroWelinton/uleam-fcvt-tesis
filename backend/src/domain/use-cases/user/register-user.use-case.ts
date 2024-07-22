@@ -1,6 +1,4 @@
-import { JwtAdapter } from "../../../config";
 import { RegisterUserDto } from "../../dtos";
-import { CustomError } from "../../errors";
 import { IApiResponse, IUser } from "../../interfaces";
 import { UserRepository } from "../../repositories";
 

@@ -1,17 +1,17 @@
 //Auth - User
 export * from "./user.entity";
 
+//Career
+export * from "./career.entity";
+
 //Subject
 export * from "./subject.entity";
 
-//Career
-export * from "./career.entity";
+//Period
+export * from "./period.entity";
 
 //Building
 export * from "./building.entity";
 
 //Educational Space
 export * from "./educational-space.entity";
-
-//Period
-export * from "./period.entity";

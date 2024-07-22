@@ -1,4 +1,4 @@
-export const DISPLAYED_COLUMNS_CAREERS: string[] = [
+export const DISPLAYED_COLUMNS_CAREERS = [
   'code',
   'name',
   'description',

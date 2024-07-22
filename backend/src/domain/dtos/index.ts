@@ -2,7 +2,9 @@
 export * from "./auth/login-user.dto";
 
 //User
+export * from "./user/list-user.dto";
 export * from "./user/register-user.dto";
+export * from "./user/update-user.dto";
 
 //Career
 export * from "./career/register-career.dto";
@@ -23,3 +25,4 @@ export * from "./period/update-period.dto";
 //Base
 export * from "./base/id-base.dto";
 export * from "./base/code-base.dto";
+export * from "./base/pagination-base.dto";

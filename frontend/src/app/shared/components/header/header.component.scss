@@ -1513,3 +1513,17 @@
 /* Min width 1600px */
 @media only screen and (min-width: 1600px) {
 }
+
+/* styles.css o styles.scss */
+.mat-form-field-custom {
+  width: 130px;
+  margin-left: 10px;
+}
+
+::ng-deep .mat-form-field-custom .mat-mdc-form-field-flex {
+  height: 40px;
+
+  .mat-mdc-form-field-infix {
+    padding: 8px;
+  }
+}

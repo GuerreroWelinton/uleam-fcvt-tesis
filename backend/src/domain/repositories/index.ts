@@ -15,3 +15,6 @@ export * from "./period.repository";
 
 //Building
 export * from "./building.repository";
+
+//EducationalSpace
+export * from "./educational-space.repository";

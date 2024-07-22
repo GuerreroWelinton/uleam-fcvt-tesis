@@ -1,14 +1,13 @@
 import {
   Directive,
+  DoCheck,
   Input,
+  OnDestroy,
+  OnInit,
   TemplateRef,
   ViewContainerRef,
-  OnInit,
-  OnDestroy,
-  DoCheck,
 } from '@angular/core';
-import { USER_ROLES } from '../../core/enums/user.enum';
-import { KEYS_LOCAL_STORAGE } from '../../core/enums/local-storage.enum';
+import { KEYS_LOCAL_STORAGE, USER_ROLES } from '../../core/enums/general.enum';
 
 @Directive({
   selector: '[sharedShowForRoles]',

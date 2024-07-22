@@ -1,12 +1,12 @@
+import { AsyncPipe, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
-import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
-import { ToggleService } from './toggle.service';
-import { AsyncPipe, NgClass } from '@angular/common';
-import { CustomizerSettingsService } from '../customizer-settings/customizer-settings.service';
+import { NgScrollbarModule } from 'ngx-scrollbar';
+import { USER_ROLES } from '../../../core/enums/general.enum';
 import { ShowForRolesDirective } from '../../directives/show-for-roles.directive';
-import { USER_ROLES } from '../../../core/enums/user.enum';
+import { CustomizerSettingsService } from '../customizer-settings/customizer-settings.service';
+import { ToggleService } from './toggle.service';
 
 @Component({
   selector: 'app-sidebar',

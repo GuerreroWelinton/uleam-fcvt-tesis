@@ -137,6 +137,18 @@
           </div>
         </mat-menu>
       </li>
+
+      <li>
+        <mat-form-field class="mat-form-field-custom">
+          <mat-select [(value)]="selectedPeriod">
+            @for (period of (periods$ | async)?.data?.result; track $index) {
+            <mat-option [value]="period.id" selected>
+              {{ period.code }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </li>
     </ul>
   </div>
 </header>

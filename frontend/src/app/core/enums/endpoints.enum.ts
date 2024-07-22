@@ -13,14 +13,11 @@ export enum AUTH_ENDPOINTS {
   LOGIN = '/login',
 }
 
-export enum PERIODS_ENDPOINTS {
-  LIST = '/list',
-}
-
 export enum BASE_ENDPOINTS {
   LIST = '/list',
   FIND_BY_ID = '/find-by-id',
   REGISTER = '/register',
+  REGISTER_GROUP = '/register-group',
   UPDATE = '/update',
   DELETE = '/delete',
 }

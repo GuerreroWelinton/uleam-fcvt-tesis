@@ -15,3 +15,6 @@ export * from "./period.datasource";
 
 //Building
 export * from "./building.datasource";
+
+//EducationalSpace
+export * from "./educational-space.datasource";
