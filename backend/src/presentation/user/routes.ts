@@ -11,6 +11,8 @@ export class UserRoutes {
     const userRepository = new UserRepositoryImpl(userDataSource);
     const userController = new UserController(userRepository);
 
+    router.get("/list", [AuthMiddleware.validateJWT], userController.list);
+
     router.get(
       "/find-by-id/:id",
       [AuthMiddleware.validateJWT],
@@ -21,6 +23,24 @@ export class UserRoutes {
       "/register",
       // [AuthMiddleware.validateJWT],
       userController.register
+    );
+
+    router.post(
+      "/register-group",
+      [AuthMiddleware.validateJWT],
+      userController.registerGroup
+    );
+
+    router.delete(
+      "/delete/:id",
+      [AuthMiddleware.validateJWT],
+      userController.delete
+    );
+
+    router.patch(
+      "/update/:id",
+      [AuthMiddleware.validateJWT],
+      userController.update
     );
 
     return router;

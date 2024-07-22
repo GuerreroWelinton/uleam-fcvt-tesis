@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard, NotAuthGuard } from './core/guards/auth.guard';
 import { HasRole } from './core/guards/has-role.guard';
-import { USER_ROLES } from './core/enums/user.enum';
+import { USER_ROLES } from './core/enums/general.enum';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/authentication', pathMatch: 'full' },

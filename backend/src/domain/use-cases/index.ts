@@ -2,8 +2,12 @@
 export * from "./auth/login-user.use-case";
 
 //User
+export * from "./user/list-user.use-case";
 export * from "./user/find-by-id-user.use-case";
 export * from "./user/register-user.use-case";
+export * from "./user/register-group-user.use-case";
+export * from "./user/delete-user.use-case";
+export * from "./user/update-user.use-case";
 
 //Career
 export * from "./career/list-career.use-case";
@@ -34,3 +38,6 @@ export * from "./building/find-one-by-code-building.use-case";
 export * from "./building/register-building.use-case";
 export * from "./building/delete-building.use-case";
 export * from "./building/update-building.use-case";
+
+//EducationalSpace
+export * from "./educational-space/list-educational-space.use-case";

@@ -14,7 +14,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: [true, "Email is already taken"],
+      // unique: [true, "Email is already taken"],
     },
     password: {
       type: String,
@@ -26,7 +26,7 @@ const userSchema = new Schema(
     },
     roles: {
       type: [String],
-      enum: [USER_ROLES],
+      enum: USER_ROLES,
       default: [USER_ROLES.STUDENT],
     },
     status: {

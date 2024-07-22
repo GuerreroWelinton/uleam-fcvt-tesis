@@ -17,14 +17,15 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FileUploadModule } from '@iplab/ngx-file-upload';
-import {
-  BASE_STATES_OPTIONS,
-  COMMON_TABLE_ACTIONS,
-} from '../../core/constants/common.constant';
-import { BASE_RECORD_STATES } from '../../core/enums/common.enum';
+
+import { BASE_RECORD_STATES } from '../../core/enums/general.enum';
 import { TableCheckboxService } from '../../core/services/table-checkbox.service';
 import { TableFilterService } from '../../core/services/table-filter.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
+import {
+  BASE_STATES_OPTIONS,
+  COMMON_TABLE_ACTIONS,
+} from '../../core/constants/component.constant';
 
 @Component({
   selector: 'app-educational-spaces',

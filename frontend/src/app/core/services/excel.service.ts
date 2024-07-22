@@ -32,6 +32,20 @@ export class ExcelService {
             raw: true,
           });
 
+          if (jsonData.length === 0) {
+            this.alertService.showAlert({
+              type: 'danger',
+              message:
+                'El archivo está vacío, por favor verifique el contenido',
+            });
+            reject(
+              new Error(
+                'El archivo está vacío, por favor verifique el contenido'
+              )
+            );
+            return;
+          }
+
           if (
             !this.validateHeaders(
               Object.keys(jsonData[0] as object),

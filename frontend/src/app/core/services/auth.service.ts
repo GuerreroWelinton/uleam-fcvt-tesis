@@ -4,12 +4,11 @@ import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment.dev';
-import { KEYS_LOCAL_STORAGE } from '../enums/local-storage.enum';
+import { UsersService } from '../../features/users/service/users.service';
 import { AUTH_ENDPOINTS, MAIN_ENDPOINTS } from '../enums/endpoints.enum';
-import { UserService } from './user.service';
+import { BASE_RECORD_STATES, KEYS_LOCAL_STORAGE } from '../enums/general.enum';
 import { IApiResponse } from '../interfaces/api-response.interface';
-import { IUser } from '../interfaces/user.interface';
-import { BASE_RECORD_STATES } from '../enums/common.enum';
+import { IUser } from '../../features/users/interfaces/user.interface';
 import { AlertService } from './alert.service';
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +19,7 @@ export class AuthService {
   constructor(
     private _httpClient: HttpClient,
     private _router: Router,
-    private _userService: UserService,
+    private _userService: UsersService,
     private _alertService: AlertService
   ) {}
 

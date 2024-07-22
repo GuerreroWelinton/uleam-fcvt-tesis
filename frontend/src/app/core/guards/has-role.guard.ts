@@ -1,5 +1,4 @@
-import { KEYS_LOCAL_STORAGE } from '../enums/local-storage.enum';
-import { USER_ROLES } from '../enums/user.enum';
+import { KEYS_LOCAL_STORAGE, USER_ROLES } from '../enums/general.enum';
 
 export function HasRole(allowedRoles: USER_ROLES[]): () => boolean {
   return () => {

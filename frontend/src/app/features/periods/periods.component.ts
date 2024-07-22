@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -14,14 +14,17 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import {
   BASE_STATES_MAT_SELECT,
   BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
-} from '../../core/constants/common.constant';
-import { TABLE_ACTIONS } from '../../core/enums/table.enum';
-import { ITableAction } from '../../core/interfaces/common.interface';
-import { IMatSelectOption } from '../../core/interfaces/component.interface';
+} from '../../core/constants/component.constant';
+import { TABLE_ACTIONS } from '../../core/enums/component.enum';
+import {
+  IMatSelectOption,
+  ITableAction,
+} from '../../core/interfaces/component.interface';
 import { DataComparisonService } from '../../core/services/data-comparison.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
@@ -70,7 +73,7 @@ export default class PeriodsComponent implements OnInit {
 
   // FORM
   public periodForm: FormGroup;
-  public BASE_STATES_MAT_SELECT: IMatSelectOption[] = BASE_STATES_MAT_SELECT;
+  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
   private periodSelected: IPeriodTable = {} as IPeriodTable;
 
   constructor(

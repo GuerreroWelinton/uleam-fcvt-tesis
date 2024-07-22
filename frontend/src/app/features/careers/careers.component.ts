@@ -20,10 +20,12 @@ import {
   BASE_STATES_MAT_SELECT,
   BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
-} from '../../core/constants/common.constant';
-import { TABLE_ACTIONS } from '../../core/enums/table.enum';
-import { ITableAction } from '../../core/interfaces/common.interface';
-import { IMatSelectOption } from '../../core/interfaces/component.interface';
+} from '../../core/constants/component.constant';
+import { TABLE_ACTIONS } from '../../core/enums/component.enum';
+import {
+  IMatSelectOption,
+  ITableAction,
+} from '../../core/interfaces/component.interface';
 import { DataComparisonService } from '../../core/services/data-comparison.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { DownloadFileDirective } from '../../shared/directives/download-file.directive';
@@ -75,7 +77,7 @@ export default class CareersComponent implements OnInit, AfterViewInit {
 
   // FORM
   public careerForm: FormGroup;
-  public BASE_STATES_MAT_SELECT: IMatSelectOption[] = BASE_STATES_MAT_SELECT;
+  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
   private careerSelected: ICareerTable = {} as ICareerTable;
   // public FILE_NAME: string = FILE_NAME_SUBJECTS;
   // public TEMPLATE_FILE_ROUTES: string = TEMPLATE_FILE_ROUTES;

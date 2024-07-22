@@ -1,14 +1,17 @@
 import { BASE_RECORD_STATES, DAY_OF_WEEK } from "../../constants/constants";
+import { IBaseRecord } from "./api-response.interface";
+import { IBuilding } from "./building.interface";
+import { IUser } from "./user.interface";
 
-export interface IEducationalSpace {
-  id: string;
+export interface IEducationalSpace extends IBaseRecord {
   name: string;
+  code: string;
   floor: number;
   capacity: number;
   hoursOfOperation: IHoursOfOperation[];
-  buildingId: string;
-  userId: string[];
-  status?: BASE_RECORD_STATES;
+  building: IBuilding;
+  users: IUser[];
+  status: BASE_RECORD_STATES;
 }
 
 export interface IHoursOfOperation {

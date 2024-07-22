@@ -25,6 +25,10 @@ const EducationalSpaceSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required"],
     },
+    code: {
+      type: String,
+      required: [true, "Code is required"],
+    },
     floor: {
       type: Number,
       required: [true, "Floor is required"],
@@ -49,8 +53,8 @@ const EducationalSpaceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [BASE_RECORD_STATES],
-      default: "ACTIVE",
+      enum: BASE_RECORD_STATES,
+      default: BASE_RECORD_STATES.ACTIVE,
     },
   },
   {

@@ -14,23 +14,26 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { first } from 'rxjs';
+
+import { MatSelectModule } from '@angular/material/select';
 import {
   BASE_STATES_MAT_SELECT,
   BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
-} from '../../core/constants/common.constant';
-import { TABLE_ACTIONS } from '../../core/enums/table.enum';
-import { ITableAction } from '../../core/interfaces/common.interface';
-import { IMatSelectOption } from '../../core/interfaces/component.interface';
+} from '../../core/constants/component.constant';
+import { TABLE_ACTIONS } from '../../core/enums/component.enum';
+import {
+  IMatSelectOption,
+  ITableAction,
+} from '../../core/interfaces/component.interface';
 import { DataComparisonService } from '../../core/services/data-comparison.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
 import { MaxValueDirective } from '../../shared/directives/max-value.directive';
+import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
 import { DISPLAYED_COLUMNS_BUILDINGS } from './helpers/building.constant';
 import { IBuilding, IBuildingTable } from './interfaces/building.interface';
 import { BuildingService } from './services/building.service';
-import { MatSelectModule } from '@angular/material/select';
-import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
 
 @Component({
   selector: 'app-buildings',
@@ -70,7 +73,7 @@ export default class BuildingsComponent implements OnInit, AfterViewInit {
 
   // FORM
   public buildingForm: FormGroup;
-  public BASE_STATES_MAT_SELECT: IMatSelectOption[] = BASE_STATES_MAT_SELECT;
+  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
   private buildingSelected: IBuildingTable = {} as IBuildingTable;
 
   constructor(

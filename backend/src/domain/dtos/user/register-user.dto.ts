@@ -58,4 +58,26 @@ export class RegisterUserDto {
       ),
     ];
   }
+
+  static createGroup(
+    objects: { [key: string]: any }[]
+  ): [string[]?, RegisterUserDto[]?] {
+    const errors: string[] = [];
+    const dtos: RegisterUserDto[] = [];
+
+    for (const object of objects) {
+      const [error, dto] = RegisterUserDto.create(object);
+      if (error) {
+        errors.push(error);
+      } else if (dto) {
+        dtos.push(dto);
+      }
+    }
+
+    if (errors.length > 0) {
+      return [errors, undefined];
+    }
+
+    return [undefined, dtos];
+  }
 }

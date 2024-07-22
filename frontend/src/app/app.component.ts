@@ -14,7 +14,6 @@ import {
 } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
-import { PeriodService } from './core/services/period.service';
 import { AppState } from './core/store';
 import { UserActions } from './core/store/user/user.actions';
 import { AlertComponent } from './shared/components/alert/alert.component';
@@ -58,8 +57,7 @@ export class AppComponent {
     public router: Router,
     public themeService: CustomizerSettingsService,
     private _store: Store<AppState>,
-    private _toggleService: ToggleService,
-    private _periodService: PeriodService
+    private _toggleService: ToggleService
   ) {}
 
   ngOnInit() {
@@ -68,12 +66,12 @@ export class AppComponent {
     // this.fetchPeriods();
   }
 
-  private fetchPeriods(): void {
-    this._periodService.getPeriods().subscribe({
-      next: (res) =>
-        this._periodService.selectLatestPeriod(res.data?.result || []),
-    });
-  }
+  // private fetchPeriods(): void {
+  //   this._periodService.getPeriods().subscribe({
+  //     next: (res) =>
+  //       this._periodService.selectLatestPeriod(res.data?.result || []),
+  //   });
+  // }
 
   private recallJsFuntions() {
     this.routerSubscription = this.router.events
