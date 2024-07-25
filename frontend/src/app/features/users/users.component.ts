@@ -87,14 +87,7 @@ import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
     StatusFormatterPipe,
   ],
   templateUrl: './users.component.html',
-  styles: `
-    .user-form-box {
-      height: 677px;
-    }
-    .user-form-template-box {
-        height: 435px;
-    }
-  `,
+  styleUrl: './users.component.scss',
 })
 export class UsersComponent implements OnInit, AfterViewInit {
   //TABLE
