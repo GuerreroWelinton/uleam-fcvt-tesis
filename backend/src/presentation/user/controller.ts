@@ -18,8 +18,9 @@ import { createErrorResponse, handleError, handleSuccess } from "../../utils";
 
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
+
   list = (req: Request, res: Response) => {
-    const [error, filters] = ListUserDto.create(req.query);
+    const [error, filters] = ListUserDto.create({ ...req.body, ...req.query });
     if (error) {
       const response = createErrorResponse(400, error);
       return res.status(400).json(response);

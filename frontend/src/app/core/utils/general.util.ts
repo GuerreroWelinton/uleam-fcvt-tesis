@@ -1,13 +1,15 @@
 export function buildQueryParams<T>(filters: Partial<T>): string {
   return Object.keys(filters)
-    .filter(
-      (key) =>
-        filters[key as keyof T] !== undefined &&
-        filters[key as keyof T] !== null
-    )
-    .map(
-      (key) => `${key}=${encodeURIComponent(String(filters[key as keyof T]))}`
-    )
+    .flatMap((key) => {
+      const value = filters[key as keyof T];
+      if (Array.isArray(value)) {
+        return value.map(
+          (item) => `${key}=${encodeURIComponent(String(item))}`
+        );
+      } else {
+        return `${key}=${encodeURIComponent(String(value))}`;
+      }
+    })
     .join('&');
 }
 

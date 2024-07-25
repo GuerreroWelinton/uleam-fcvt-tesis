@@ -1,26 +1,17 @@
-import { KEYS_LOCAL_STORAGE, USER_ROLES } from '../enums/general.enum';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { USER_ROLES } from '../enums/general.enum';
+import { TokenService } from '../services/token.service';
 
-export function HasRole(allowedRoles: USER_ROLES[]): () => boolean {
-  return () => {
-    const tokenKey: string = KEYS_LOCAL_STORAGE.TOKEN;
-    const token = localStorage.getItem(tokenKey);
+export function HasRole(allowedRoles: USER_ROLES[]): CanActivateFn {
+  return (route, state) => {
+    const tokenService = inject(TokenService);
+    const router = inject(Router);
 
-    if (!token) {
-      return false;
+    if (tokenService.hasRole(allowedRoles)) {
+      return true;
+    } else {
+      return router.navigate(['/dashboard']);
     }
-
-    const payload: string = token.split('.')[1];
-    const { roles, exp } = JSON.parse(atob(payload));
-
-    const now: number = new Date().getTime() / 1000;
-    if (now >= exp) {
-      return false;
-    }
-
-    const hasRole = roles.some((role: USER_ROLES) =>
-      allowedRoles.includes(role)
-    );
-
-    return hasRole;
   };
 }

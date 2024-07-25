@@ -1,8 +1,10 @@
 import { PaginationDto } from "..";
 import { BASE_RECORD_STATES, USER_ROLES } from "../../../constants/constants";
+import { UserEntity } from "../../entities";
 
 export class ListUserDto {
   private constructor(
+    public user: UserEntity,
     public pagination: PaginationDto,
     public name?: string,
     public lastName?: string,
@@ -19,6 +21,7 @@ export class ListUserDto {
     if (error) return [error];
 
     const {
+      user,
       name,
       lastName,
       email,
@@ -43,6 +46,7 @@ export class ListUserDto {
     return [
       undefined,
       new ListUserDto(
+        user,
         pagination!,
         name,
         lastName,

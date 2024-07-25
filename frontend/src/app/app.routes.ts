@@ -7,9 +7,9 @@ export const routes: Routes = [
   { path: '', redirectTo: '/authentication', pathMatch: 'full' },
   {
     path: 'authentication',
+    canActivate: [NotAuthGuard],
     loadChildren: () =>
       import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
-    canActivate: [NotAuthGuard],
   },
   {
     path: 'dashboard',
@@ -46,9 +46,12 @@ export const routes: Routes = [
 
   {
     path: 'users',
+    canActivate: [
+      AuthGuard,
+      HasRole([USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]),
+    ],
     loadChildren: () =>
       import('./features/users/users.routes').then((m) => m.USERS_ROUTES),
-    canActivate: [AuthGuard],
   },
 
   //Configuración

@@ -16,10 +16,7 @@ export class UpdateBuilding implements RegisterBuildingUseCase {
     buildingId: IdBaseDto,
     updateBuildingDto: UpdateBuildingDto
   ): Promise<Partial<IApiResponse<IBuilding>>> {
-    const building = await this.buildingRepository.update(
-      buildingId,
-      updateBuildingDto
-    );
+    await this.buildingRepository.update(buildingId, updateBuildingDto);
 
     return {
       message: `Edificio se ha actualizado con éxito`,

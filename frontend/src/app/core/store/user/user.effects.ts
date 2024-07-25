@@ -61,10 +61,9 @@ export class UserEffects {
       ofType(UserActions.preAuth),
       mergeMap(() => {
         return this._authService.isAuthenticated().pipe(
-          map((user) => {
-            // console.log('🚀 ~ UserEffects ~ map ~ user:', user);
-            if (user) {
-              return UserActions.preAuthSuccess({ user });
+          map(({ user, token }) => {
+            if (user && token) {
+              return UserActions.preAuthSuccess({ user, token });
             } else {
               return UserActions.preAuthFailure({
                 error: 'User not authenticated',

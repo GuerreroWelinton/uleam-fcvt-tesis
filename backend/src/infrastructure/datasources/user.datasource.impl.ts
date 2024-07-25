@@ -1,5 +1,5 @@
 import { BcryptAdapter } from "../../config";
-import { BASE_RECORD_STATES } from "../../constants/constants";
+import { BASE_RECORD_STATES, USER_ROLES } from "../../constants/constants";
 import { UserModel } from "../../data/mongodb";
 import { UserDataSource } from "../../domain/datasources";
 import {
@@ -25,6 +25,7 @@ export class UserDataSourceImpl implements UserDataSource {
   ): Promise<{ users: UserEntity[]; total: number }> {
     return handleTryCatch<{ users: UserEntity[]; total: number }>(async () => {
       const {
+        user,
         pagination: { skip, limit },
         name,
         lastName,
@@ -36,19 +37,34 @@ export class UserDataSourceImpl implements UserDataSource {
         updatedAt,
       } = filters;
 
-      let query = {
+      const userRolesList = user.roles;
+
+      let query: Object = {
         ...(name && { name: { $regex: name, $options: "i" } }),
         ...(lastName && { lastName: { $regex: lastName, $options: "i" } }),
         ...(email && { email: { $regex: email, $options: "i" } }),
         ...(phoneNumber && {
           phoneNumber: { $regex: phoneNumber, $options: "i" },
         }),
-        ...(roles && { roles: { $in: roles } }),
         status: { $ne: BASE_RECORD_STATES.DELETED },
         ...(status && { status }),
         ...(createdAt && { createdAt: { $gte: createdAt, $lte: createdAt } }),
         ...(updatedAt && { updatedAt: { $gte: updatedAt, $lte: updatedAt } }),
       };
+
+      if (userRolesList.includes(USER_ROLES.ADMIN)) {
+        query = {
+          ...query,
+          ...(roles && { roles: { $in: roles } }),
+        };
+      } else {
+        query = {
+          ...query,
+          ...(roles && {
+            roles: { $in: roles, $nin: [...userRolesList, USER_ROLES.ADMIN] },
+          }),
+        };
+      }
 
       const usersPromise = UserModel.find(query)
         .sort({ createdAt: -1 })
@@ -115,7 +131,6 @@ export class UserDataSourceImpl implements UserDataSource {
     registerUserDto: RegisterUserDto[]
   ): Promise<UserEntity[]> {
     return handleTryCatch<UserEntity[]>(async () => {
-      // await UserModel.collection.dropIndex("email_1");
       const emails = registerUserDto.map((user) => user.email);
       const uniqueEmails = new Set(emails);
       if (uniqueEmails.size !== registerUserDto.length) {
@@ -124,7 +139,8 @@ export class UserDataSourceImpl implements UserDataSource {
         );
       }
 
-      const group = registerUserDto.map(async (user) => {
+      const usersToRegister = [];
+      for (const user of registerUserDto) {
         const { name, lastName, email, password, phoneNumber, roles, status } =
           user;
 
@@ -139,7 +155,7 @@ export class UserDataSourceImpl implements UserDataSource {
           );
         }
 
-        return {
+        usersToRegister.push({
           name,
           lastName,
           email,
@@ -147,16 +163,16 @@ export class UserDataSourceImpl implements UserDataSource {
           phoneNumber,
           roles,
           status,
-        };
-      });
+        });
+      }
 
-      if (group.length === 0) {
+      if (usersToRegister.length === 0) {
         throw CustomError.badRequest(
           "No se han proporcionado usuarios para registrar"
         );
       }
 
-      const users = await UserModel.insertMany(await Promise.all(group));
+      const users = await UserModel.insertMany(usersToRegister);
 
       return users.map((user) => UserMapper.userEntityFromObject(user));
     });

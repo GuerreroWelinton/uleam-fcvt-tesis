@@ -7,7 +7,8 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
-import { KEYS_LOCAL_STORAGE, USER_ROLES } from '../../core/enums/general.enum';
+import { USER_ROLES } from '../../core/enums/general.enum';
+import { TokenService } from '../../core/services/token.service';
 
 @Directive({
   selector: '[sharedShowForRoles]',
@@ -20,7 +21,8 @@ export class ShowForRolesDirective implements OnInit, OnDestroy, DoCheck {
 
   constructor(
     private _viewContainerRef: ViewContainerRef,
-    private _templateRef: TemplateRef<any>
+    private _templateRef: TemplateRef<any>,
+    private _tokenService: TokenService
   ) {}
 
   ngOnInit(): void {
@@ -32,30 +34,11 @@ export class ShowForRolesDirective implements OnInit, OnDestroy, DoCheck {
   }
 
   ngDoCheck(): void {
-    const newRoles = this._getUserRoles();
+    const newRoles = this._tokenService.getUserRoles();
     if (this._rolesChanged(newRoles)) {
       this.currentRoles = newRoles;
       this._updateView();
     }
-  }
-
-  private _getUserRoles(): USER_ROLES[] {
-    const tokenKey: string = KEYS_LOCAL_STORAGE.TOKEN;
-    const token = localStorage.getItem(tokenKey);
-
-    if (!token) {
-      return [];
-    }
-
-    const payload: string = token.split('.')[1];
-    const { roles, exp } = JSON.parse(atob(payload));
-
-    const now: number = new Date().getTime() / 1000;
-    if (now >= exp) {
-      return [];
-    }
-
-    return roles;
   }
 
   private _rolesChanged(newRoles: USER_ROLES[]): boolean {

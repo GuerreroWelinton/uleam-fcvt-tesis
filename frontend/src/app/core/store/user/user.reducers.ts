@@ -41,10 +41,11 @@ const logout = (state: IUserState): IUserState => ({
 
 const preAuthSuccess = (
   state: IUserState,
-  { user }: { user: IUser }
+  { user, token }: { user: IUser; token: string }
 ): IUserState => ({
   ...state,
   user,
+  token,
   error: null,
 });
 

@@ -32,7 +32,6 @@ export const KEYS_TO_UPDATE_USER: (keyof IUser)[] = [
   'name',
   'lastName',
   'password',
-  // 'email',
   'phoneNumber',
   'roles',
   'status',

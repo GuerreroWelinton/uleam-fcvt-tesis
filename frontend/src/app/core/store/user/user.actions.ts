@@ -32,7 +32,7 @@ const preAuth = createAction(UserActionTypes.PreAuth);
 
 const preAuthSuccess = createAction(
   UserActionTypes.PreAuthSuccess,
-  props<{ user: IUser }>()
+  props<{ user: IUser; token: string }>()
 );
 
 const preAuthFailure = createAction(
