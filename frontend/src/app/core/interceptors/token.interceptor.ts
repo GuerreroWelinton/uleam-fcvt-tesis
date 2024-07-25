@@ -1,17 +1,17 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { AuthService } from '../services/auth.service';
 import { inject } from '@angular/core';
 import { TOKEN_EXCLUDED_ROUTES } from '../constants/general.constant';
+import { TokenService } from '../services/token.service';
 
 export const TokenInterceptor: HttpInterceptorFn = (req, next) => {
-  if (TOKEN_EXCLUDED_ROUTES.some((route: string) => req.url.includes(route))) {
+  if (TOKEN_EXCLUDED_ROUTES.some((route) => req.url.includes(route))) {
     return next(req);
   }
 
-  const authService = inject(AuthService);
-  const token = authService.getToken();
+  const tokenService = inject(TokenService);
+  const token = tokenService.getToken();
 
-  if (token) {
+  if (tokenService.hasValidToken()) {
     const authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,

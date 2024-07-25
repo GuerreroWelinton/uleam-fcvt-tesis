@@ -40,6 +40,13 @@ export class UsersService {
     return this._httpClient.get<IApiResponse<IUser>>(endpoint);
   }
 
+  public register(user: Partial<IUser>): Observable<IApiResponse<IUser>> {
+    const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.REGISTER}`;
+    return this._httpClient
+      .post<IApiResponse<IUser>>(endpoint, user)
+      .pipe(tap((res) => this.showAlert(res)));
+  }
+
   public registerGroup(
     users: Partial<IUser>[]
   ): Observable<IApiResponse<IUser[]>> {

@@ -48,6 +48,7 @@
             class="sidebar-menu-link"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
           >
             <i class="material-symbols-outlined"> group </i>
             <span class="title"> Usuarios </span>

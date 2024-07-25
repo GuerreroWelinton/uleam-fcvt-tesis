@@ -3,4 +3,5 @@ export enum TABLE_ACTIONS {
   DELETE = 'delete',
   VIEW = 'visibility',
   ADD = 'add',
+  ADD_GROUP = 'add_group',
 }

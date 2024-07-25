@@ -11,15 +11,16 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileUploadControl, FileUploadModule } from '@iplab/ngx-file-upload';
-import { map } from 'rxjs';
+import { finalize, map, Observable, of, tap } from 'rxjs';
 import {
   ACTION_BUTTON_ADD,
+  ACTION_BUTTON_ADD_GROUP,
   BASE_STATES_MAT_SELECT,
-  BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
   DEFAULT_PAGE_SIZE,
   USER_ROLES_OPTIONS,
@@ -51,8 +52,11 @@ import { IUser, IUserTable } from './interfaces/user.interface';
 import { UsersService } from './service/users.service';
 
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
+import { USER_ROLES } from '../../core/enums/general.enum';
+import { IApiResponse } from '../../core/interfaces/api-response.interface';
+import { TokenService } from '../../core/services/token.service';
 import { MaxWidthEllipsisDirective } from '../../shared/directives/max-width-ellipsis.directive';
+import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
 
 @Component({
   selector: 'app-users',
@@ -70,6 +74,7 @@ import { MaxWidthEllipsisDirective } from '../../shared/directives/max-width-ell
     MatSelectModule,
     MatTableModule,
     MatTooltipModule,
+    MatTabsModule,
 
     DownloadFileDirective,
     FileUploadModule,
@@ -82,40 +87,59 @@ import { MaxWidthEllipsisDirective } from '../../shared/directives/max-width-ell
     StatusFormatterPipe,
   ],
   templateUrl: './users.component.html',
+  styles: `
+    .user-form-box {
+      height: 677px;
+    }
+    .user-form-template-box {
+        height: 435px;
+    }
+  `,
 })
 export class UsersComponent implements OnInit, AfterViewInit {
   //TABLE
   @ViewChild(MatPaginator)
   public paginator: MatPaginator;
-  public dataSource = new MatTableDataSource<IUserTable>([]);
-  public totalDataCount: number = 0;
+  public dataSource$: Observable<MatTableDataSource<IUserTable>> = of(
+    new MatTableDataSource<IUserTable>([])
+  );
+  public totalCount: number = 0;
   public isLoading: boolean = false;
-  public DISPLAYED_COLUMNS = DISPLAYED_COLUMNS_USERS;
-  public BASE_STATES_OPTIONS = BASE_STATES_OPTIONS;
-  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  public displayColumns = DISPLAYED_COLUMNS_USERS;
+  public defaultPageSize = DEFAULT_PAGE_SIZE;
 
   //BUTTONS
-  public TABLE_ACTIONS = TABLE_ACTIONS;
-  public ACTION_BUTTON_ADD = ACTION_BUTTON_ADD;
-  public buttonActive = ACTION_BUTTON_ADD;
+  public actionButtons = TABLE_ACTIONS;
+  public actionButtonAdd = ACTION_BUTTON_ADD;
+  public actionButtonAddGroup = ACTION_BUTTON_ADD_GROUP;
+  public activeActionbutton = ACTION_BUTTON_ADD;
 
   // PUPUP
   public classApplied: boolean = false;
   public titlePopup: string = '';
 
+  // TAB
+  public activeTabIndex: number = 0;
+
   // FORM
   public userForm: FormGroup;
+  public userRoleOptions = USER_ROLES_OPTIONS;
+  public baseStatesOptions = BASE_STATES_MAT_SELECT;
+  public selectedUser: IUserTable | null = null;
+  private userFilters: Partial<IUser> = {};
+  private userPagination: IPagination = {
+    page: 1,
+    limit: DEFAULT_PAGE_SIZE[0],
+  };
+
+  //File
   public fileUploadControl: FileUploadControl;
-  public USER_ROLES_OPTIONS = USER_ROLES_OPTIONS;
-  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
-  public FILE_NAME: string = FILE_NAME_USERS;
-  public TEMPLATE_FILE_ROUTES: string = TEMPLATE_FILE_ROUTES;
-  private filters: Partial<IUser> = {};
-  public pagination: IPagination = { page: 1, limit: DEFAULT_PAGE_SIZE[0] };
-  public userSelected: IUser | null = null;
+  public templateFileUrl: string = TEMPLATE_FILE_ROUTES;
+  public fileName: string = FILE_NAME_USERS;
 
   constructor(
     public themeService: CustomizerSettingsService,
+    private _tokenService: TokenService,
     private _formBuilder: FormBuilder,
     private _userService: UsersService,
     private _fileUploadService: FileUploadService,
@@ -124,42 +148,54 @@ export class UsersComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.setDataSource();
-    this.userForm = this.setUserForm(this.buttonActive);
+    this.userFilters.roles = this.filterUserRolesOptions();
+    this.dataSource$ = this.fetchUserData();
+    this.userForm = this.setUserForm(this.activeActionbutton);
     this.fileUploadControl = this._fileUploadService.createFileUploadControl();
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource$.pipe(
+      tap((dataSource) => (dataSource.paginator = this.paginator))
+    );
+  }
+
+  //Filters
+  private filterUserRolesOptions(): USER_ROLES[] {
+    const roles = this._tokenService.getUserRoles();
+
+    const filteredOptions = USER_ROLES_OPTIONS.filter((option) =>
+      option.showForRoles.some((role) => roles.includes(role))
+    );
+
+    return filteredOptions.map((option) => option.value);
   }
 
   //TABLE
-  private setDataSource(): void {
+  private fetchUserData(): Observable<MatTableDataSource<IUserTable>> {
     this.isLoading = true;
-    this._userService
-      .list(this.filters, this.pagination)
-      .pipe(
-        map((res) => {
-          const users = res.data?.result || [];
-          // console.log('🚀 ~ UsersComponent ~ map ~ users:', users);
-          const usersWithAction = users.map((user) => ({
-            ...user,
-            actions: COMMON_TABLE_ACTIONS,
-          }));
-          this.totalDataCount = res.data?.totalCount || 0;
-          return new MatTableDataSource<IUserTable>(usersWithAction);
-        })
-      )
-      .subscribe((dataSource) => {
-        this.dataSource = dataSource;
-        this.isLoading = false;
-      });
+    return this._userService.list(this.userFilters, this.userPagination).pipe(
+      map((res) => this.transformUserData(res)),
+      finalize(() => (this.isLoading = false))
+    );
+  }
+
+  private transformUserData(
+    res: IApiResponse<IUser[]>
+  ): MatTableDataSource<IUserTable> {
+    const users = res.data?.result || [];
+    const usersWithAction = users.map((user) => ({
+      ...user,
+      actions: COMMON_TABLE_ACTIONS,
+    }));
+    this.totalCount = res.data?.totalCount || 0;
+    return new MatTableDataSource<IUserTable>(usersWithAction);
   }
 
   public onPageChange($event: PageEvent): void {
     const { pageIndex, pageSize } = $event;
-    this.pagination = { page: pageIndex + 1, limit: pageSize };
-    this.setDataSource();
+    this.userPagination = { page: pageIndex + 1, limit: pageSize };
+    this.dataSource$ = this.fetchUserData();
   }
 
   //BUTTONS
@@ -167,12 +203,19 @@ export class UsersComponent implements OnInit, AfterViewInit {
     actionButton: ITableAction,
     element: IUserTable | null
   ): void {
-    this.buttonActive = actionButton;
-    this.titlePopup = actionButton.label;
-    this.userSelected = element;
-    this.userForm = this.setUserForm(actionButton);
-    this.patchValueToForm(actionButton, element);
+    this.initializeFormForAction(actionButton, element);
+    this.populateFormWithUserData(actionButton, element);
     this.togglePopup();
+  }
+
+  private initializeFormForAction(
+    actionButton: ITableAction,
+    element: IUserTable | null
+  ): void {
+    this.activeActionbutton = actionButton;
+    this.titlePopup = actionButton.label;
+    this.selectedUser = element;
+    this.userForm = this.setUserForm(actionButton);
   }
 
   //POPUP
@@ -180,41 +223,86 @@ export class UsersComponent implements OnInit, AfterViewInit {
     this.classApplied = !this.classApplied;
   }
 
-  public onClosedPopup(): void {
-    this.togglePopup();
+  public closePopup(): void {
     this.userForm.reset();
     this.fileUploadControl.clear();
-    this.userSelected = null;
+    this.activeTabIndex = 0;
+    this.selectedUser = null;
+    this.resetUserRoleOptions();
+    this.togglePopup();
+  }
+
+  private resetUserRoleOptions(): void {
+    this.userRoleOptions.forEach((role) => (role.enabled = true));
+  }
+
+  //TAB
+  public changeTab($event: MatTabChangeEvent): void {
+    const { index } = $event;
+    const actionButton = this.getActionButtonByIndex(index);
+    this.initializeFormForAction(actionButton, null);
+    this.fileUploadControl.clear();
+  }
+
+  private getActionButtonByIndex(index: number): ITableAction {
+    const actionMap = new Map<number, ITableAction>([
+      [0, this.actionButtonAdd],
+      [1, this.actionButtonAddGroup],
+    ]);
+    return actionMap.get(index) || this.actionButtonAdd;
   }
 
   //FORM
-  public setUserForm(buttonActive: ITableAction): FormGroup<any> {
-    if (buttonActive.name === TABLE_ACTIONS.ADD) {
-      return this._formBuilder.group({
-        roles: [null, [Validators.required]],
-      });
-    }
+  public setUserForm(buttonActive: ITableAction): FormGroup {
+    const formConfig = this.getFormConfigByAction(buttonActive);
+    return this._formBuilder.group(formConfig);
+  }
 
-    if (buttonActive.name === TABLE_ACTIONS.DELETE) {
-      return this._formBuilder.group({});
-    }
-
-    // default for view and edit
-    return this._formBuilder.group({
+  private getFormConfigByAction(buttonActive: ITableAction): {} {
+    const defaultConfig = {
       name: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', [Validators.required, Validators.maxLength(10)]],
       roles: ['', [Validators.required]],
+    };
+
+    const addConfig = {
+      ...defaultConfig,
+      password: ['', [Validators.required]],
+    };
+
+    const addGroupConfig = {
+      roles: ['', [Validators.required]],
+    };
+
+    const viewAndEditConfig = {
+      ...defaultConfig,
       status: ['', [Validators.required]],
-    });
+    };
+
+    const actionMap = new Map<TABLE_ACTIONS, {}>([
+      [TABLE_ACTIONS.ADD, addConfig],
+      [TABLE_ACTIONS.ADD_GROUP, addGroupConfig],
+      [TABLE_ACTIONS.VIEW, viewAndEditConfig],
+      [TABLE_ACTIONS.EDIT, viewAndEditConfig],
+      [TABLE_ACTIONS.DELETE, {}],
+    ]);
+
+    return actionMap.get(buttonActive.name) || {};
   }
 
-  public patchValueToForm(
+  public populateFormWithUserData(
     buttonActive: ITableAction,
     rowSelected: IUserTable | null
   ): void {
-    if (buttonActive.name === TABLE_ACTIONS.ADD || !rowSelected) return;
+    if (
+      buttonActive.name === TABLE_ACTIONS.ADD ||
+      buttonActive.name === TABLE_ACTIONS.ADD_GROUP ||
+      !rowSelected
+    ) {
+      return;
+    }
 
     const { name, lastName, email, phoneNumber, roles, status } = rowSelected;
     this.userForm.patchValue({
@@ -225,6 +313,13 @@ export class UsersComponent implements OnInit, AfterViewInit {
       roles,
       status,
     });
+
+    this.toggleFormState(buttonActive);
+
+    this.updateRoleOptionsBasedOnSelection(roles);
+  }
+
+  private toggleFormState(buttonActive: ITableAction): void {
     buttonActive.name === TABLE_ACTIONS.VIEW
       ? this.userForm.disable()
       : this.userForm.enable();
@@ -234,25 +329,98 @@ export class UsersComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private updateRoleOptionsBasedOnSelection(roles: USER_ROLES[]): void {
+    const { isStudentSelected, areAdminSupervisorTeacherSelected } =
+      this.checkRoleSelection(roles);
+
+    this.userRoleOptions.forEach((option) => {
+      if (option.value === USER_ROLES.STUDENT) {
+        option.enabled = !areAdminSupervisorTeacherSelected;
+      } else {
+        option.enabled = !isStudentSelected;
+      }
+    });
+  }
+
+  private checkRoleSelection(selectedValues: USER_ROLES[]): {
+    isStudentSelected: boolean;
+    areAdminSupervisorTeacherSelected: boolean;
+  } {
+    const isStudentSelected = selectedValues.includes(USER_ROLES.STUDENT);
+    const areAdminSupervisorTeacherSelected = selectedValues.some((role) =>
+      [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR, USER_ROLES.TEACHER].includes(
+        role
+      )
+    );
+
+    return { isStudentSelected, areAdminSupervisorTeacherSelected };
+  }
+
+  public updateRoleSelection(event: MatSelectChange): void {
+    const selectedValues = event.value as USER_ROLES[];
+    this.updateRoleOptionsBasedOnSelection(selectedValues);
+    this.removeConflictingRoles(selectedValues);
+  }
+
+  private removeConflictingRoles(selectedValues: USER_ROLES[]): void {
+    const { isStudentSelected, areAdminSupervisorTeacherSelected } =
+      this.checkRoleSelection(selectedValues);
+
+    if (isStudentSelected && areAdminSupervisorTeacherSelected) {
+      this.userForm.patchValue({
+        roles: selectedValues.filter((role) => role !== USER_ROLES.STUDENT),
+      });
+    }
+  }
+
   public onSubmit(): void {
     if (this.userForm.invalid) return;
 
-    if (this.buttonActive.name === TABLE_ACTIONS.ADD) this.onAddUser();
-    if (this.buttonActive.name === TABLE_ACTIONS.EDIT) this.onEditUser();
-    if (this.buttonActive.name === TABLE_ACTIONS.DELETE) this.onDeleteUser();
+    const actionHandler = this.getActionHandlerByButton(
+      this.activeActionbutton
+    );
 
-    this.onClosedPopup();
+    actionHandler();
+  }
+
+  private getActionHandlerByButton(button: ITableAction): () => void {
+    const actionMap = new Map<TABLE_ACTIONS, () => void>([
+      [TABLE_ACTIONS.ADD, () => this.onAddUser()],
+      [TABLE_ACTIONS.ADD_GROUP, () => this.onAddGroupUser()],
+      [TABLE_ACTIONS.EDIT, () => this.onEditUser()],
+      [TABLE_ACTIONS.DELETE, () => this.onDeleteUser()],
+    ]);
+    return actionMap.get(button.name) || (() => {});
   }
 
   private onAddUser(): void {
+    const { name, lastName, email, password, phoneNumber, roles } =
+      this.userForm.value;
+
+    const newUser: Partial<IUser> = {
+      name,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      roles,
+    };
+
+    this._userService
+      .register(newUser)
+      .subscribe(() => this.afterProcessAction());
+  }
+
+  private onAddGroupUser(): void {
     if (
       this.fileUploadControl.invalid ||
       !this.fileUploadControl.value.length
     ) {
       return;
     }
+
     const { roles } = this.userForm.value;
-    this.fileUploadControl.value;
+
     this._excelService
       .readExcel<Partial<IUser>>(
         this.fileUploadControl.value,
@@ -263,41 +431,48 @@ export class UsersComponent implements OnInit, AfterViewInit {
           const convertedUser = convertToSchemaType<IUser>(user, USER_SCHEMA);
           return { ...convertedUser, roles };
         });
+
         this._userService
           .registerGroup(usersWithRolesAndCorrectTypes)
-          .subscribe(() => this.setDataSource());
+          .subscribe(() => this.afterProcessAction());
       });
   }
 
   private onEditUser(): void {
-    if (!this.userSelected) return;
-    const { id, name, lastName, email, phoneNumber, roles, status } =
-      this.userSelected;
+    if (!this.selectedUser) return;
+    const { id, name, lastName, phoneNumber, roles, status } =
+      this.selectedUser;
     const formValues: Partial<IUser> = this.userForm.value;
     const userSelectedValues: Partial<IUser> = {
       name,
       lastName,
-      // email,
       phoneNumber,
       roles,
       status,
     };
+
     const updatedFields = this._dataComparisonService.compareAndUpdate<IUser>(
       formValues,
       userSelectedValues,
       KEYS_TO_UPDATE_USER
     );
+
     if (Object.keys(updatedFields).length > 0) {
       this._userService
         .update(id, updatedFields)
-        .subscribe(() => this.setDataSource());
+        .subscribe(() => this.afterProcessAction());
     }
   }
 
   private onDeleteUser(): void {
-    if (!this.userSelected) return;
+    if (!this.selectedUser) return;
     this._userService
-      .delete(this.userSelected.id)
-      .subscribe(() => this.setDataSource());
+      .delete(this.selectedUser.id)
+      .subscribe(() => this.afterProcessAction());
+  }
+
+  private afterProcessAction(): void {
+    this.closePopup();
+    this.dataSource$ = this.fetchUserData();
   }
 }

@@ -6,15 +6,6 @@ import {
   ITableAction,
 } from '../interfaces/component.interface';
 
-export const COMMON_TABLE_ACTIONS: {
-  label: string;
-  name: TABLE_ACTIONS;
-}[] = [
-  { label: 'Ver', name: TABLE_ACTIONS.VIEW },
-  { label: 'Editar', name: TABLE_ACTIONS.EDIT },
-  { label: 'Eliminar', name: TABLE_ACTIONS.DELETE },
-];
-
 export const BASE_STATES_MAT_SELECT: IMatSelectOption<string>[] = [
   { value: 'active', viewValue: 'Activo' },
   { value: 'inactive', viewValue: 'Inactivo' },
@@ -39,29 +30,48 @@ export const ACTION_BUTTON_ADD: ITableAction = {
   name: TABLE_ACTIONS.ADD,
 };
 
+export const ACTION_BUTTON_ADD_GROUP: ITableAction = {
+  label: 'Agregar grupo de',
+  name: TABLE_ACTIONS.ADD_GROUP,
+};
+
+export const COMMON_TABLE_ACTIONS: {
+  label: string;
+  name: TABLE_ACTIONS;
+}[] = [
+  { label: 'Ver', name: TABLE_ACTIONS.VIEW },
+  { label: 'Editar', name: TABLE_ACTIONS.EDIT },
+  { label: 'Eliminar', name: TABLE_ACTIONS.DELETE },
+];
+
 export const USER_ROLES_OPTIONS: {
   value: USER_ROLES;
   viewValue: string;
+  enabled: boolean;
   showForRoles: USER_ROLES[];
 }[] = [
   {
     value: USER_ROLES.ADMIN,
     viewValue: 'Administrador',
+    enabled: true,
     showForRoles: [USER_ROLES.ADMIN],
   },
   {
     value: USER_ROLES.SUPERVISOR,
     viewValue: 'Supervisor',
+    enabled: true,
     showForRoles: [USER_ROLES.ADMIN],
   },
   {
     value: USER_ROLES.TEACHER,
     viewValue: 'Profesor',
+    enabled: true,
     showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
   },
   {
     value: USER_ROLES.STUDENT,
     viewValue: 'Estudiante',
+    enabled: true,
     showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
   },
 ];
