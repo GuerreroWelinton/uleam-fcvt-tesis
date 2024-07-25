@@ -31,7 +31,7 @@ export const ACTION_BUTTON_ADD: ITableAction = {
 };
 
 export const ACTION_BUTTON_ADD_GROUP: ITableAction = {
-  label: 'Agregar grupo de',
+  label: 'Agregar grupo',
   name: TABLE_ACTIONS.ADD_GROUP,
 };
 

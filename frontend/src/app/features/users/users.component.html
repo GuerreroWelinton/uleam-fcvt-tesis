@@ -144,7 +144,10 @@
     >
       <mat-card-header>
         <mat-card-title>
-          <h5 class="mt-0 mb-0">{{ titlePopup }} usuario</h5>
+          <h5 class="mt-0 mb-0">
+            @if (activeActionbutton.name === actionButtons.ADD_GROUP) {
+            {{ titlePopup }} de usuarios } @else { {{ titlePopup }} usuario }
+          </h5>
         </mat-card-title>
         <mat-card-subtitle>
           <button mat-button (click)="closePopup()">
@@ -235,7 +238,7 @@
           type="submit"
           [disabled]="userForm.invalid || !fileUploadControl.value.length"
         >
-          {{ titlePopup }} usuario
+          {{ titlePopup }}
         </button>
       </div>
     </div>
