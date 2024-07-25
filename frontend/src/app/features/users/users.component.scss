@@ -1,0 +1,15 @@
+.user-form-box {
+  height: 677px;
+}
+.user-form-template-box {
+  height: 435px;
+}
+
+@media (max-width: 768px) {
+  .user-form-box {
+    height: 640px;
+  }
+  .user-form-template-box {
+    height: 425px;
+  }
+}
