@@ -22,7 +22,8 @@
     <div class="sidebar-inner">
       <div class="sidebar-menu">
         <mat-accordion>
-          <span class="sub-title text-body"> PRINCIPAL </span>
+          <!-- INICIO -->
+          <span class="sub-title text-body"> INICIO </span>
           <a
             routerLink="/dashboard"
             class="sidebar-menu-link"
@@ -33,7 +34,8 @@
             <span class="title"> Tablero </span>
           </a>
 
-          <span class="sub-title text-body"> FUNCIONES </span>
+          <!-- SERVICIOS -->
+          <span class="sub-title text-body"> SERVICIOS </span>
           <a
             routerLink="/educational-spaces"
             class="sidebar-menu-link"
@@ -43,23 +45,13 @@
             <i class="material-symbols-outlined"> chat </i>
             <span class="title"> Mis espacios </span>
           </a>
-          <a
-            routerLink="/users"
-            class="sidebar-menu-link"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
-          >
-            <i class="material-symbols-outlined"> group </i>
-            <span class="title"> Usuarios </span>
-          </a>
 
-          <!-- Configuración -->
+          <!-- ADMINISTRACIÓN -->
           <span
             class="sub-title text-body"
-            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
           >
-            CONFIGURACIÓN
+            ADMINISTRACIÓN
           </span>
 
           <a
@@ -104,6 +96,17 @@
           >
             <i class="material-symbols-outlined"> group </i>
             <span class="title"> Asignaturas </span>
+          </a>
+
+          <a
+            routerLink="/users"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Usuarios </span>
           </a>
 
           <!-- Ayuda -->
