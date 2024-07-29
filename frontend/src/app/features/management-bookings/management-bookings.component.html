@@ -14,8 +14,8 @@
   </ol>
 </div>
 
-@for (eduSpace of (eduSpaces$ | async); track $index) {
 <div class="row">
+  @for (eduSpace of (eduSpaces$ | async); track $index) {
   <div class="col-lg-4 col-md-6">
     <mat-card
       class="daxa-card mb-25 border-radius bg-white border-none d-block"
@@ -33,5 +33,5 @@
       </mat-card-content>
     </mat-card>
   </div>
+  }
 </div>
-}
