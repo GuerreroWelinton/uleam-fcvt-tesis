@@ -83,7 +83,6 @@ import { UsersService } from '../users/services/users.service';
     OnlyNumbersDirective,
   ],
   templateUrl: './management-educational-spaces.component.html',
-  styleUrl: './management-educational-spaces.component.scss',
 })
 export default class ManagementEducationalSpacesComponent
   implements OnInit, AfterViewInit

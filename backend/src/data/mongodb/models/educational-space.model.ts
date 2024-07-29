@@ -1,23 +1,23 @@
 import mongoose from "mongoose";
-import { BASE_RECORD_STATES, DAY_OF_WEEK } from "../../../constants/constants";
+import { BASE_RECORD_STATES } from "../../../constants/constants";
 
-const HoursOfOperationSchema = new mongoose.Schema({
-  dayOfWeek: {
-    type: String,
-    enum: Object.values(DAY_OF_WEEK),
-    required: [true, "Day of week is required"],
-  },
-  startTime: {
-    type: String,
-    match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
-    required: [true, "Start is required"],
-  },
-  endTime: {
-    type: String,
-    match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
-    required: [true, "End is required"],
-  },
-});
+// const HoursOfOperationSchema = new mongoose.Schema({
+//   dayOfWeek: {
+//     type: String,
+//     enum: Object.values(DAY_OF_WEEK),
+//     required: [true, "Day of week is required"],
+//   },
+//   startTime: {
+//     type: String,
+//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
+//     required: [true, "Start is required"],
+//   },
+//   endTime: {
+//     type: String,
+//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
+//     required: [true, "End is required"],
+//   },
+// });
 
 const EducationalSpaceSchema = new mongoose.Schema(
   {

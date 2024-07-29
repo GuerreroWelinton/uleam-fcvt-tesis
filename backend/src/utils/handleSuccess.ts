@@ -8,7 +8,7 @@ export const handleSuccess = <T>(
   const response: IApiResponse<T> = {
     code: 200,
     status: "success",
-    message: apiResponse.message || "Operation completed successfully",
+    message: apiResponse.message || "Operación realizada con éxito",
     data: apiResponse.data,
     token: apiResponse.token,
   };

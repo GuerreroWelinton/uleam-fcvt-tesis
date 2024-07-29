@@ -1,0 +1,15 @@
+<mat-card class="daxa-card mb-25 border-radius bg-white border-none d-block">
+  <mat-card-content>
+    <div class="d-flex flex-column align-items-center">
+      <h5 class="mb-10">{{ eduSpaceData.name }}</h5>
+      <i class="ri-building-2-fill building-icon"></i>
+      <h5>{{ eduSpaceData.building.name }}</h5>
+      <p>Código: {{ eduSpaceData.code }}</p>
+      <p>Capacidad: {{ eduSpaceData.capacity }}</p>
+      <p>Piso: {{ eduSpaceData.floor }}</p>
+      <button mat-raised-button class="daxa mt-2" (click)="emitSelected()">
+        Seleccionar
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
