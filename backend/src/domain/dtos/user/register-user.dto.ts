@@ -10,7 +10,10 @@ export class RegisterUserDto {
     public phoneNumber: string,
     public roles?: USER_ROLES[],
     public status?: BASE_RECORD_STATES
-  ) {}
+  ) {
+    this.roles = roles || [USER_ROLES.STUDENT];
+    this.status = status || BASE_RECORD_STATES.ACTIVE;
+  }
 
   static create(object: { [key: string]: any }): [string?, RegisterUserDto?] {
     const { name, lastName, email, password, phoneNumber, roles, status } =

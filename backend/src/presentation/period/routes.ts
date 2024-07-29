@@ -14,10 +14,7 @@ export class PeriodRoutes {
     const periodRepository = new PeriodRepositoryImpl(periodDataSource);
     const periodController = new PeriodController(periodRepository);
 
-    router.get("/list", [AuthMiddleware.validateJWT], periodController.list);
-
-    //findById
-    //findOneByCode
+    router.get("/list", periodController.list);
 
     router.post(
       "/register",

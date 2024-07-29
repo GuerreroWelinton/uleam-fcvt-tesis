@@ -23,7 +23,7 @@ export const BASE_STATES_OPTIONS: IStatusOption = {
   [BASE_RECORD_STATES.INACTIVE]: { label: 'Inactivo', class: 'rejected' },
 };
 
-export const DEFAULT_PAGE_SIZE: number[] = [5, 10, 25, 100];
+export const DEFAULT_PAGE_SIZE: number[] = [10, 25, 100];
 
 export const ACTION_BUTTON_ADD: ITableAction = {
   label: 'Agregar',

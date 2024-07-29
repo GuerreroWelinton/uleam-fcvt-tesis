@@ -14,3 +14,13 @@ export enum KEYS_LOCAL_STORAGE {
   TOKEN = 'token',
   PERIOD = 'selectedPeriod',
 }
+
+export enum DAY_OF_WEEK {
+  MONDAY = 'monday',
+  TUESDAY = 'tuesday',
+  WEDNESDAY = 'wednesday',
+  THURSDAY = 'thursday',
+  FRIDAY = 'friday',
+  SATURDAY = 'saturday',
+  SUNDAY = 'sunday',
+}

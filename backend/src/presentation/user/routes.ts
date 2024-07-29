@@ -21,7 +21,7 @@ export class UserRoutes {
 
     router.post(
       "/register",
-      [AuthMiddleware.validateJWT],
+      // [AuthMiddleware.validateJWT],
       userController.register
     );
 

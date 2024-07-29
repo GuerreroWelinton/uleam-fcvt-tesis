@@ -35,15 +35,21 @@
           </a>
 
           <!-- SERVICIOS -->
-          <span class="sub-title text-body"> SERVICIOS </span>
+          <span
+            class="sub-title text-body"
+            *sharedShowForRoles="[USER_ROLES.TEACHER]"
+          >
+            SERVICIOS
+          </span>
           <a
-            routerLink="/educational-spaces"
+            routerLink="/bookings"
             class="sidebar-menu-link"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.TEACHER]"
           >
             <i class="material-symbols-outlined"> chat </i>
-            <span class="title"> Mis espacios </span>
+            <span class="title"> Reservas </span>
           </a>
 
           <!-- ADMINISTRACIÓN -->
@@ -63,17 +69,6 @@
           >
             <i class="material-symbols-outlined"> group </i>
             <span class="title"> Periodos </span>
-          </a>
-
-          <a
-            routerLink="/buildings"
-            class="sidebar-menu-link"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            *sharedShowForRoles="[USER_ROLES.ADMIN]"
-          >
-            <i class="material-symbols-outlined"> group </i>
-            <span class="title"> Edificios </span>
           </a>
 
           <a
@@ -109,7 +104,40 @@
             <span class="title"> Usuarios </span>
           </a>
 
-          <!-- Ayuda -->
+          <a
+            routerLink="/buildings"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Edificios </span>
+          </a>
+
+          <a
+            routerLink="/management-educational-spaces"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.ADMIN]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Espacios </span>
+          </a>
+
+          <a
+            routerLink="/management-bookings"
+            class="sidebar-menu-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *sharedShowForRoles="[USER_ROLES.SUPERVISOR]"
+          >
+            <i class="material-symbols-outlined"> group </i>
+            <span class="title"> Reservas </span>
+          </a>
+
+          <!-- AYUDA -->
           <span class="sub-title text-body"> AYUDA </span>
           <a
             routerLink="/tutorials"

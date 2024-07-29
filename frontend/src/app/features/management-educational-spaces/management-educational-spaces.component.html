@@ -1,0 +1,319 @@
+<!-- BREADCRUMB -->
+<div
+  class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-between"
+>
+  <h5 class="mb-0">Espacios educativos</h5>
+  <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
+    <li class="breadcrumb-item position-relative">
+      <a routerLink="/" class="d-inline-block position-relative">
+        <i class="ri-settings-3-fill"></i>
+        <span>Administración</span>
+      </a>
+    </li>
+    <li class="breadcrumb-item position-relative">Espacios educativos</li>
+  </ol>
+</div>
+
+<!-- TABLE -->
+<div class="row">
+  <div class="col-lg-12">
+    <mat-card
+      class="daxa-card mb-20 border-radius bg-white border-none d-block"
+    >
+      <mat-card-header>
+        <mat-card-title>
+          <button
+            mat-button
+            class="text-daxa p-0 h-auto"
+            (click)="onActionButton(actionButtonAdd, null)"
+          >
+            + Agregar espacio educativo
+          </button>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div [class.component-dark-theme]="themeService.isDark()">
+          @if (isLoading) {
+          <mat-progress-bar mode="query"></mat-progress-bar>
+          }
+
+          <div class="splitter-table-container" tabindex="0">
+            <table mat-table [dataSource]="(dataSource$ | async)!">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.name }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>Código</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.code }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="capacity">
+                <th mat-header-cell *matHeaderCellDef>Capacidad</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.capacity }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="floor">
+                <th mat-header-cell *matHeaderCellDef>Piso</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.floor }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let element">
+                  @if (element.status | statusFormatter; as formattedStatus) {
+                  <span
+                    class="daxa-badge d-inline-block"
+                    [ngClass]="formattedStatus.class"
+                  >
+                    {{ formattedStatus.label }}
+                  </span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                  Acciones
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <div class="action-info">
+                    @for (actionButton of element.actions; track $index) {
+                    <button
+                      type="button"
+                      mat-button
+                      [matTooltip]="actionButton.label"
+                      matTooltipPosition="above"
+                      (click)="onActionButton(actionButton, element)"
+                    >
+                      <i class="material-symbols-outlined">
+                        {{ actionButton.name }}
+                      </i>
+                    </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="displayedColumns; sticky: true"
+              ></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          </div>
+
+          <div class="mt-10">
+            <mat-paginator
+              [length]="totalCount"
+              [pageSizeOptions]="defaultPageSize"
+            ></mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="popup-container" [class.active]="classApplied">
+  <div class="popup-dialog">
+    <mat-card
+      class="daxa-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-header>
+        <mat-card-title>
+          <h5 class="mt-0 mb-0">{{ titlePopup }} espacio educativo</h5>
+        </mat-card-title>
+        <mat-card-subtitle>
+          <button mat-button (click)="closePopup()">
+            <i class="ri-close-fill"></i>
+          </button>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="eduSpaceForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            @if (activeActionButton.name !== actionButtons.DELETE) {
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">Nombre</label>
+              <mat-form-field>
+                <mat-label>Nombre</mat-label>
+                <input
+                  matInput
+                  placeholder="Ej. Labaratorio de ejemplo"
+                  formControlName="name"
+                  [sharedMaxChar]="50"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">Código</label>
+              <mat-form-field>
+                <mat-label>Código</mat-label>
+                <input
+                  matInput
+                  placeholder="Ej. LAB-001"
+                  formControlName="code"
+                  [sharedMaxChar]="20"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black"
+                >Capacidad</label
+              >
+              <mat-form-field>
+                <mat-label>Capacidad</mat-label>
+                <input
+                  matInput
+                  placeholder="Ej. 20"
+                  formControlName="capacity"
+                  sharedOnlyNumbers
+                  [sharedMaxChar]="2"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-12">
+              <label class="main-label d-block lh-1 text-black">
+                Edificio
+              </label>
+              <mat-form-field>
+                <mat-label> Edificio </mat-label>
+                <mat-select
+                  formControlName="buildingId"
+                  (selectionChange)="onBuildingChange($event)"
+                >
+                  @for (career of (buildings$ | async); track $index) {
+                  <mat-option [value]="career.value">
+                    {{ career.viewValue }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">Piso</label>
+              <mat-form-field>
+                <mat-label>Piso</mat-label>
+                <mat-select formControlName="floor">
+                  @for(floor of floorsOptions; track $index) {
+                  <mat-option [value]="floor">
+                    {{ floor }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">Usuarios</label>
+              <mat-form-field>
+                <mat-label> Usuarios </mat-label>
+                <mat-chip-grid
+                  #chipGrid
+                  aria-label="Users selection"
+                  [disabled]="disabledMatChip"
+                >
+                  @for (user of usersSelected; track user.value) {
+                  <mat-chip-row (removed)="onRemoveUser(user.value)">
+                    {{ user.viewValue }}
+                    <button
+                      matChipRemove
+                      [attr.aria-label]="'remove ' + user.value"
+                    >
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                  }
+                </mat-chip-grid>
+                <input
+                  #usersInput
+                  formControlName="usersId"
+                  [matAutocomplete]="auto"
+                  [matChipInputFor]="chipGrid"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  [matChipInputAddOnBlur]="false"
+                />
+                <mat-autocomplete
+                  requireSelection
+                  #auto="matAutocomplete"
+                  (optionSelected)="onSelectedUser($event)"
+                >
+                  @for (user of (users$ | async); track user.value) {
+                  <mat-option [value]="user.value">
+                    {{ user.viewValue }}
+                  </mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+
+            @if (activeActionButton.name !== actionButtons.ADD) {
+            <div class="col-md-12">
+              <label class="main-label d-block lh-1 text-black">Estado</label>
+              <mat-form-field>
+                <mat-label> Estado </mat-label>
+                <mat-select formControlName="status">
+                  @for (state of baseStatesOptions; track $index) {
+                  <mat-option [value]="state.value">
+                    {{ state.viewValue }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+            }
+            <!--  -->
+            }
+            <!--  -->
+            @if (activeActionButton.name === actionButtons.DELETE) {
+            <div class="col-md-12 pb-15">
+              <p>
+                ¿Está seguro de que desea proceder? Esta acción cambiará el
+                estado del espacio educativo seleccionado a "Eliminado". Una vez
+                eliminado, el espacio educativo no estará accesible ni podrá ser
+                operado en el futuro. Por favor, asegúrese de que desea
+                continuar con esta acción irreversible.
+              </p>
+            </div>
+            }
+            <!--  -->
+
+            <!--  -->
+            @if (activeActionButton.name !== actionButtons.VIEW) {
+            <div class="btn-box">
+              <button mat-button type="button" (click)="closePopup()">
+                Cancelar
+              </button>
+              <button
+                mat-button
+                type="submit"
+                [disabled]="eduSpaceForm.invalid"
+              >
+                {{ titlePopup }}
+              </button>
+            </div>
+            }
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

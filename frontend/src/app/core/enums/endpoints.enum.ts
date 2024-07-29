@@ -20,4 +20,5 @@ export enum BASE_ENDPOINTS {
   REGISTER_GROUP = '/register-group',
   UPDATE = '/update',
   DELETE = '/delete',
+  LIST_BY_USER = '/list-by-user',
 }

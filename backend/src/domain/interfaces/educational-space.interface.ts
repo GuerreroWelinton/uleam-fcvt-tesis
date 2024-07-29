@@ -8,7 +8,7 @@ export interface IEducationalSpace extends IBaseRecord {
   code: string;
   floor: number;
   capacity: number;
-  hoursOfOperation: IHoursOfOperation[];
+  // hoursOfOperation: IHoursOfOperation[];
   building: IBuilding;
   users: IUser[];
   status: BASE_RECORD_STATES;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -18,14 +18,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FileUploadModule } from '@iplab/ngx-file-upload';
 
-import { BASE_RECORD_STATES } from '../../core/enums/general.enum';
-import { TableCheckboxService } from '../../core/services/table-checkbox.service';
-import { TableFilterService } from '../../core/services/table-filter.service';
-import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
+import { map, Observable, of } from 'rxjs';
 import {
   BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
 } from '../../core/constants/component.constant';
+import { BASE_RECORD_STATES } from '../../core/enums/general.enum';
+import { TableCheckboxService } from '../../core/services/table-checkbox.service';
+import { TableFilterService } from '../../core/services/table-filter.service';
+import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
+import { IEducationalSpace } from '../management-educational-spaces/interfaces/educational-spaces.interface';
+import { ManagementEducationalSpacesService } from '../management-educational-spaces/services/management-educational-spaces.service';
 
 @Component({
   selector: 'app-educational-spaces',
@@ -49,7 +52,9 @@ import {
   templateUrl: './educational-spaces.component.html',
   styleUrl: './educational-spaces.component.scss',
 })
-export class EducationalSpacesComponent {
+export default class EducationalSpacesComponent implements OnInit {
+  public eduSpaces$: Observable<IEducationalSpace[]> = of([]);
+
   public showCalendar: boolean = false;
 
   public toggleCalendar() {
@@ -114,8 +119,13 @@ export class EducationalSpacesComponent {
   constructor(
     public themeService: CustomizerSettingsService,
     private readonly _tableFilterSvc: TableFilterService,
-    private readonly _tableCheckboxSvc: TableCheckboxService
+    private readonly _tableCheckboxSvc: TableCheckboxService,
+    private _educationalSpacesService: ManagementEducationalSpacesService
   ) {}
+
+  ngOnInit(): void {
+    this.eduSpaces$ = this.fetchEducationalSpaces();
+  }
 
   public dataSource: MatTableDataSource<any, MatPaginator> =
     new MatTableDataSource<any>(ELEMENT_DATA);
@@ -125,6 +135,12 @@ export class EducationalSpacesComponent {
   public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
 
   public statusOptions: any = BASE_STATES_OPTIONS;
+
+  private fetchEducationalSpaces(): Observable<IEducationalSpace[]> {
+    return this._educationalSpacesService
+      .list()
+      .pipe(map((res) => res.data?.result || []));
+  }
 
   // Filter
   public applyFilter(event: Event): void {
