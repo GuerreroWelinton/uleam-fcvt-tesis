@@ -63,15 +63,7 @@ export class AppComponent {
   ngOnInit() {
     this.recallJsFuntions();
     this._store.dispatch(UserActions.preAuth());
-    // this.fetchPeriods();
   }
-
-  // private fetchPeriods(): void {
-  //   this._periodService.getPeriods().subscribe({
-  //     next: (res) =>
-  //       this._periodService.selectLatestPeriod(res.data?.result || []),
-  //   });
-  // }
 
   private recallJsFuntions() {
     this.routerSubscription = this.router.events

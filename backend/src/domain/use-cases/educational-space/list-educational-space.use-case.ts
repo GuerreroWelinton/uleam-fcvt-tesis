@@ -22,7 +22,7 @@ export class ListEducationalSpace implements ListEducationalSpaceUseCase {
             code,
             floor,
             capacity,
-            hoursOfOperation,
+            // hoursOfOperation,
             building,
             users,
             status,
@@ -35,10 +35,10 @@ export class ListEducationalSpace implements ListEducationalSpaceUseCase {
             code,
             floor,
             capacity,
-            hoursOfOperation: hoursOfOperation.map((operation) => {
-              const { dayOfWeek, startTime, endTime } = operation;
-              return { dayOfWeek, startTime, endTime };
-            }),
+            // hoursOfOperation: hoursOfOperation.map((operation) => {
+            //   const { dayOfWeek, startTime, endTime } = operation;
+            //   return { dayOfWeek, startTime, endTime };
+            // }),
             building: {
               id: building.id,
               name: building.name,

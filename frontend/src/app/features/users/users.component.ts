@@ -49,7 +49,7 @@ import {
   USER_SCHEMA,
 } from './helpers/user.constant';
 import { IUser, IUserTable } from './interfaces/user.interface';
-import { UsersService } from './service/users.service';
+import { UsersService } from './services/users.service';
 
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { USER_ROLES } from '../../core/enums/general.enum';
@@ -89,7 +89,7 @@ import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
 })
-export class UsersComponent implements OnInit, AfterViewInit {
+export default class UsersComponent implements OnInit, AfterViewInit {
   //TABLE
   @ViewChild(MatPaginator)
   public paginator: MatPaginator;

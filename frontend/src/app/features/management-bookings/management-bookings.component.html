@@ -1,0 +1,37 @@
+<!-- BREADCRUMB -->
+<div
+  class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-between"
+>
+  <h5 class="mb-0">Reservas</h5>
+  <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
+    <li class="breadcrumb-item position-relative">
+      <a routerLink="/" class="d-inline-block position-relative">
+        <i class="ri-settings-3-fill"></i>
+        <span>Administración</span>
+      </a>
+    </li>
+    <li class="breadcrumb-item position-relative">Reservas</li>
+  </ol>
+</div>
+
+@for (eduSpace of (eduSpaces$ | async); track $index) {
+<div class="row">
+  <div class="col-lg-4 col-md-6">
+    <mat-card
+      class="daxa-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <div class="d-flex flex-column align-items-center">
+          <h5 class="mb-10">{{ eduSpace.name }}</h5>
+          <i class="ri-building-2-fill building-icon"></i>
+          <h5>{{ eduSpace.building.name }}</h5>
+          <p>Código: {{ eduSpace.code }}</p>
+          <p>Capacidad: {{ eduSpace.capacity }}</p>
+          <p>Piso: {{ eduSpace.floor }}</p>
+          <button mat-raised-button class="daxa mt-2">Seleccionar</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+}

@@ -8,6 +8,11 @@ export const selectAuthUser = createSelector(
   (state) => state.user
 );
 
+export const selectUserId = createSelector(
+  selectUserState,
+  (state) => state.user?.id
+);
+
 export const selectAuthToken = createSelector(
   selectUserState,
   (state) => state.token

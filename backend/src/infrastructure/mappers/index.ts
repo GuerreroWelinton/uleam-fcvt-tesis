@@ -12,3 +12,6 @@ export * from "./period.mapper";
 
 //Building
 export * from "./building.mapper";
+
+//EducationalSpace
+export * from "./educational-space.mapper";

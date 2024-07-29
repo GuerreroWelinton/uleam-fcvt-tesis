@@ -41,6 +41,7 @@ import { Alert, AlertService } from '../../../core/services/alert.service';
     `
       .alert {
         position: fixed;
+        margin-left: 12px;
         right: 12px;
         z-index: 1050;
         transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;

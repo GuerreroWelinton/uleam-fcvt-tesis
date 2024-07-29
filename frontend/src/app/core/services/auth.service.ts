@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment.dev';
 import { IUser } from '../../features/users/interfaces/user.interface';
-import { UsersService } from '../../features/users/service/users.service';
+import { UsersService } from '../../features/users/services/users.service';
 import { AUTH_ENDPOINTS, MAIN_ENDPOINTS } from '../enums/endpoints.enum';
 import { BASE_RECORD_STATES } from '../enums/general.enum';
 import { IApiResponse } from '../interfaces/api-response.interface';

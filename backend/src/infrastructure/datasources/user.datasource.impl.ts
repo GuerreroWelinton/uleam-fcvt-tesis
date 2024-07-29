@@ -166,7 +166,7 @@ export class UserDataSourceImpl implements UserDataSource {
         });
       }
 
-      if (usersToRegister.length === 0) {
+      if (!usersToRegister.length) {
         throw CustomError.badRequest(
           "No se han proporcionado usuarios para registrar"
         );

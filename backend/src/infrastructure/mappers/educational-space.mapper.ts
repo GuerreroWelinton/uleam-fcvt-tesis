@@ -16,9 +16,9 @@ export class EducationalSpaceMapper {
       code,
       floor,
       capacity,
-      hoursOfOperation,
+      // hoursOfOperation,
       buildingId,
-      userId,
+      usersId,
       status,
       createdAt,
       updatedAt,
@@ -30,11 +30,11 @@ export class EducationalSpaceMapper {
     if (!Validators.id.test(_id || id)) {
       throw CustomError.badRequest("Id is not valid");
     }
-    if (!code) {
-      throw CustomError.badRequest("Missing code");
-    }
     if (!name) {
       throw CustomError.badRequest("Missing name");
+    }
+    if (!code) {
+      throw CustomError.badRequest("Missing code");
     }
     if (!floor) {
       throw CustomError.badRequest("Missing floor");
@@ -42,13 +42,13 @@ export class EducationalSpaceMapper {
     if (!capacity) {
       throw CustomError.badRequest("Missing capacity");
     }
-    if (!hoursOfOperation) {
-      throw CustomError.badRequest("Missing hoursOfOperation");
-    }
+    // if (!hoursOfOperation) {
+    //   throw CustomError.badRequest("Missing hoursOfOperation");
+    // }
     const buildingEntity = BuildingMapper.buildingEntityFromObject(buildingId);
-    const usersEntity = userId.map((user: any) =>
-      UserMapper.userEntityFromObject(user)
-    );
+    const usersEntity = usersId.map((user: any) => {
+      return UserMapper.userEntityFromObject(user);
+    });
     if (!Object.values(BASE_RECORD_STATES).includes(status)) {
       throw CustomError.badRequest("Invalid status");
     }
@@ -65,7 +65,7 @@ export class EducationalSpaceMapper {
       code,
       floor,
       capacity,
-      hoursOfOperation,
+      // hoursOfOperation,
       buildingEntity,
       usersEntity,
       status,

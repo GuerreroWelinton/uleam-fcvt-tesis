@@ -37,16 +37,16 @@ const EducationalSpaceSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Capacity is required"],
     },
-    hoursOfOperation: {
-      type: [HoursOfOperationSchema],
-      required: [true, "Hours operation is required"],
-    },
+    // hoursOfOperation: {
+    //   type: [HoursOfOperationSchema],
+    //   required: [true, "Hours operation is required"],
+    // },
     buildingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Building",
       required: [true, "Building is required"],
     },
-    userId: {
+    usersId: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
       required: [true, "User is required"],
