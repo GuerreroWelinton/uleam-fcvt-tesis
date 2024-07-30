@@ -75,3 +75,16 @@ export const USER_ROLES_OPTIONS: {
     showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
   },
 ];
+
+export const BASE_LEVEL_SELECT: IMatSelectOption<string>[] = [
+  { value: 'PRIMERO', viewValue: 'PRIMERO' },
+  { value: 'SEGUNDO', viewValue: 'SEGUNDO' },
+  { value: 'TERCERO', viewValue: 'TERCERO' },
+  { value: 'CUARTO', viewValue: 'CUARTO' },
+  { value: 'QUINTO', viewValue: 'QUINTO' },
+  { value: 'SEXTO', viewValue: 'SEXTO' },
+  { value: 'SEPTIMO', viewValue: 'SEPTIMO' },
+  { value: 'OCTAVO', viewValue: 'OCTAVO' },
+  { value: 'NOVENO', viewValue: 'NOVENO' },
+  { value: 'DECIMO', viewValue: 'DECIMO' },
+];

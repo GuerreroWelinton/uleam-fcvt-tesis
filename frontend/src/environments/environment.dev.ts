@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  API_URL: 'http://localhost:3000/api/v1',
+  production: true,
+  API_URL: 'https://uleam-fcvt.site/api/v1',
 };

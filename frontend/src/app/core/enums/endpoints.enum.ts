@@ -7,6 +7,7 @@ export enum MAIN_ENDPOINTS {
   SUBJECT_CAREERS = '/subject-careers',
   EDUCATIONAL_SPACES = '/educational-spaces',
   PERIODS = '/periods',
+  RESERVATION = '/reservations',
 }
 
 export enum AUTH_ENDPOINTS {
