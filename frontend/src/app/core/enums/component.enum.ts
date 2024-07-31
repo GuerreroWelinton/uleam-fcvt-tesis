@@ -4,4 +4,5 @@ export enum TABLE_ACTIONS {
   VIEW = 'visibility',
   ADD = 'add',
   ADD_GROUP = 'add_group',
+  DOWNLOAD = 'download',
 }

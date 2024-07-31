@@ -15,3 +15,6 @@ export * from "./building.entity";
 
 //Educational Space
 export * from "./educational-space.entity";
+
+//Booking
+export * from "./booking.entity";

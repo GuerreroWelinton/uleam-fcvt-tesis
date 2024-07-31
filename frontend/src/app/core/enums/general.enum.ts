@@ -3,6 +3,13 @@ export enum BASE_RECORD_STATES {
   INACTIVE = 'inactive',
 }
 
+export enum BOOKING_STATES {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  CONFIRMED = 'confirmed',
+  REJECTED = 'rejected',
+}
+
 export enum USER_ROLES {
   ADMIN = 'admin',
   SUPERVISOR = 'supervisor',

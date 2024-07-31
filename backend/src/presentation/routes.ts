@@ -7,6 +7,7 @@ import { SubjectRoutes } from "./subject/routes";
 import { PeriodRoutes } from "./period/routes";
 import { BuildingRoutes } from "./building/routes";
 import { EducationalSpaceRoutes } from "./educational-space/routes";
+import { BookingRoutes } from "./booking/routes";
 
 export class AppRoutes {
   static get routes(): Router {
@@ -21,7 +22,8 @@ export class AppRoutes {
     router.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.PERIODS}`, PeriodRoutes.routes);
     router.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.BUILDINGS}`, BuildingRoutes.routes);
     router.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.EDUCATIONAL_SPACES}`, EducationalSpaceRoutes.routes);
-
+    router.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.BOOKINGS}`, BookingRoutes.routes);
+    
     return router;
   }
 }

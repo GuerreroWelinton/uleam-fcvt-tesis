@@ -27,8 +27,8 @@ export const routes: Routes = [
     path: 'bookings',
     canActivate: [AuthGuard, HasRole([USER_ROLES.TEACHER])],
     loadChildren: () =>
-      import('./features/educational-spaces/educational-spaces.routes').then(
-        (m) => m.EDUCATIONAL_SPACES_ROUTES
+      import('./features/bookings/bookings.routes').then(
+        (m) => m.BOOKINGS_ROUTES
       ),
   },
 

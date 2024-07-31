@@ -4,9 +4,9 @@ export enum MAIN_ENDPOINTS {
   SUBJECTS = '/subjects',
   CAREERS = '/careers',
   BUILDINGS = '/buildings',
-  SUBJECT_CAREERS = '/subject-careers',
   EDUCATIONAL_SPACES = '/educational-spaces',
   PERIODS = '/periods',
+  BOOKINGS = '/bookings',
   RESERVATION = '/reservations',
 }
 

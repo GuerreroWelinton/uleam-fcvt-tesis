@@ -19,6 +19,6 @@ export const handleError = (
     const response = createErrorResponse(error.statusCode, error.message);
     return res.status(error.statusCode).json(response);
   }
-  const response = createErrorResponse(500, "Internal Server Error");
+  const response = createErrorResponse(500, "Error interno del servidor");
   return res.status(500).json(response);
 };

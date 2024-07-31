@@ -45,3 +45,7 @@ export * from "./educational-space/register-educational-space.use-case";
 export * from "./educational-space/delete-educational-space.use-case";
 export * from "./educational-space/update-educational-space.use-case";
 export * from "./educational-space/list-by-user-id-educational-space.use-case";
+
+//Booking
+export * from "./booking/list-booking.use-case";
+export * from "./booking/register-booking.use-case";

@@ -1,0 +1,222 @@
+<div class="row">
+  <div class="col-lg-12">
+    <mat-card
+      class="daxa-card mb-20 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <mat-tab-group dynamicHeight>
+          <mat-tab label="Calendario" [tabIndex]="0">
+            <full-calendar [options]="calendarOptions"></full-calendar>
+          </mat-tab>
+          <mat-tab label="Documentos" [tabIndex]="1">
+            <app-documents></app-documents>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div class="popup-container" [class.active]="classApplied">
+  <div class="popup-dialog">
+    <mat-card
+      class="daxa-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-header>
+        <mat-card-title>
+          <h5 class="mt-0 mb-0">Reserva</h5>
+        </mat-card-title>
+        <mat-card-subtitle>
+          <button mat-button (click)="closePopup()">
+            <i class="ri-close-fill"></i>
+          </button>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-lg-4">
+              <label class="main-label d-block lh-1 text-black"> Fecha </label>
+              <mat-form-field>
+                <mat-label>Fecha </mat-label>
+                <input matInput formControlName="date" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-4">
+              <label class="main-label d-block lh-1 text-black">
+                Hora de entrada
+              </label>
+              <mat-form-field>
+                <mat-label>Hora de entrada</mat-label>
+                <input matInput formControlName="startTime" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-4">
+              <label class="main-label d-block lh-1 text-black">
+                Hora de salida
+              </label>
+              <mat-form-field>
+                <mat-label>Hora de salida</mat-label>
+                <input matInput formControlName="endTime" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">
+                Docente
+              </label>
+              <mat-form-field>
+                <mat-label>Docente</mat-label>
+                <input matInput formControlName="teacher" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-6">
+              <label class="main-label d-block lh-1 text-black">
+                Edificio
+              </label>
+              <mat-form-field>
+                <mat-label>Edificio</mat-label>
+                <input matInput formControlName="building" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-6">
+              <label class="main-label d-block lh-1 text-black">
+                Espacio educativo
+              </label>
+              <mat-form-field>
+                <mat-label>Espacio educativo</mat-label>
+                <input matInput formControlName="eduSpace" readonly="true" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+              <label class="main-label d-block lh-1 text-black">
+                Carrera
+              </label>
+              <mat-form-field>
+                <mat-label> Carrera </mat-label>
+                <mat-select formControlName="career">
+                  @for (career of (careers); track $index) {
+                  <mat-option [value]="career.id">
+                    {{ career.name }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+              <label class="main-label d-block lh-1 text-black">
+                Asignatura
+              </label>
+              <mat-form-field>
+                <mat-label> Asignatura </mat-label>
+                <mat-select
+                  formControlName="subject"
+                  (selectionChange)="onChangeSubject($event)"
+                >
+                  @for (subject of (subjects); track $index) {
+                  <mat-option [value]="subject.id">
+                    {{ subject.name }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-6">
+              <label class="main-label d-block lh-1 text-black"> Nivel </label>
+              <mat-form-field>
+                <mat-label>Nivel</mat-label>
+                <input
+                  matInput
+                  formControlName="academicLevel"
+                  readonly="true"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-6">
+              <label class="main-label d-block lh-1 text-black">
+                Cantidad de participantes
+              </label>
+              <mat-form-field>
+                <mat-label>Cantidad de participantes</mat-label>
+                <input
+                  matInput
+                  formControlName="number_participants"
+                  readonly="true"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">
+                Tema de la práctica
+              </label>
+              <mat-form-field>
+                <mat-label>Tema de la práctica</mat-label>
+                <input matInput formControlName="topic" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-lg-12">
+              <label class="main-label d-block lh-1 text-black">
+                Observaciones
+              </label>
+              <mat-form-field>
+                <mat-label>Observaciones</mat-label>
+                <input matInput formControlName="observation" />
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-12">
+              <label class="main-label d-block lh-1 text-black">
+                Plantilla de participantes
+              </label>
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                matTooltip="Plantilla en formato xlsx para la importación de participantes"
+                class="d-block text-center w-100 mb-12"
+                appDownloadFile
+                [fileUrl]="templateFileUrl"
+                [fileName]="fileName"
+              >
+                Descargar plantilla
+              </button>
+              <div class="mb-20">
+                <file-upload
+                  class="file-uploader"
+                  [control]="fileUploadControl"
+                  [multiple]="false"
+                ></file-upload>
+              </div>
+            </div>
+
+            <div class="btn-box">
+              <button mat-button type="button" (click)="closePopup()">
+                Cancelar
+              </button>
+              <button
+                mat-button
+                type="submit"
+                [disabled]="
+                  bookingForm.invalid || !fileUploadControl.value.length
+                "
+              >
+                Reservar
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -26,6 +26,10 @@ export * from "./period/update-period.dto";
 export * from "./educational-space/register-educational-space.dto";
 export * from "./educational-space/update-educational-space.dto";
 
+//Booking
+export * from "./booking/list-booking.dto";
+export * from "./booking/register-booking.dto";
+
 //Base
 export * from "./base/id-base.dto";
 export * from "./base/code-base.dto";

@@ -18,3 +18,6 @@ export * from "./building.repository";
 
 //EducationalSpace
 export * from "./educational-space.repository";
+
+//Booking
+export * from "./booking.repository";
