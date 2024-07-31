@@ -1,4 +1,9 @@
-import { ListBookingDto, RegisterBookingDto } from "../dtos";
+import {
+  IdBaseDto,
+  ListBookingDto,
+  RegisterBookingDto,
+  UpdateBookingDto,
+} from "../dtos";
 import { BookingEntity } from "../entities";
 
 export abstract class BookingRepository {
@@ -6,5 +11,10 @@ export abstract class BookingRepository {
 
   abstract register(
     registerBookingDto: RegisterBookingDto
+  ): Promise<BookingEntity>;
+
+  abstract update(
+    bookingId: IdBaseDto,
+    updateBookingDto: UpdateBookingDto
   ): Promise<BookingEntity>;
 }

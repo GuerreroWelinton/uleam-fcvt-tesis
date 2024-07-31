@@ -49,3 +49,4 @@ export * from "./educational-space/list-by-user-id-educational-space.use-case";
 //Booking
 export * from "./booking/list-booking.use-case";
 export * from "./booking/register-booking.use-case";
+export * from "./booking/update-booking.use-case";

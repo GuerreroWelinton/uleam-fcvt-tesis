@@ -4,8 +4,8 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.dev';
 import { BASE_ENDPOINTS, MAIN_ENDPOINTS } from '../enums/endpoints.enum';
 import { IApiResponse } from '../interfaces/api-response.interface';
-import { AlertService } from './alert.service';
 import { IBooking } from '../interfaces/booking.interface';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +27,16 @@ export class OnBookingService {
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.REGISTER}`;
     return this._httpClient
       .post<IApiResponse<IBooking>>(endpoint, booking)
+      .pipe(tap((res) => this.showAlert(res)));
+  }
+
+  public update(
+    id: string,
+    booking: object
+  ): Observable<IApiResponse<IBooking>> {
+    const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.UPDATE}/${id}`;
+    return this._httpClient
+      .patch<IApiResponse<IBooking>>(endpoint, booking)
       .pipe(tap((res) => this.showAlert(res)));
   }
 

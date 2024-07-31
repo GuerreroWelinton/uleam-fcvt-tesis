@@ -75,9 +75,9 @@ import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
     MatTableModule,
     MatTooltipModule,
     MatTabsModule,
+    FileUploadModule,
 
     DownloadFileDirective,
-    FileUploadModule,
     MaxCharDirective,
     OnlyNumbersDirective,
     ShowForRolesDirective,

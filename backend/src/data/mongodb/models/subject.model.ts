@@ -25,6 +25,11 @@ export const SubjectSchema = new Schema(
       enum: BASE_RECORD_STATES,
       default: BASE_RECORD_STATES.ACTIVE,
     },
+    periodId: {
+      type: Schema.Types.ObjectId,
+      ref: "Period",
+      // required: [true, "Period is required"],
+    },
   },
   { timestamps: true }
 );

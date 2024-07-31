@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 import { BASE_RECORD_STATES } from "../../../constants/constants";
 
 // const HoursOfOperationSchema = new mongoose.Schema({
@@ -19,7 +19,7 @@ import { BASE_RECORD_STATES } from "../../../constants/constants";
 //   },
 // });
 
-const EducationalSpaceSchema = new mongoose.Schema(
+const EducationalSpaceSchema = new Schema(
   {
     name: {
       type: String,
@@ -42,12 +42,12 @@ const EducationalSpaceSchema = new mongoose.Schema(
     //   required: [true, "Hours operation is required"],
     // },
     buildingId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Building",
       required: [true, "Building is required"],
     },
     usersId: {
-      type: [mongoose.Schema.Types.ObjectId],
+      type: [Schema.Types.ObjectId],
       ref: "User",
       required: [true, "User is required"],
     },
@@ -55,6 +55,11 @@ const EducationalSpaceSchema = new mongoose.Schema(
       type: String,
       enum: BASE_RECORD_STATES,
       default: BASE_RECORD_STATES.ACTIVE,
+    },
+    periodId: {
+      type: Schema.Types.ObjectId,
+      ref: "Period",
+      // required: [true, "Period is required"],
     },
   },
   {
@@ -74,7 +79,7 @@ const EducationalSpaceSchema = new mongoose.Schema(
 //   next();
 // });
 
-export const EducationalSpaceModel = mongoose.model(
+export const EducationalSpaceModel = model(
   "Educational-Space",
   EducationalSpaceSchema
 );

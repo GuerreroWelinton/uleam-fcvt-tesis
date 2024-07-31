@@ -1,7 +1,12 @@
-import { BASE_RECORD_STATES, USER_ROLES } from "../../constants/constants";
-import { BookingModel, UserModel } from "../../data/mongodb";
+import { BOOKING_STATES } from "../../constants/constants";
+import { BookingModel } from "../../data/mongodb";
 import { BookingDataSource } from "../../domain/datasources";
-import { ListBookingDto, RegisterBookingDto } from "../../domain/dtos";
+import {
+  IdBaseDto,
+  ListBookingDto,
+  RegisterBookingDto,
+  UpdateBookingDto,
+} from "../../domain/dtos";
 import { BookingEntity } from "../../domain/entities";
 import { CustomError } from "../../domain/errors";
 import { handleTryCatch } from "../../utils";
@@ -53,7 +58,7 @@ export class BookingDataSourceImpl implements BookingDataSource {
           $gte: startTime,
         },
         eduSpaceId,
-        status: { $ne: BASE_RECORD_STATES.DELETED },
+        status: { $ne: BOOKING_STATES.REJECTED },
       };
       const existingBooking = await BookingModel.findOne({
         ...queryExistingBooking,
@@ -87,6 +92,68 @@ export class BookingDataSourceImpl implements BookingDataSource {
         .exec();
 
       return BookingMapper.bookingEntityFromObject(populatedBooking!);
+    });
+  }
+
+  async update(
+    bookingId: IdBaseDto,
+    updateBookingDto: UpdateBookingDto
+  ): Promise<BookingEntity> {
+    return handleTryCatch<BookingEntity>(async () => {
+      if (
+        Object.values(updateBookingDto).every((value) => value === undefined)
+      ) {
+        throw CustomError.badRequest(
+          "Debe enviar al menos un dato para actualizar el la reserva"
+        );
+      }
+
+      const { id } = bookingId;
+
+      const {
+        startTime,
+        endTime,
+        topic,
+        observation,
+        teacherId,
+        eduSpaceId,
+        subjectId,
+        participants,
+        status,
+      } = updateBookingDto;
+
+      const query = {
+        ...(startTime && { startTime }),
+        ...(endTime && { endTime }),
+        ...(topic && { topic }),
+        ...(observation && { observation }),
+        ...(teacherId && { teacherId }),
+        ...(eduSpaceId && { eduSpaceId }),
+        ...(subjectId && { subjectId }),
+        ...(participants && { participants }),
+        ...(status && { status }),
+      };
+
+      const updatedBooking = await BookingModel.findByIdAndUpdate(
+        { _id: id, status: { $ne: BOOKING_STATES.REJECTED } },
+        { ...query },
+        { new: true }
+      )
+        .populate([
+          { path: "teacherId" },
+          { path: "subjectId", populate: [{ path: "careerId" }] },
+          {
+            path: "eduSpaceId",
+            populate: [{ path: "buildingId" }, { path: "usersId" }],
+          },
+        ])
+        .exec();
+
+      if (!updatedBooking) {
+        throw CustomError.notFound("La reserva que desea actualizar no existe");
+      }
+
+      return BookingMapper.bookingEntityFromObject(updatedBooking);
     });
   }
 }
