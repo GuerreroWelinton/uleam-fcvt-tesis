@@ -1,5 +1,10 @@
 import { BookingDataSource } from "../../domain/datasources";
-import { ListBookingDto, RegisterBookingDto } from "../../domain/dtos";
+import {
+  IdBaseDto,
+  ListBookingDto,
+  RegisterBookingDto,
+  UpdateBookingDto,
+} from "../../domain/dtos";
 import { BookingEntity } from "../../domain/entities";
 import { BookingRepository } from "../../domain/repositories";
 
@@ -12,5 +17,12 @@ export class BookingRepositoryImpl implements BookingRepository {
 
   register(registerBookingDto: RegisterBookingDto): Promise<BookingEntity> {
     return this.bookingDataSource.register(registerBookingDto);
+  }
+
+  update(
+    bookingId: IdBaseDto,
+    updateBookingDto: UpdateBookingDto
+  ): Promise<BookingEntity> {
+    return this.bookingDataSource.update(bookingId, updateBookingDto);
   }
 }

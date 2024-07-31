@@ -14,16 +14,18 @@ export class BookingRoutes {
     const bookingRepository = new BookingRepositoryImpl(bookingDataSource);
     const bookingController = new BookingController(bookingRepository);
 
-    router.get(
-      "/list",
-      //   [AuthMiddleware.validateJWT],
-      bookingController.list
-    );
+    router.get("/list", [AuthMiddleware.validateJWT], bookingController.list);
 
     router.post(
       "/register",
-      //   [AuthMiddleware.validateJWT],
+      [AuthMiddleware.validateJWT],
       bookingController.register
+    );
+
+    router.patch(
+      "/update/:id",
+      [AuthMiddleware.validateJWT],
+      bookingController.update
     );
 
     return router;

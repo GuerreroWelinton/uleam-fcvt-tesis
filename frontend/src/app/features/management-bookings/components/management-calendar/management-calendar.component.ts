@@ -171,15 +171,17 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   public approveBooking(): void {
     if (this.bookingForm.invalid) return;
     const { id } = this.selectedBooking;
-    console.log('Change status to approved');
-    this.afterSubmitForm();
+    this._onBookingService
+      .update(id, { status: BOOKING_STATES.APPROVED })
+      .subscribe(() => this.afterSubmitForm());
   }
 
   public rejectBooking(): void {
     if (this.bookingForm.invalid) return;
     const { id } = this.selectedBooking;
-    console.log('Change status to rejected');
-    this.afterSubmitForm();
+    this._onBookingService
+      .update(id, { status: BOOKING_STATES.REJECTED })
+      .subscribe(() => this.afterSubmitForm());
   }
 
   private afterSubmitForm(): void {

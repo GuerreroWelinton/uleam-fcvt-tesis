@@ -54,6 +54,11 @@ export const BookingSchema = new Schema(
       enum: BOOKING_STATES,
       default: BOOKING_STATES.PENDING,
     },
+    periodId: {
+      type: Schema.Types.ObjectId,
+      ref: "Period",
+      // required: [true, "Period is required"],
+    },
   },
   { timestamps: true }
 );
