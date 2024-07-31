@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.dev';
 import { BASE_ENDPOINTS, MAIN_ENDPOINTS } from '../enums/endpoints.enum';
 import { IApiResponse } from '../interfaces/api-response.interface';
 import { IBooking } from '../interfaces/booking.interface';
+import { IFilters } from '../interfaces/general.interface';
 import { AlertService } from './alert.service';
 
 @Injectable({
@@ -18,9 +19,10 @@ export class OnBookingService {
     private _alertService: AlertService
   ) {}
 
-  public list(): Observable<IApiResponse<IBooking[]>> {
+  public list(filters: IFilters): Observable<IApiResponse<IBooking[]>> {
+    const params = new HttpParams({ fromObject: filters });
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.LIST}`;
-    return this._httpClient.get<IApiResponse<IBooking[]>>(endpoint);
+    return this._httpClient.get<IApiResponse<IBooking[]>>(endpoint, { params });
   }
 
   public register(booking: object): Observable<IApiResponse<IBooking>> {

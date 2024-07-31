@@ -5,8 +5,8 @@
   <h5 class="mb-0">Tablero</h5>
   <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
     <li class="breadcrumb-item position-relative">
-      <a routerLink="/" class="d-inline-block position-relative">
-        <!-- <i class="ri-home-8-line"></i> -->
+      <a class="d-inline-block position-relative">
+        <i class="ri-home-8-line"></i>
         Inicio
       </a>
     </li>
@@ -14,13 +14,43 @@
   </ol>
 </div>
 
-<!-- <mat-card class="daxa-card mb-25 border-radius bg-white border-none d-block">
-  <mat-card-header>
-    <mat-card-title>
-      <h5 class="mt-0 mb-0">Datos del usuario</h5>
-    </mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <pre>{{ profile$ | async | json }}</pre>
-  </mat-card-content>
-</mat-card> -->
+<div class="row">
+  <div class="col-lg-12 col-xxxl-6">
+    <mat-card
+      class="daxa-card welcome-card mb-25 border-radius position-relative bg-gradient border-none d-block"
+    >
+      <mat-card-content>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="content">
+              <span class="d-block text-white">
+                {{ formattedDate }}
+              </span>
+              <h3 class="text-white">Bienvenido!</h3>
+              <p class="text-white">
+                Este sistema te permitirá gestionar reservas.
+              </p>
+              <span class="d-block text-white fw-medium">
+                Avance de la página
+              </span>
+              <div class="chart">
+                <apx-chart
+                  [series]="chartOptions.series!"
+                  [colors]="chartOptions.colors!"
+                  [chart]="chartOptions.chart!"
+                  [plotOptions]="chartOptions.plotOptions!"
+                  [fill]="chartOptions.fill!"
+                ></apx-chart>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="image">
+              <img src="assets/images/welcome.svg" alt="welcome-image" />
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

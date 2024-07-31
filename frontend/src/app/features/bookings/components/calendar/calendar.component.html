@@ -14,7 +14,7 @@
     </mat-card-header>
 
     <mat-card-content>
-      <form [formGroup]="bookingForm">
+      <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <div class="col-lg-4">
             <label class="main-label d-block lh-1 text-black"> Fecha </label>
@@ -74,7 +74,13 @@
             <label class="main-label d-block lh-1 text-black"> Carrera </label>
             <mat-form-field>
               <mat-label> Carrera </mat-label>
-              <input matInput formControlName="career" readonly="true" />
+              <mat-select formControlName="career">
+                @for (career of (careers); track $index) {
+                <mat-option [value]="career.id">
+                  {{ career.name }}
+                </mat-option>
+                }
+              </mat-select>
             </mat-form-field>
           </div>
 
@@ -84,7 +90,16 @@
             </label>
             <mat-form-field>
               <mat-label> Asignatura </mat-label>
-              <input matInput formControlName="subject" readonly="true" />
+              <mat-select
+                formControlName="subject"
+                (selectionChange)="onChangeSubject($event)"
+              >
+                @for (subject of (subjects); track $index) {
+                <mat-option [value]="subject.id">
+                  {{ subject.name }}
+                </mat-option>
+                }
+              </mat-select>
             </mat-form-field>
           </div>
 
@@ -92,7 +107,12 @@
             <label class="main-label d-block lh-1 text-black"> Nivel </label>
             <mat-form-field>
               <mat-label>Nivel</mat-label>
-              <input matInput formControlName="academicLevel" readonly="true" />
+              <input
+                matInput
+                placeholder="Se asignará automáticamente"
+                formControlName="academicLevel"
+                readonly="true"
+              />
             </mat-form-field>
           </div>
 
@@ -103,6 +123,7 @@
             <mat-form-field>
               <mat-label>Cantidad de participantes</mat-label>
               <input
+                placeholder="Se asignará automáticamente"
                 matInput
                 formControlName="number_participants"
                 readonly="true"
@@ -116,7 +137,7 @@
             </label>
             <mat-form-field>
               <mat-label>Tema de la práctica</mat-label>
-              <input matInput formControlName="topic" readonly="true" />
+              <input matInput formControlName="topic" />
             </mat-form-field>
           </div>
 
@@ -126,19 +147,36 @@
             </label>
             <mat-form-field>
               <mat-label>Observaciones</mat-label>
-              <input matInput formControlName="observation" readonly="true" />
+              <input matInput formControlName="observation" />
             </mat-form-field>
           </div>
 
-          <div class="col-lg-12">
-            <label class="main-label d-block lh-1 text-black"> Estado </label>
-            <mat-form-field>
-              <mat-label>Estado</mat-label>
-              <input matInput formControlName="status" readonly="true" />
-            </mat-form-field>
+          <div class="col-md-12">
+            <label class="main-label d-block lh-1 text-black">
+              Plantilla de participantes
+            </label>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              matTooltip="Plantilla en formato xlsx para la importación de participantes"
+              class="d-block text-center w-100 mb-12"
+              appDownloadFile
+              [fileUrl]="templateFileUrl"
+              [fileName]="fileName"
+            >
+              Descargar plantilla
+            </button>
+            <div class="mb-20">
+              <file-upload
+                class="file-uploader"
+                [control]="fileUploadControl"
+                [multiple]="false"
+              ></file-upload>
+            </div>
           </div>
+
           <div class="btn-box">
-            @if (selectedBooking.status ===bookingStates.APPROVED) {
             <button
               mat-flat-button
               type="button"
@@ -146,24 +184,50 @@
               (click)="hidePopup()"
             >
               Cancelar
-            </button>
-            }
-            <!--  -->
-            @if (selectedBooking.status === bookingStates.PENDING ) {
-            <button mat-flat-button color="warn" (click)="rejectBooking()">
-              Rechazar
             </button>
             <button
               mat-flat-button
               class="daxa ml-10"
-              (click)="approveBooking()"
+              [disabled]="
+                bookingForm.invalid || !fileUploadControl.value.length
+              "
             >
-              Aprobar
+              Reservar
             </button>
-            <!--  -->
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<ng-template #assistanceTemplate>
+  <mat-card class="daxa-card mb-25 border-radius bg-white border-none d-block">
+    <mat-card-header>
+      <mat-card-title>
+        <h5 class="mt-0 mb-0">Asistencia</h5>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <button mat-button (click)="hidePopup()">
+          <i class="ri-close-fill"></i>
+        </button>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="assistenceForm" (ngSubmit)="onSubmitAssistence()">
+        <div class="row">
+          <div formArrayName="participants">
+            @for (participant of bookingParticipants; track $index) {
+            <div [formGroupName]="$index" class="col-lg-12">
+              <label>
+                <input type="checkbox" formControlName="attended" />
+                {{ participant.name }}
+              </label>
+            </div>
             }
-            <!--  -->
-            @if (selectedBooking.status === bookingStates.CONFIRMED) {
+          </div>
+          <div class="btn-box">
             <button
               mat-flat-button
               type="button"
@@ -174,13 +238,11 @@
             </button>
             <button
               mat-flat-button
-              type="button"
-              color="primary ml-10"
-              (click)="generateReport()"
+              class="daxa ml-10"
+              [disabled]="assistenceForm.invalid"
             >
-              Reporte
+              Guardar
             </button>
-            }
           </div>
         </div>
       </form>

@@ -179,20 +179,20 @@ export class EducationalSpaceDataSourceImpl
           `Ya existe un espacio educativo con el código ${code}`
         );
       }
+      // TODO: HACERLO SI VIENE EL BUILDING ID SI NO NO
+      // const existingBuilding = await BuildingModel.findOne({
+      //   _id: buildingId,
+      //   status: { $ne: BASE_RECORD_STATES.DELETED },
+      // }).exec();
+      // if (!existingBuilding) {
+      //   throw CustomError.notFound("El edificio que desea asignar no existe");
+      // }
 
-      const existingBuilding = await BuildingModel.findOne({
-        _id: buildingId,
-        status: { $ne: BASE_RECORD_STATES.DELETED },
-      }).exec();
-      if (!existingBuilding) {
-        throw CustomError.notFound("El edificio que desea asignar no existe");
-      }
-
-      if (floor && existingBuilding.numberOfFloors < floor) {
-        throw CustomError.badRequest(
-          "El piso no puede ser mayor al número de pisos del edificio"
-        );
-      }
+      // if (floor && existingBuilding.numberOfFloors < floor) {
+      //   throw CustomError.badRequest(
+      //     "El piso no puede ser mayor al número de pisos del edificio"
+      //   );
+      // }
 
       const updatedEducationalSpace =
         await EducationalSpaceModel.findOneAndUpdate(

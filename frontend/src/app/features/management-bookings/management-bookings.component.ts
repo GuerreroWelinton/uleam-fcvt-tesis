@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { PreBookingService } from '../../core/services/pre-booking.service';
 import { IEducationalSpace } from '../management-educational-spaces/interfaces/educational-spaces.interface';
@@ -16,13 +16,17 @@ import { ManagementPreBookingComponent } from './components/management-pre-booki
   ],
   templateUrl: './management-bookings.component.html',
 })
-export default class ManagementBookingsComponent implements OnInit {
+export default class ManagementBookingsComponent implements OnInit, OnDestroy {
   public selectedEduSpace$: Observable<IEducationalSpace | null> = of(null);
 
   constructor(private _preBookingService: PreBookingService) {}
 
   ngOnInit(): void {
     this.selectedEduSpace$ = this.fetchSelectedEduSpace();
+  }
+
+  ngOnDestroy(): void {
+    this.updateSelectedEduSpace();
   }
 
   private fetchSelectedEduSpace(): Observable<IEducationalSpace | null> {
