@@ -14,7 +14,9 @@ export class ListBooking implements ListBookingUseCase {
   async execute(
     listBookingDto: ListBookingDto
   ): Promise<Partial<IApiResponse<IBooking[]>>> {
-    const bookings = await this.bookingRepository.list(listBookingDto);
+    const { bookings, total } = await this.bookingRepository.list(
+      listBookingDto
+    );
 
     return {
       message: `Reservas encontradas con éxito`,
@@ -49,6 +51,7 @@ export class ListBooking implements ListBookingUseCase {
             updatedAt,
           };
         }),
+        totalCount: total,
       },
     };
   }

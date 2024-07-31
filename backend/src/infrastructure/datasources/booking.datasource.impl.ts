@@ -15,24 +15,75 @@ import { BookingMapper } from "../mappers";
 export class BookingDataSourceImpl implements BookingDataSource {
   constructor() {}
 
-  async list(listBookingDto: ListBookingDto): Promise<BookingEntity[]> {
-    return handleTryCatch<BookingEntity[]>(async () => {
-      const bookings = await BookingModel.find()
-        .populate([
-          { path: "teacherId" },
-          { path: "subjectId", populate: [{ path: "careerId" }] },
-          {
-            path: "eduSpaceId",
-            populate: [{ path: "buildingId" }, { path: "usersId" }],
-          },
-        ])
-        .sort({ createdAt: -1 })
-        .exec();
+  async list(
+    listBookingDto: ListBookingDto
+  ): Promise<{ bookings: BookingEntity[]; total: number }> {
+    return handleTryCatch<{ bookings: BookingEntity[]; total: number }>(
+      async () => {
+        const {
+          limit,
+          page,
+          id,
+          startTime,
+          endTime,
+          topic,
+          observation,
+          teacherId,
+          eduSpaceId,
+          subjectId,
+          participants,
+          status,
+          createdAt,
+          updatedAt,
+        } = listBookingDto;
 
-      return bookings.map((booking) => {
-        return BookingMapper.bookingEntityFromObject(booking);
-      });
-    });
+        let skip: number = 0;
+        let formattedLimit: number = 0;
+        if (limit && page) {
+          const formattedPage = +page;
+          formattedLimit = +limit;
+          skip = formattedLimit * (formattedPage - 1);
+        }
+
+        const query = {
+          ...(eduSpaceId && { eduSpaceId }),
+          ...(startTime && { startTime: { $gte: new Date(startTime) } }),
+          ...(endTime && { endTime: { $lte: new Date(endTime) } }),
+          ...(id && { id }),
+          ...(topic && { topic }),
+          ...(observation && { observation }),
+          ...(teacherId && { teacherId }),
+          ...(subjectId && { subjectId }),
+          ...(participants && { participants }),
+          ...(status && { status: { $in: status } }),
+          ...(createdAt && { createdAt: { $gte: new Date(createdAt) } }),
+          ...(updatedAt && { updatedAt: { $lte: new Date(updatedAt) } }),
+        };
+
+        const bookings = await BookingModel.find(query)
+          .populate([
+            { path: "teacherId" },
+            { path: "subjectId", populate: [{ path: "careerId" }] },
+            {
+              path: "eduSpaceId",
+              populate: [{ path: "buildingId" }, { path: "usersId" }],
+            },
+          ])
+          .limit(formattedLimit)
+          .skip(skip)
+          .sort({ createdAt: -1 })
+          .exec();
+
+        const total = await BookingModel.countDocuments(query).exec();
+
+        return {
+          bookings: bookings.map((booking) =>
+            BookingMapper.bookingEntityFromObject(booking)
+          ),
+          total,
+        };
+      }
+    );
   }
 
   async register(

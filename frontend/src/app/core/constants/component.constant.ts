@@ -101,12 +101,12 @@ export const USER_ROLES_OPTIONS: {
     enabled: true,
     showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
   },
-  {
-    value: USER_ROLES.STUDENT,
-    viewValue: 'Estudiante',
-    enabled: true,
-    showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
-  },
+  // {
+  //   value: USER_ROLES.STUDENT,
+  //   viewValue: 'Estudiante',
+  //   enabled: true,
+  //   showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
+  // },
 ];
 
 //Delete this

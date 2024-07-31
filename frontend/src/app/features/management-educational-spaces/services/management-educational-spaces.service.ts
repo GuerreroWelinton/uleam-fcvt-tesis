@@ -44,11 +44,11 @@ export class ManagementEducationalSpacesService {
 
   public update(
     id: string,
-    educationalSpace: Partial<IEducationalSpace>
+    educationalSpace: object
   ): Observable<IApiResponse<IEducationalSpace>> {
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.UPDATE}/${id}`;
     return this._httpClient
-      .put<IApiResponse<IEducationalSpace>>(endpoint, educationalSpace)
+      .patch<IApiResponse<IEducationalSpace>>(endpoint, educationalSpace)
       .pipe(tap((res) => this.showAlert(res)));
   }
 

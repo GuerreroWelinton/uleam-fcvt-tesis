@@ -11,7 +11,9 @@ import { BookingRepository } from "../../domain/repositories";
 export class BookingRepositoryImpl implements BookingRepository {
   constructor(private readonly bookingDataSource: BookingDataSource) {}
 
-  list(listBookingDto: ListBookingDto): Promise<BookingEntity[]> {
+  list(
+    listBookingDto: ListBookingDto
+  ): Promise<{ bookings: BookingEntity[]; total: number }> {
     return this.bookingDataSource.list(listBookingDto);
   }
 

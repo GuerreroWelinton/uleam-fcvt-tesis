@@ -7,7 +7,9 @@ import {
 import { BookingEntity } from "../entities";
 
 export abstract class BookingDataSource {
-  abstract list(listBookingDto: ListBookingDto): Promise<BookingEntity[]>;
+  abstract list(
+    listBookingDto: ListBookingDto
+  ): Promise<{ bookings: BookingEntity[]; total: number }>;
 
   abstract register(
     registerBookingDto: RegisterBookingDto

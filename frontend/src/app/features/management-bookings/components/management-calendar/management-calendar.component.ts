@@ -14,26 +14,36 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import {
+  FullCalendarComponent,
+  FullCalendarModule,
+} from '@fullcalendar/angular';
 import {
   CalendarOptions,
+  DatesSetArg,
   EventClickArg,
   EventSourceInput,
 } from '@fullcalendar/core';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import {
   BASE_CALENDAR_OPTIONS,
   BOOKING_STATES_OPTIONS,
 } from '../../../../core/constants/component.constant';
 import { BOOKING_STATES } from '../../../../core/enums/general.enum';
 import { IBooking } from '../../../../core/interfaces/booking.interface';
+import { IFilters } from '../../../../core/interfaces/general.interface';
 import { OnBookingService } from '../../../../core/services/on-booking.service';
 import { PopupContainerService } from '../../../../core/services/popup-container.service';
+import { PreBookingService } from '../../../../core/services/pre-booking.service';
+import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
+
+//todo: refactor
 import 'moment/locale/es';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 @Component({
   selector: 'app-management-calendar',
   standalone: true,
@@ -46,11 +56,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
     MatInputModule,
   ],
   templateUrl: './management-calendar.component.html',
-  styles: `
-  .test {
-    color: red
-  }
-  `,
 })
 export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // POPUP
@@ -58,27 +63,31 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   public popupTemplate: TemplateRef<HTMLElement> | null = null;
 
   // FULLCALENDAR
+  @ViewChild('calendar')
+  public calendarComponent: FullCalendarComponent;
   public calendarOptions = BASE_CALENDAR_OPTIONS;
   public selectedBooking: IBooking = {} as IBooking;
+  public filters: IFilters = {};
   private bookings: IBooking[] = [];
 
   // FROM
   public bookingForm: FormGroup;
   public bookingStates = BOOKING_STATES;
   public bookingStatesOptions = BOOKING_STATES_OPTIONS;
+  public selectedEduSpace$: Observable<IEducationalSpace | null> = of(null);
 
   // AUX
   private unsubscribe$ = new Subject<boolean>();
 
   constructor(
     private _popupContainerService: PopupContainerService,
+    private _preBookingService: PreBookingService,
     private _onBookingService: OnBookingService,
     private _formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.calendarOptions = this.setCalendarOptions();
-    this.fetchBookings();
     this.bookingForm = this.initializeForm();
   }
 
@@ -91,8 +100,10 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   private setCalendarOptions(): CalendarOptions {
     return {
       ...this.calendarOptions,
+      selectable: false,
       editable: false,
-      eventClick: (arg) => this.handleClickEvent(arg),
+      eventClick: this.handleClickEvent.bind(this),
+      datesSet: this.handleDatesSet.bind(this),
     };
   }
 
@@ -105,27 +116,50 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
     this.showPopup();
   }
 
+  private handleDatesSet(arg: DatesSetArg) {
+    const { start, end } = arg;
+    this.filters = {
+      startTime: start.toISOString(),
+      endTime: end.toISOString(),
+      status: [
+        BOOKING_STATES.PENDING,
+        BOOKING_STATES.APPROVED,
+        BOOKING_STATES.CONFIRMED,
+      ],
+    };
+    this.fetchBookings();
+  }
+
   private fetchBookings(): void {
-    this._onBookingService
-      .list()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((res) => {
-        this.bookings = res.data?.result || [];
+    this._preBookingService
+      .getSelectedEduSpace()
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((selectedEduSpace) => !!selectedEduSpace),
+        switchMap((selectedEduSpace) => {
+          this.filters = { eduSpaceId: selectedEduSpace!.id, ...this.filters };
+          return this._onBookingService.list(this.filters);
+        })
+      )
+      .subscribe((bookingsList) => {
+        this.bookings = bookingsList.data?.result || [];
         this.calendarOptions.events = this.setEvents(this.bookings);
       });
   }
 
   private setEvents(bookings: IBooking[]): EventSourceInput {
-    return bookings
-      .filter((booking) => booking.status !== BOOKING_STATES.REJECTED)
-      .map((booking) => ({
-        id: booking.id,
-        title: booking.subject.name,
-        start: booking.startTime,
-        end: booking.endTime,
-        backgroundColor: BOOKING_STATES_OPTIONS[booking.status].color,
-        borderColor: BOOKING_STATES_OPTIONS[booking.status].color,
-      }));
+    return (
+      bookings
+        // .filter((booking) => booking.status !== BOOKING_STATES.REJECTED)
+        .map((booking) => ({
+          id: booking.id,
+          title: booking.subject.name,
+          start: booking.startTime,
+          end: booking.endTime,
+          backgroundColor: BOOKING_STATES_OPTIONS[booking.status].color,
+          borderColor: BOOKING_STATES_OPTIONS[booking.status].color,
+        }))
+    );
   }
 
   // FORM
@@ -204,19 +238,20 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   }
 
   // REPORT
+  //todo: refactor
   public generateReport() {
-    // TODO: Esto debe generar un reporte con la data de la reserva seleccionada
-    console.log(this.selectedBooking);
-
     let participants: any = [];
-    let participants2: any = [{ text: 'NOMBRES', style: 'tableHeader' }, { text: 'ASISTENCIA', style: 'tableHeader' }];
-    this.selectedBooking.participants.forEach(e => {
+    let participants2: any = [
+      { text: 'NOMBRES', style: 'tableHeader' },
+      { text: 'ASISTENCIA', style: 'tableHeader' },
+    ];
+    this.selectedBooking.participants.forEach((e) => {
       participants.push(e.name + ' ' + (e.attended ? 'ASISTIO' : 'NO ASISTIO'));
     });
 
-    const participantsData = this.selectedBooking.participants.map(e => [
+    const participantsData = this.selectedBooking.participants.map((e) => [
       e.name,
-      e.attended ? 'ASISTIO' : 'NO ASISTIO'
+      e.attended ? 'ASISTIO' : 'NO ASISTIO',
     ]);
 
     const documentDefinition: any = {
@@ -224,45 +259,55 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
         {
           text: 'REGISTRO DE PRÁCTICAS DEL LABORATORIO DE BIOLOGÍA',
           alignment: 'center',
-          style: 'subheader'
+          style: 'subheader',
         },
         {
           columns: [
             {
-              text: 'Fecha de práctica: ' + moment(this.selectedBooking.createdAt).locale('es').format('dddd, D [de] MMMM [de] YYYY')
+              text:
+                'Fecha de práctica: ' +
+                moment(this.selectedBooking.createdAt)
+                  .locale('es')
+                  .format('dddd, D [de] MMMM [de] YYYY'),
             },
-          ]
+          ],
         },
         {
           columns: [
             {
-              text: 'Hora de entrada: ' + moment(this.selectedBooking.startTime).format('HH:mm A')
+              text:
+                'Hora de entrada: ' +
+                moment(this.selectedBooking.startTime).format('HH:mm A'),
             },
             {
-              text: 'Hora de salida: ' + moment(this.selectedBooking.endTime).format('HH:mm A')
+              text:
+                'Hora de salida: ' +
+                moment(this.selectedBooking.endTime).format('HH:mm A'),
             },
-          ]
+          ],
         },
         'Docente responsable: ',
         {
           columns: [
             {
-              text: 'Carrera: ' + this.selectedBooking.subject.career.name
+              text: 'Carrera: ' + this.selectedBooking.subject.career.name,
             },
             {
-              text: 'Asignatura: ' + this.selectedBooking.subject.name
+              text: 'Asignatura: ' + this.selectedBooking.subject.name,
             },
-          ]
+          ],
         },
         {
           columns: [
             {
-              text: 'Nivel: ' + this.selectedBooking.subject.academicLevel
+              text: 'Nivel: ' + this.selectedBooking.subject.academicLevel,
             },
             {
-              text: 'N° de estudiantes: ' + this.selectedBooking.participants.length
+              text:
+                'N° de estudiantes: ' +
+                this.selectedBooking.participants.length,
             },
-          ]
+          ],
         },
         'TEMA DE LA PRÁCTICA: ' + this.selectedBooking.topic,
 
@@ -272,19 +317,22 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
           table: {
             headerRows: 1,
             body: [
-              [{ text: 'NOMBRES', style: 'tableHeader' }, { text: 'ASISTENCIA', style: 'tableHeader' }],
-              ...participantsData
-            ]
+              [
+                { text: 'NOMBRES', style: 'tableHeader' },
+                { text: 'ASISTENCIA', style: 'tableHeader' },
+              ],
+              ...participantsData,
+            ],
           },
-          layout: 'noBorders'
+          layout: 'noBorders',
         },
         {
           alignment: 'justify',
           columns: [
             {
-              text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.'
+              text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.',
             },
-          ]
+          ],
         },
         { text: 'OBSERVACIONES', style: 'title' },
         { text: this.selectedBooking.observation },
@@ -293,27 +341,27 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
         header: {
           fontSize: 18,
           bold: true,
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 10],
         },
         subheader: {
           fontSize: 16,
           bold: true,
-          margin: [0, 10, 0, 5]
+          margin: [0, 10, 0, 5],
         },
         title: {
           fontSize: 12,
           bold: true,
-          margin: [0, 5, 0, 0]
+          margin: [0, 5, 0, 0],
         },
         tableExample: {
           fontSize: 12,
-          margin: [0, 5, 0, 15]
+          margin: [0, 5, 0, 15],
         },
         tableHeader: {
           bold: true,
           fontSize: 13,
-          color: 'black'
-        }
+          color: 'black',
+        },
       },
     };
     // pdfMake.createPdf(documentDefinition).download('sample.pdf');
