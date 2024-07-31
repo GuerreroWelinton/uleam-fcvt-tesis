@@ -26,11 +26,11 @@ export class CustomError extends Error {
     return new CustomError(409, message);
   }
 
-  static internalServer(message: string = "Internal Server Error") {
+  static internalServer(message: string = "Error interno del servidor") {
     return new CustomError(500, message);
   }
 
-  static notImplemented(message: string = "Function not implemented") {
+  static notImplemented(message: string = "Funcionalidad no implementada") {
     return new CustomError(501, message);
   }
 }

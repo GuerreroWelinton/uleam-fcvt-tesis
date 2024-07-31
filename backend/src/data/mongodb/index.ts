@@ -8,3 +8,4 @@ export * from "./models/building.model";
 export * from "./models/subject.model";
 export * from "./models/career.model";
 export * from "./models/educational-space.model";
+export * from "./models/booking.model";

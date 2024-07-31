@@ -17,6 +17,7 @@ export enum MAIN_ENDPOINTS {
   CAREERS = "/careers",
   BUILDINGS = "/buildings",
   EDUCATIONAL_SPACES = "/educational-spaces",
+  BOOKINGS = "/bookings",
   PERIODS = "/periods",
 }
 
@@ -24,6 +25,13 @@ export enum BASE_RECORD_STATES {
   ACTIVE = "active",
   INACTIVE = "inactive",
   DELETED = "deleted",
+}
+
+export enum BOOKING_STATES {
+  PENDING = "pending",
+  APPROVED = "approved",
+  CONFIRMED = "confirmed",
+  REJECTED = "rejected",
 }
 
 export enum USER_ROLES {

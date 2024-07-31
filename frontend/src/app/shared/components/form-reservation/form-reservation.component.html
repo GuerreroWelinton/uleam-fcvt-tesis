@@ -1,0 +1,117 @@
+<mat-card class="daxa-card mb-20 border-radius bg-white border-none d-block">
+  <mat-card-header>
+    <mat-card-title>Registrar Práctica</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-4 mb-1">
+          <mat-form-field>
+            <mat-label>Fecha Práctica</mat-label>
+            <input readonly matInput formControlName="date" />
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 mb-1">
+          <mat-form-field>
+            <mat-label>Hora Entrada</mat-label>
+            <input readonly matInput formControlName="start_hour" />
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 mb-1">
+          <mat-form-field>
+            <mat-label>Hora Salida</mat-label>
+            <input readonly matInput formControlName="end_hour" />
+          </mat-form-field>
+        </div>
+        <!--  -->
+        <div class="col-md-12 mb-1">
+          <mat-form-field>
+            <mat-label>Docente</mat-label>
+            <input readonly matInput formControlName="user" />
+          </mat-form-field>
+        </div>
+        <div class="col-md-12 mb-1">
+          <mat-form-field>
+            <mat-label>Tema de la Práctica</mat-label>
+            <input
+              matInput
+              formControlName="topic"
+              placeholder="Ingresar tema"
+            />
+          </mat-form-field>
+        </div>
+        <!--  -->
+        <div class="col-md-6 mb-1">
+          <mat-form-field>
+            <mat-label>Carrera</mat-label>
+            <mat-select
+              formControlName="careerId"
+              (selectionChange)="onBuildingChange($event)"
+            >
+              @for (career of (careers$ | async); track $index) {
+              <mat-option [value]="career.value">
+                {{ career.viewValue }}
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6 mb-1">
+          <mat-form-field>
+            <mat-label>Asignatura</mat-label>
+            <mat-select
+              formControlName="subject"
+              (selectionChange)="onBuildingChangeSubject($event)"
+            >
+              @for (subject of subjectsOptions; track $index) {
+              <mat-option [value]="subject.id">
+                {{ subject.name }}
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6 mb-1">
+          <mat-form-field>
+            <mat-label>Nivel</mat-label>
+            <!-- <mat-select formControlName="level">
+              @for (state of baseStatesOptions; track $index) {
+              <mat-option [value]="state.value">
+                {{ state.viewValue }}
+              </mat-option>
+              }
+            </mat-select> -->
+            <input readonly matInput formControlName="academicLevel" />
+          </mat-form-field>
+        </div>
+        <div class="col-md-6 mb-1">
+          <mat-form-field>
+            <mat-label>Número estudiantes</mat-label>
+            <input
+              matInput
+              formControlName="number_students"
+              placeholder="Ingresar"
+            />
+          </mat-form-field>
+        </div>
+        <!--  -->
+        <div class="col-md-12 mb-1">
+          <mat-form-field>
+            <mat-label>Observaciones</mat-label>
+            <input
+              matInput
+              formControlName="observation"
+              placeholder="Ingresar"
+            />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="btn-box">
+        <button mat-button type="button" (click)="close()">Cancelar</button>
+        <button mat-button type="submit" [disabled]="reservationForm.invalid">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

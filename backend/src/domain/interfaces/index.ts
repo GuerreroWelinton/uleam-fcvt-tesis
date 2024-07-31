@@ -16,5 +16,8 @@ export * from "./building.interface";
 //Educational Space
 export * from "./educational-space.interface";
 
+//Booking
+export * from "./booking.interface";
+
 //Api
 export * from "./api-response.interface";

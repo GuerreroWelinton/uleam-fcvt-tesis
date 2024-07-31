@@ -18,3 +18,6 @@ export * from "./building.datasource";
 
 //EducationalSpace
 export * from "./educational-space.datasource";
+
+//Booking
+export * from "./booking.datasource";

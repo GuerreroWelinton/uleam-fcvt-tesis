@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-lg-12">
+    <mat-card
+      class="daxa-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content class="example-alerts">
+        <div class="alert alert-outline-secondary" role="alert">
+          Seleccione un espacio educativo para solicitar una reserva.
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  @for (eduSpace of (eduSpaces$ | async); track $index) {
+  <div class="col-lg-4 col-md-6">
+    <shared-card-educational-space
+      [eduSpaceData]="eduSpace"
+      (selectedEduSpace)="onSelectedEduSpace($event)"
+    ></shared-card-educational-space>
+  </div>
+  }
+</div>

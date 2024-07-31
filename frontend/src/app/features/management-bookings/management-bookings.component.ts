@@ -1,44 +1,39 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
-import { AppState } from '../../core/store';
-import { selectUserId } from '../../core/store/user/user.selectors';
+import { PreBookingService } from '../../core/services/pre-booking.service';
 import { IEducationalSpace } from '../management-educational-spaces/interfaces/educational-spaces.interface';
-import { ManagementEducationalSpacesService } from '../management-educational-spaces/services/management-educational-spaces.service';
+import { ManagementOnBookingComponent } from './components/management-on-booking/management-on-booking.component';
+import { ManagementPreBookingComponent } from './components/management-pre-booking/management-pre-booking.component';
 
 @Component({
   selector: 'app-management-bookings',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, CommonModule],
+  imports: [
+    AsyncPipe,
+    ManagementPreBookingComponent,
+    ManagementOnBookingComponent,
+  ],
   templateUrl: './management-bookings.component.html',
 })
 export default class ManagementBookingsComponent implements OnInit {
-  private userId$ = this._store.select(selectUserId);
-  public eduSpaces$: Observable<IEducationalSpace[]> = of([]);
+  public selectedEduSpace$: Observable<IEducationalSpace | null> = of(null);
 
-  constructor(
-    private _store: Store<AppState>,
-    private _educationalSpacesService: ManagementEducationalSpacesService
-  ) {}
+  constructor(private _preBookingService: PreBookingService) {}
 
   ngOnInit(): void {
-    this.eduSpaces$ = this.fetchEducationalSpaces();
+    this.selectedEduSpace$ = this.fetchSelectedEduSpace();
   }
 
-  public fetchEducationalSpaces(): Observable<IEducationalSpace[]> {
-    return this.userId$.pipe(
-      filter((userId) => userId !== undefined),
-      switchMap((userId) =>
-        this._educationalSpacesService.listByUserId(userId!).pipe(
-          map((res) => {
-            return res.data?.result || [];
-          })
-        )
-      )
-    );
+  private fetchSelectedEduSpace(): Observable<IEducationalSpace | null> {
+    return this._preBookingService.getSelectedEduSpace();
+  }
+
+  public onBack(): void {
+    this.updateSelectedEduSpace();
+  }
+
+  private updateSelectedEduSpace(): void {
+    this._preBookingService.updateSelectedEduSpace(null);
   }
 }

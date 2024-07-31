@@ -15,3 +15,6 @@ export * from "./building.mapper";
 
 //EducationalSpace
 export * from "./educational-space.mapper";
+
+//Booking
+export * from "./booking.mapper";

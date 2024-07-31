@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-lg-12">
+    <mat-card
+      class="daxa-card mb-20 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <mat-tab-group dynamicHeight>
+          <mat-tab label="Calendario" [tabIndex]="0">
+            <app-management-calendar></app-management-calendar>
+          </mat-tab>
+          <mat-tab label="Documentos" [tabIndex]="2">
+            <app-management-documents></app-management-documents>
+          </mat-tab>
+          <mat-tab label="Lista" [tabIndex]="1">
+            <app-management-list></app-management-list>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div class="popup-container" [class.active]="classApplied$ | async">
+  <div class="popup-dialog">
+    <ng-container *ngTemplateOutlet="template$ | async"></ng-container>
+  </div>
+</div>

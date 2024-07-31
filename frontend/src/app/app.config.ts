@@ -16,7 +16,7 @@ import { effects, metaReducers, reducers } from './core/store';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { PeriodInterceptor } from './core/interceptors/period.interceptor';
 import { TokenInterceptor } from './core/interceptors/token.interceptor';
-
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 const devtools = isDevMode()
   ? [
       provideStoreDevtools({
@@ -36,6 +36,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     provideStore(reducers, { metaReducers }),
     provideEffects(effects),
-    ...devtools,
+    ...devtools,provideAnimationsAsync(),
   ],
 };

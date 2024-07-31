@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { USER_ROLES } from './core/enums/general.enum';
 import { AuthGuard, NotAuthGuard } from './core/guards/auth.guard';
 import { HasRole } from './core/guards/has-role.guard';
-import { MANAGEMENT_BOOKINGS_ROUTES } from './features/management-bookings/management-bookings.routes';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/authentication', pathMatch: 'full' },
@@ -16,11 +15,11 @@ export const routes: Routes = [
   // INICIO
   {
     path: 'dashboard',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/dashboard/dashboard.routes').then(
         (m) => m.DASHBOARD_ROUTES
       ),
-    canActivate: [AuthGuard],
   },
 
   // SERVICIOS
@@ -28,8 +27,8 @@ export const routes: Routes = [
     path: 'bookings',
     canActivate: [AuthGuard, HasRole([USER_ROLES.TEACHER])],
     loadChildren: () =>
-      import('./features/educational-spaces/educational-spaces.routes').then(
-        (m) => m.EDUCATIONAL_SPACES_ROUTES
+      import('./features/bookings/bookings.routes').then(
+        (m) => m.BOOKINGS_ROUTES
       ),
   },
 
@@ -81,21 +80,21 @@ export const routes: Routes = [
   },
   {
     path: 'management-bookings',
+    canActivate: [AuthGuard, HasRole([USER_ROLES.SUPERVISOR])],
     loadChildren: () =>
       import('./features/management-bookings/management-bookings.routes').then(
         (m) => m.MANAGEMENT_BOOKINGS_ROUTES
       ),
-    canActivate: [AuthGuard],
   },
 
   // AYUDA
   {
     path: 'tutorials',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/tutorials/tutorials.routes').then(
         (m) => m.TUTORIALS_ROUTES
       ),
-    canActivate: [AuthGuard],
   },
 
   { path: '**', redirectTo: '/authentication', pathMatch: 'full' },

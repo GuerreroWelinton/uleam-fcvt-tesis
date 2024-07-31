@@ -21,7 +21,7 @@ const CareerSchema = new Schema(
     },
     status: {
       type: String,
-      enum: [BASE_RECORD_STATES],
+      enum: BASE_RECORD_STATES,
       default: BASE_RECORD_STATES.ACTIVE,
     },
   },
