@@ -5,7 +5,8 @@ import { CustomError } from "../../domain/errors";
 
 export class PeriodMapper {
   static periodEntityFromObject(object: { [key: string]: any }): PeriodEntity {
-    const { _id, id, code, status, createdAt, updatedAt } = object;
+    const { _id, id, code, startDate, endDate, status, createdAt, updatedAt } =
+      object;
 
     if (!_id || !id) {
       throw CustomError.badRequest("Missing id");
@@ -16,6 +17,12 @@ export class PeriodMapper {
     if (!code) {
       throw CustomError.badRequest("Missing code");
     }
+    if (!startDate) {
+      throw CustomError.badRequest("Missing startDate");
+    }
+    if (!endDate) {
+      throw CustomError.badRequest("Missing endDate");
+    }
     if (!Object.values(BASE_RECORD_STATES).includes(status)) {
       throw CustomError.badRequest("Invalid status");
     }
@@ -25,7 +32,14 @@ export class PeriodMapper {
     if (!updatedAt) {
       throw new Error("Missing updatedAt");
     }
-
-    return new PeriodEntity(_id || id, code, status, createdAt, updatedAt);
+    return new PeriodEntity(
+      _id || id,
+      code,
+      startDate,
+      endDate,
+      status,
+      createdAt,
+      updatedAt
+    );
   }
 }

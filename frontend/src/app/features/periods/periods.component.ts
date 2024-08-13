@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
@@ -10,62 +10,85 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { finalize, map, Observable, of, tap } from 'rxjs';
 import {
+  ACTION_BUTTON_ADD,
   BASE_STATES_MAT_SELECT,
-  BASE_STATES_OPTIONS,
   COMMON_TABLE_ACTIONS,
+  DEFAULT_PAGE_SIZE,
 } from '../../core/constants/component.constant';
 import { TABLE_ACTIONS } from '../../core/enums/component.enum';
-import {
-  IMatSelectOption,
-  ITableAction,
-} from '../../core/interfaces/component.interface';
+import { BASE_RECORD_STATES } from '../../core/enums/general.enum';
+import { IApiResponse } from '../../core/interfaces/api-response.interface';
+import { ITableAction } from '../../core/interfaces/component.interface';
+import { IFilters } from '../../core/interfaces/general.interface';
+import { IPeriod, IPeriodTable } from '../../core/interfaces/period.interface';
 import { DataComparisonService } from '../../core/services/data-comparison.service';
+import { PeriodService } from '../../core/services/period.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
-import { MaxValueDirective } from '../../shared/directives/max-value.directive';
-import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
+import { StatusFormatterPipe } from '../../shared/pipes/status-formatter.pipe';
 import { DISPLAYED_COLUMNS_PERIODS } from './helpers/period.constant';
-import { IPeriod, IPeriodTable } from './interfaces/period.interface';
-import { PeriodService } from './services/period.service';
 
 @Component({
   selector: 'app-periods',
   standalone: true,
   imports: [
+    AsyncPipe,
+    DatePipe,
+    NgClass,
+    ReactiveFormsModule,
+
     MatButtonModule,
     MatCardModule,
+    MatDatepickerModule,
     MatFormFieldModule,
-    MatSelectModule,
     MatInputModule,
+    MatNativeDateModule,
     MatPaginator,
+    MatProgressBarModule,
+    MatSelectModule,
     MatTableModule,
     MatTooltipModule,
-    ReactiveFormsModule,
-    NgClass,
+
+    StatusFormatterPipe,
+
     MaxCharDirective,
-    MaxValueDirective,
-    OnlyNumbersDirective,
   ],
   templateUrl: './periods.component.html',
   // styleUrl: './periods.component.scss'
 })
 export default class PeriodsComponent implements OnInit {
   //TABLE
+  public isLoading: boolean = false;
+  public dataSource$: Observable<MatTableDataSource<IPeriodTable>> = of(
+    new MatTableDataSource<IPeriodTable>([])
+  );
+  public displayedColumns: string[] = DISPLAYED_COLUMNS_PERIODS;
+  private filters: IFilters = {
+    page: 1,
+    pageSize: DEFAULT_PAGE_SIZE[0],
+    status: [BASE_RECORD_STATES.ACTIVE, BASE_RECORD_STATES.INACTIVE],
+  };
+
+  // PAGINATOR
   @ViewChild(MatPaginator)
   public paginator: MatPaginator;
-  public dataSource = new MatTableDataSource<IPeriod>([]);
-  public DISPLAYED_COLUMNS: string[] = DISPLAYED_COLUMNS_PERIODS;
-  public BASE_STATES_OPTIONS: any = BASE_STATES_OPTIONS;
+  public totalCount: number = 0;
+  public defaultPageSize = DEFAULT_PAGE_SIZE;
 
   // BUTTONS
-  public buttonActive: TABLE_ACTIONS = TABLE_ACTIONS.ADD;
-  public TABLE_ACTIONS = TABLE_ACTIONS;
+  public actionButtons = TABLE_ACTIONS;
+  public actionButtonAdd = ACTION_BUTTON_ADD;
+  public activeActionButton = ACTION_BUTTON_ADD;
 
   // POPUP
   public classApplied: boolean = false;
@@ -73,138 +96,187 @@ export default class PeriodsComponent implements OnInit {
 
   // FORM
   public periodForm: FormGroup;
-  public BASE_STATES_MAT_SELECT = BASE_STATES_MAT_SELECT;
-  private periodSelected: IPeriodTable = {} as IPeriodTable;
+  public baseStatesOptions = BASE_STATES_MAT_SELECT;
+  private periodSelected: IPeriodTable | null = null;
 
   constructor(
     public themeService: CustomizerSettingsService,
     private _periodService: PeriodService,
     private _formBuilder: FormBuilder,
     private _dataComparisonService: DataComparisonService
-  ) {
-    this.periodForm = this.setPeriodForm();
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.fetchPeriods();
+    this.dataSource$ = this.fetchPeriodData();
+    this.periodForm = this.setForm(ACTION_BUTTON_ADD);
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource$.pipe(
+      tap((dataSource) => (dataSource.paginator = this.paginator))
+    );
   }
 
   // TABLE
-  public fetchPeriods(): void {
-    this._periodService.list().subscribe((res) => {
-      return this.setDataSource(res.data?.result);
-    });
+  public fetchPeriodData(): Observable<MatTableDataSource<IPeriodTable>> {
+    this.isLoading = true;
+    return this._periodService.list(this.filters).pipe(
+      map((res) => this.transformPeriodData(res)),
+      finalize(() => (this.isLoading = false))
+    );
   }
 
-  private setDataSource(periods?: IPeriod[]): void {
-    if (periods) {
-      const periodsWithAction = periods.map((period) => ({
-        ...period,
-        action: COMMON_TABLE_ACTIONS,
-      }));
-      this.dataSource.data = periodsWithAction;
-    } else {
-      this.dataSource.data = [];
-    }
+  private transformPeriodData(
+    res: IApiResponse<IPeriod[]>
+  ): MatTableDataSource<IPeriodTable> {
+    const periods = res.data?.result || [];
+    const periodsTable = periods.map((period) => ({
+      ...period,
+      actions: COMMON_TABLE_ACTIONS,
+    }));
+    this.totalCount = res.data?.totalCount || 0;
+    return new MatTableDataSource<IPeriodTable>(periodsTable);
   }
 
   // BUTTONS
-  public onActionAdd() {
-    this.periodSelected = {} as IPeriodTable;
-    this.titlePopup = 'Añadir';
-    this.buttonActive = TABLE_ACTIONS.ADD;
-    this.patchValueToForm(this.buttonActive);
+  public onActionButton(
+    actionButton: ITableAction,
+    rowSelected: IPeriodTable | null
+  ): void {
+    this.initializeForm(actionButton, rowSelected);
+    this.populateForm(actionButton, rowSelected);
     this.togglePopup();
-  }
-
-  public onAction(item: ITableAction, element: IPeriodTable): void {
-    this.periodSelected = element;
-    this.titlePopup = item.label;
-    this.buttonActive = item.name;
-    this.patchValueToForm(this.buttonActive);
-    this.togglePopup();
-  }
-
-  private patchValueToForm(action: TABLE_ACTIONS): void {
-    const { code, status } = this.periodSelected;
-    this.periodForm.patchValue({
-      code: action !== TABLE_ACTIONS.ADD ? code : '',
-      status: action !== TABLE_ACTIONS.ADD ? status : '',
-    });
-    if (action === TABLE_ACTIONS.VIEW) {
-      this.periodForm.disable();
-    } else {
-      this.periodForm.enable();
-    }
   }
 
   // POPUP
-  public togglePopup(): void {
+  private togglePopup(): void {
     this.classApplied = !this.classApplied;
   }
 
-  public onClosePopup(): void {
+  public closePopup(): void {
     this.periodForm.reset();
+    this.periodSelected = null;
     this.togglePopup();
   }
 
-  //FORM
-  private setPeriodForm(): FormGroup<any> {
-    return this._formBuilder.group({
+  // FORM
+  private initializeForm(
+    actionButton: ITableAction,
+    rowSelected: IPeriodTable | null
+  ): void {
+    this.activeActionButton = actionButton;
+    this.titlePopup = actionButton.label;
+    this.periodForm = this.setForm(actionButton);
+    this.periodSelected = rowSelected;
+  }
+
+  private setForm(actionButton: ITableAction): FormGroup {
+    const formConfig = this.getFormConfig(actionButton);
+    return this._formBuilder.group(formConfig);
+  }
+
+  private getFormConfig(actionButton: ITableAction): object {
+    const defaultFormConfig = {
       code: ['', [Validators.required]],
-      status: [''],
-    });
+      startDate: ['', [Validators.required]],
+      endDate: ['', [Validators.required]],
+    };
+
+    const viewAndEditFormConfig = {
+      ...defaultFormConfig,
+      status: ['', [Validators.required]],
+    };
+
+    const configMap = new Map<TABLE_ACTIONS, object>([
+      [TABLE_ACTIONS.ADD, defaultFormConfig],
+      [TABLE_ACTIONS.EDIT, viewAndEditFormConfig],
+      [TABLE_ACTIONS.VIEW, viewAndEditFormConfig],
+      [TABLE_ACTIONS.DELETE, {}],
+    ]);
+
+    return configMap.get(actionButton.name) || {};
+  }
+
+  private populateForm(
+    actionButton: ITableAction,
+    rowSelected: IPeriodTable | null
+  ): void {
+    this.toogleFormState(actionButton);
+
+    if (
+      actionButton.name === TABLE_ACTIONS.ADD ||
+      actionButton.name === TABLE_ACTIONS.DELETE ||
+      !rowSelected
+    ) {
+      return;
+    }
+
+    const { code, startDate, endDate, status } = rowSelected;
+
+    this.periodForm.patchValue({ code, startDate, endDate, status });
+  }
+
+  private toogleFormState(actionButton: ITableAction): void {
+    actionButton.name === TABLE_ACTIONS.VIEW
+      ? this.periodForm.disable()
+      : this.periodForm.enable();
+  }
+
+  public onPageChange($event: PageEvent): void {
+    const { pageIndex, pageSize } = $event;
+    this.filters = { ...this.filters, page: pageIndex + 1, limit: pageSize };
+    this.dataSource$ = this.fetchPeriodData();
   }
 
   public onSubmit(): void {
     if (this.periodForm.invalid) return;
-    if (this.buttonActive === TABLE_ACTIONS.ADD) {
-      this.onAddPeriod();
-    } else if (this.buttonActive === TABLE_ACTIONS.EDIT) {
-      this.onEditPeriod();
-    } else if (this.buttonActive === TABLE_ACTIONS.DELETE) {
-      this.onDeletePeriod();
-    }
   }
 
-  private onAddPeriod(): void {
-    const { code, status } = this.periodForm.value;
-    this._periodService
-      .register({ code, status })
-      .subscribe(() => this.afterProcessAction());
-  }
+  // public onSubmit(): void {
+  //   if (this.periodForm.invalid) return;
+  //   if (this.buttonActive === TABLE_ACTIONS.ADD) {
+  //     this.onAddPeriod();
+  //   } else if (this.buttonActive === TABLE_ACTIONS.EDIT) {
+  //     this.onEditPeriod();
+  //   } else if (this.buttonActive === TABLE_ACTIONS.DELETE) {
+  //     this.onDeletePeriod();
+  //   }
+  // }
 
-  public onEditPeriod(): void {
-    const { id, code, status } = this.periodSelected;
-    const formValues: Partial<IPeriod> = this.periodForm.value;
-    const periodSelectedValues: Partial<IPeriod> = {
-      code,
-      status,
-    };
-    const keys: (keyof IPeriod)[] = ['code', 'status'];
-    const updatedFields = this._dataComparisonService.compareAndUpdate<IPeriod>(
-      formValues,
-      periodSelectedValues,
-      keys
-    );
-    if (Object.keys(updatedFields).length > 0) {
-      this._periodService
-        .update(id, updatedFields)
-        .subscribe(() => this.afterProcessAction());
-    }
-  }
+  // private onAddPeriod(): void {
+  //   const { code, status } = this.periodForm.value;
+  //   this._periodService
+  //     .register({ code, status })
+  //     .subscribe(() => this.afterProcessAction());
+  // }
 
-  private onDeletePeriod(): void {
-    const { id } = this.periodSelected;
-    this._periodService.delete(id).subscribe(() => this.afterProcessAction());
-  }
+  // public onEditPeriod(): void {
+  //   const { id, code, status } = this.periodSelected;
+  //   const formValues: Partial<IPeriod> = this.periodForm.value;
+  //   const periodSelectedValues: Partial<IPeriod> = {
+  //     code,
+  //     status,
+  //   };
+  //   const keys: (keyof IPeriod)[] = ['code', 'status'];
+  //   const updatedFields = this._dataComparisonService.compareAndUpdate<IPeriod>(
+  //     formValues,
+  //     periodSelectedValues,
+  //     keys
+  //   );
+  //   if (Object.keys(updatedFields).length > 0) {
+  //     this._periodService
+  //       .update(id, updatedFields)
+  //       .subscribe(() => this.afterProcessAction());
+  //   }
+  // }
+
+  // private onDeletePeriod(): void {
+  //   const { id } = this.periodSelected;
+  //   this._periodService.delete(id).subscribe(() => this.afterProcessAction());
+  // }
 
   private afterProcessAction(): void {
-    this.fetchPeriods();
-    this.onClosePopup();
+    this.dataSource$ = this.fetchPeriodData();
+    this.closePopup();
   }
 }

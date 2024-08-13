@@ -16,12 +16,9 @@ export class UpdatePeriod implements UpdatePeriodUseCase {
     periodId: IdBaseDto,
     updatePeriodDto: UpdatePeriodDto
   ): Promise<Partial<IApiResponse<IPeriod>>> {
-    const period = await this.periodRepository.update(
-      periodId,
-      updatePeriodDto
-    );
+    await this.periodRepository.update(periodId, updatePeriodDto);
     return {
-      message: `Periodo se ha actualizado con éxito`,
+      message: `El período se ha actualizado con éxito`,
     };
   }
 }

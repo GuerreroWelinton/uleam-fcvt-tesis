@@ -25,7 +25,8 @@ export const ROLE_TEXTS: { [key in USER_ROLES]: string } = {
 
 export const BASE_STATES_OPTIONS: IStatusOption = {
   [BASE_RECORD_STATES.ACTIVE]: { label: 'Activo', class: 'confirmed' },
-  [BASE_RECORD_STATES.INACTIVE]: { label: 'Inactivo', class: 'rejected' },
+  [BASE_RECORD_STATES.INACTIVE]: { label: 'Inactivo', class: 'pending' },
+  [BASE_RECORD_STATES.DELETED]: { label: 'Eliminado', class: 'rejected' },
 };
 
 export const BOOKING_STATES_OPTIONS: IBookingStatusOption = {

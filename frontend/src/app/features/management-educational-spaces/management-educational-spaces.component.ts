@@ -63,7 +63,6 @@ import { UsersService } from '../users/services/users.service';
     AsyncPipe,
     NgClass,
     ReactiveFormsModule,
-    JsonPipe,
 
     MatButtonModule,
     MatCardModule,
@@ -245,7 +244,7 @@ export default class ManagementEducationalSpacesComponent
     return this._formBuilder.group(formConfig);
   }
 
-  private getFormConfig(actionButton: ITableAction): Object {
+  private getFormConfig(actionButton: ITableAction): object {
     const defaultFormConfig = {
       name: ['', [Validators.required]],
       code: ['', [Validators.required]],
@@ -260,7 +259,7 @@ export default class ManagementEducationalSpacesComponent
       status: ['', [Validators.required]],
     };
 
-    const configMap = new Map<TABLE_ACTIONS, Object>([
+    const configMap = new Map<TABLE_ACTIONS, object>([
       [TABLE_ACTIONS.ADD, defaultFormConfig],
       [TABLE_ACTIONS.EDIT, viewAndEditFormConfig],
       [TABLE_ACTIONS.VIEW, viewAndEditFormConfig],
