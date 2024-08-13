@@ -14,8 +14,7 @@ export class RegisterPeriod implements RegisterPeriodUseCase {
   async execute(
     registerPeriodDto: RegisterPeriodDto
   ): Promise<Partial<IApiResponse<IPeriod>>> {
-    const period = await this.periodRepository.register(registerPeriodDto);
-    const { code } = period;
+    const { code } = await this.periodRepository.register(registerPeriodDto);
 
     return {
       message: `Periodo con el código ${code} se ha registrado con éxito`,

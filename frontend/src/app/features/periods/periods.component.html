@@ -2,7 +2,7 @@
 <div
   class="breadcrumb-card mb-20 d-md-flex align-items-center justify-content-between"
 >
-  <h5 class="mb-0">Periodos</h5>
+  <h5 class="mb-0">Períodos</h5>
   <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
     <li class="breadcrumb-item position-relative">
       <a routerLink="/" class="d-inline-block position-relative">
@@ -10,13 +10,12 @@
         Administración
       </a>
     </li>
-    <li class="breadcrumb-item position-relative">Periodos</li>
+    <li class="breadcrumb-item position-relative">Períodos</li>
   </ol>
 </div>
 
-<!-- Page -->
+<!-- TABLE -->
 <div class="row">
-  <!-- Table -->
   <div class="col-lg-12">
     <mat-card
       class="daxa-card mb-20 border-radius bg-white border-none d-block"
@@ -26,18 +25,21 @@
           <button
             mat-button
             class="text-daxa p-0 h-auto"
-            (click)="onActionAdd()"
+            (click)="onActionButton(actionButtonAdd, null)"
           >
-            + Añadir periodo
+            + Añadir período
           </button>
         </mat-card-title>
-        <!-- TODO mat-card-subtitle -->
       </mat-card-header>
 
       <mat-card-content>
         <div [class.component-dark-theme]="themeService.isDark()">
+          @if (isLoading) {
+          <mat-progress-bar mode="query"></mat-progress-bar>
+          }
+
           <div class="splitter-table-container" tabindex="0">
-            <table mat-table [dataSource]="dataSource">
+            <table mat-table [dataSource]="(dataSource$ | async)!">
               <ng-container matColumnDef="code">
                 <th mat-header-cell *matHeaderCellDef>Código</th>
                 <td mat-cell *matCellDef="let element">
@@ -45,34 +47,50 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef>Fecha de inicio</th>
                 <td mat-cell *matCellDef="let element">
-                  <span
-                    class="daxa-badge d-inline-block"
-                    [ngClass]="BASE_STATES_OPTIONS[element.status].class"
-                  >
-                    {{ BASE_STATES_OPTIONS[element.status].label }}
-                  </span>
+                  {{ element.startDate | date : "dd/MM/yyyy" }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="action" stickyEnd>
+              <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef>Fecha de fin</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.endDate | date : "dd/MM/yyyy" }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let element">
+                  @if (element.status | statusFormatter; as formattedStatus) {
+                  <span
+                    class="daxa-badge d-inline-block"
+                    [ngClass]="formattedStatus.class"
+                  >
+                    {{ formattedStatus.label }}
+                  </span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions" stickyEnd>
                 <th mat-header-cell *matHeaderCellDef class="text-center">
                   Acciones
                 </th>
                 <td mat-cell *matCellDef="let element">
                   <div class="action-info">
-                    @for (item of element.action; track $index) {
+                    @for (actionButton of element.actions; track $index) {
                     <button
                       type="button"
                       mat-button
-                      [matTooltip]="item.label"
+                      [matTooltip]="actionButton.label"
                       matTooltipPosition="above"
-                      (click)="onAction(item, element)"
+                      (click)="onActionButton(actionButton, element)"
                     >
                       <i class="material-symbols-outlined">
-                        {{ item.name }}
+                        {{ actionButton.name }}
                       </i>
                     </button>
                     }
@@ -80,13 +98,16 @@
                 </td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="DISPLAYED_COLUMNS"></tr>
-              <tr mat-row *matRowDef="let row; columns: DISPLAYED_COLUMNS"></tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
           </div>
+
           <div class="mt-10">
             <mat-paginator
-              [pageSizeOptions]="[10, 25, 50, 100]"
+              [length]="totalCount"
+              [pageSizeOptions]="defaultPageSize"
+              (page)="onPageChange($event)"
             ></mat-paginator>
           </div>
         </div>
@@ -102,18 +123,20 @@
       >
         <mat-card-header>
           <mat-card-title>
-            <h5 class="mt-0 mb-0">{{ titlePopup }} edificio</h5>
+            <h5 class="mt-0 mb-0">{{ titlePopup }} período</h5>
           </mat-card-title>
           <mat-card-subtitle>
-            <button mat-button (click)="onClosePopup()">
+            <button mat-button (click)="closePopup()">
               <i class="ri-close-fill"></i>
             </button>
           </mat-card-subtitle>
         </mat-card-header>
+
         <mat-card-content>
           <form [formGroup]="periodForm" (ngSubmit)="onSubmit()">
             <div class="row">
-              @if (buttonActive !== TABLE_ACTIONS.DELETE) {
+              @if (activeActionButton.name !== actionButtons.DELETE) {
+
               <div class="col-md-12">
                 <label class="main-label d-block lh-1 text-black">
                   Código
@@ -128,15 +151,55 @@
                   />
                 </mat-form-field>
               </div>
-              @if (buttonActive !== TABLE_ACTIONS.ADD) {
+
               <div class="col-md-12">
                 <label class="main-label d-block lh-1 text-black">
-                  Estado
+                  Fecha de inicio
+                </label>
+                <mat-form-field>
+                  <mat-label> MM/DD/YYYY </mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="starDate"
+                    formControlName="startDate"
+                  />
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="starDate"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #starDate></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-12">
+                <label class="main-label d-block lh-1 text-black">
+                  Fecha de fin
+                </label>
+                <mat-form-field>
+                  <mat-label> MM/DD/YYYY </mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="endDate"
+                    formControlName="endDate"
+                  />
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="endDate"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #endDate></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              @if (activeActionButton.name !== actionButtons.ADD) {
+
+              <div class="col-md-12">
+                <label class="main-label d-block lh-1 text-black"
+                  >Estado
                 </label>
                 <mat-form-field>
                   <mat-label> Estado </mat-label>
                   <mat-select formControlName="status">
-                    @for (state of BASE_STATES_MAT_SELECT; track $index) {
+                    @for (state of baseStatesOptions; track $index) {
                     <mat-option [value]="state.value">
                       {{ state.viewValue }}
                     </mat-option>
@@ -144,8 +207,10 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+
               }
-              <!-- <div class="d-none"></div> -->
+              <!--  -->
+
               } @else {
               <div class="col-md-12 pb-15">
                 <p>
@@ -157,9 +222,12 @@
                 </p>
               </div>
 
-              } @if (buttonActive !== TABLE_ACTIONS.VIEW) {
+              }
+              <!--  -->
+
+              @if (activeActionButton.name !== actionButtons.VIEW) {
               <div class="btn-box">
-                <button mat-button type="button" (click)="onClosePopup()">
+                <button mat-button type="button" (click)="closePopup()">
                   Cancel
                 </button>
                 <button

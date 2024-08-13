@@ -19,6 +19,7 @@ export * from "./building/register-building.dto";
 export * from "./building/update-building.dto";
 
 //Period
+export * from "./period/list-period.dto";
 export * from "./period/register-period.dto";
 export * from "./period/update-period.dto";
 

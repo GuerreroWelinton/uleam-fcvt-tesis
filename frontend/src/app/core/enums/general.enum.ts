@@ -1,6 +1,7 @@
 export enum BASE_RECORD_STATES {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
+  DELETED = 'deleted',
 }
 
 export enum BOOKING_STATES {

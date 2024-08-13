@@ -1,6 +1,7 @@
 import { PeriodDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
+  ListPeriodDto,
   RegisterPeriodDto,
   UpdatePeriodDto,
 } from "../../domain/dtos";
@@ -10,12 +11,11 @@ import { PeriodRepository } from "../../domain/repositories";
 export class PeriodRepositoryImpl implements PeriodRepository {
   constructor(private readonly periodDataSource: PeriodDataSource) {}
 
-  list(): Promise<PeriodEntity[]> {
-    return this.periodDataSource.list();
+  list(
+    listPeriodDto: ListPeriodDto
+  ): Promise<{ periods: PeriodEntity[]; total: number }> {
+    return this.periodDataSource.list(listPeriodDto);
   }
-
-  //findById
-  //findOneByCode
 
   register(registerPeriodDto: RegisterPeriodDto): Promise<PeriodEntity> {
     return this.periodDataSource.register(registerPeriodDto);

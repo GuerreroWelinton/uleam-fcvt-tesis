@@ -1,11 +1,15 @@
-import { IdBaseDto, RegisterPeriodDto, UpdatePeriodDto } from "../dtos";
+import {
+  IdBaseDto,
+  ListPeriodDto,
+  RegisterPeriodDto,
+  UpdatePeriodDto,
+} from "../dtos";
 import { PeriodEntity } from "../entities";
 
 export abstract class PeriodDataSource {
-  abstract list(): Promise<PeriodEntity[]>;
-
-  //findById
-  //findOneByCode
+  abstract list(
+    listPeriodDto: ListPeriodDto
+  ): Promise<{ periods: PeriodEntity[]; total: number }>;
 
   abstract register(
     registerPeriodDto: RegisterPeriodDto

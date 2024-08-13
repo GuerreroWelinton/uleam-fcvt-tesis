@@ -1,19 +1,20 @@
 import { AsyncPipe, JsonPipe, NgClass } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { tap } from 'rxjs';
 import { ROLE_TEXTS } from '../../../core/constants/component.constant';
+import { BASE_RECORD_STATES } from '../../../core/enums/general.enum';
+import { PeriodService } from '../../../core/services/period.service';
 import { AppState } from '../../../core/store';
 import { UserActions } from '../../../core/store/user/user.actions';
 import { selectAuthUser } from '../../../core/store/user/user.selectors';
-import { PeriodService } from '../../../features/periods/services/period.service';
 import { ToggleService } from '../../../shared/components/sidebar/toggle.service';
 import { CustomizerSettingsService } from '../customizer-settings/customizer-settings.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -37,13 +38,19 @@ export class HeaderComponent {
   public profile$ = this._store.select(selectAuthUser);
 
   public selectedPeriod: string = '';
-  public periods$ = this._periodService.list().pipe(
-    tap((periods) => {
-      if (periods && periods.data?.result && periods.data.result.length > 0) {
-        this.selectedPeriod = periods.data.result[0].id;
-      }
+  public periods$ = this._periodService
+    .list({
+      page: 1,
+      limit: 10,
+      status: [BASE_RECORD_STATES.ACTIVE],
     })
-  );
+    .pipe(
+      tap((periods) => {
+        if (periods && periods.data?.result && periods.data.result.length > 0) {
+          this.selectedPeriod = periods.data.result[0].id;
+        }
+      })
+    );
   public ROLE_TEXTS = ROLE_TEXTS;
 
   constructor(

@@ -3,6 +3,7 @@ import { PeriodModel } from "../../data/mongodb";
 import { PeriodDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
+  ListPeriodDto,
   RegisterPeriodDto,
   UpdatePeriodDto,
 } from "../../domain/dtos";
@@ -14,40 +15,71 @@ import { PeriodMapper } from "../mappers";
 export class PeriodDataSourceImpl implements PeriodDataSource {
   constructor() {}
 
-  async list(): Promise<PeriodEntity[]> {
-    return handleTryCatch<PeriodEntity[]>(async () => {
-      const periods = await PeriodModel.find({
-        status: { $ne: BASE_RECORD_STATES.DELETED },
-      })
-        .sort({ createdAt: -1 })
-        .exec();
+  async list(
+    listPeriodDto: ListPeriodDto
+  ): Promise<{ periods: PeriodEntity[]; total: number }> {
+    return handleTryCatch<{ periods: PeriodEntity[]; total: number }>(
+      async () => {
+        const {
+          limit,
+          page,
+          id,
+          code,
+          startDate,
+          endDate,
+          status,
+          createdAt,
+          updatedAt,
+        } = listPeriodDto;
 
-      return periods.map((period) => {
-        return PeriodMapper.periodEntityFromObject(period);
-      });
-    });
+        let skip: number = 0;
+        let formattedLimit: number = 0;
+        if (limit && page) {
+          const formattedPage = +page;
+          formattedLimit = +limit;
+          skip = formattedLimit * (formattedPage - 1);
+        }
+
+        const query = {
+          ...(id && { _id: id }),
+          ...(code && { code }),
+          ...(startDate && { startDate: { $gte: startDate } }),
+          ...(endDate && { endDate: { $lte: endDate } }),
+          ...(status && { status: { $in: status } }),
+          ...(createdAt && { createdAt: { $gte: createdAt } }),
+          ...(updatedAt && { updatedAt: { $lte: updatedAt } }),
+        };
+
+        const periods = await PeriodModel.find(query)
+          .limit(formattedLimit)
+          .skip(skip)
+          .sort({ createdAt: -1 })
+          .exec();
+
+        const total = await PeriodModel.countDocuments(query).exec();
+
+        return {
+          periods: periods.map((period) =>
+            PeriodMapper.periodEntityFromObject(period)
+          ),
+          total,
+        };
+      }
+    );
   }
-
-  //findById
-  //findOneByCode
 
   async register(registerPeriodDto: RegisterPeriodDto): Promise<PeriodEntity> {
     return handleTryCatch<PeriodEntity>(async () => {
-      const { code, status } = registerPeriodDto;
+      const { code, startDate, endDate, status } = registerPeriodDto;
 
-      const existingPeriod = await PeriodModel.findOne({
-        code,
-        status: { $ne: BASE_RECORD_STATES.DELETED },
-      }).exec();
-
+      const query = { code, status: { $ne: BASE_RECORD_STATES.DELETED } };
+      const existingPeriod = await PeriodModel.exists(query).exec();
       if (existingPeriod) {
         throw CustomError.conflict("Ya existe un periodo con el mismo código");
       }
 
-      const period = await PeriodModel.create({
-        code,
-        status,
-      });
+      const data = { code, startDate, endDate, status };
+      const period = await PeriodModel.create(data);
       await period.save();
 
       return PeriodMapper.periodEntityFromObject(period);
@@ -57,12 +89,12 @@ export class PeriodDataSourceImpl implements PeriodDataSource {
   async delete(periodId: IdBaseDto): Promise<PeriodEntity> {
     return handleTryCatch<PeriodEntity>(async () => {
       const { id } = periodId;
+
       const deletedPeriod = await PeriodModel.findOneAndUpdate(
         { _id: id, status: { $ne: BASE_RECORD_STATES.DELETED } },
         { status: BASE_RECORD_STATES.DELETED },
         { new: true }
       ).exec();
-
       if (!deletedPeriod) {
         throw CustomError.notFound("El periodo que desea eliminar no existe");
       }
@@ -82,20 +114,26 @@ export class PeriodDataSourceImpl implements PeriodDataSource {
     }
 
     const { id } = periodId;
-    const { code, status } = updatePeriodDto;
+    const { code, startDate, endDate, status } = updatePeriodDto;
 
-    const existingPeriod = await PeriodModel.findOne({
-      code,
-      status: { $ne: BASE_RECORD_STATES.DELETED },
-    }).exec();
-
-    if (existingPeriod) {
-      throw CustomError.conflict("Ya existe un periodo con el mismo código");
+    if (code) {
+      const query = { code, status: { $ne: BASE_RECORD_STATES.DELETED } };
+      const existingPeriod = await PeriodModel.exists(query).exec();
+      if (existingPeriod) {
+        throw CustomError.conflict("Ya existe un periodo con el mismo código");
+      }
     }
+
+    const data = {
+      ...(code && { code }),
+      ...(startDate && { startDate: { $gte: startDate } }),
+      ...(endDate && { endDate: { $lte: endDate } }),
+      ...(status && { status }),
+    };
 
     const updatedPeriod = await PeriodModel.findOneAndUpdate(
       { _id: id, status: { $ne: BASE_RECORD_STATES.DELETED } },
-      { code, status },
+      { ...data },
       { new: true }
     ).exec();
 
