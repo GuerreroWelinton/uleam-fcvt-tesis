@@ -21,3 +21,6 @@ export * from "./booking.interface";
 
 //Api
 export * from "./api-response.interface";
+
+//File Upload
+export * from "./file-upload.interface";

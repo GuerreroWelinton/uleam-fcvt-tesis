@@ -9,3 +9,4 @@ export * from "./models/subject.model";
 export * from "./models/career.model";
 export * from "./models/educational-space.model";
 export * from "./models/booking.model";
+export * from "./models/file-upload.model";

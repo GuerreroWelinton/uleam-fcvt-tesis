@@ -110,20 +110,6 @@ export const USER_ROLES_OPTIONS: {
   // },
 ];
 
-//Delete this
-export const BASE_LEVEL_SELECT: IMatSelectOption<string>[] = [
-  { value: 'PRIMERO', viewValue: 'PRIMERO' },
-  { value: 'SEGUNDO', viewValue: 'SEGUNDO' },
-  { value: 'TERCERO', viewValue: 'TERCERO' },
-  { value: 'CUARTO', viewValue: 'CUARTO' },
-  { value: 'QUINTO', viewValue: 'QUINTO' },
-  { value: 'SEXTO', viewValue: 'SEXTO' },
-  { value: 'SEPTIMO', viewValue: 'SEPTIMO' },
-  { value: 'OCTAVO', viewValue: 'OCTAVO' },
-  { value: 'NOVENO', viewValue: 'NOVENO' },
-  { value: 'DECIMO', viewValue: 'DECIMO' },
-];
-
 import { CalendarOptions } from '@fullcalendar/core';
 import esLocale from '@fullcalendar/core/locales/es';
 import interactionPlugin from '@fullcalendar/interaction';

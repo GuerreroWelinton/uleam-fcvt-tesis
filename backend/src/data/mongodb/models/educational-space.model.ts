@@ -1,24 +1,6 @@
 import { model, Schema } from "mongoose";
 import { BASE_RECORD_STATES } from "../../../constants/constants";
 
-// const HoursOfOperationSchema = new mongoose.Schema({
-//   dayOfWeek: {
-//     type: String,
-//     enum: Object.values(DAY_OF_WEEK),
-//     required: [true, "Day of week is required"],
-//   },
-//   startTime: {
-//     type: String,
-//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
-//     required: [true, "Start is required"],
-//   },
-//   endTime: {
-//     type: String,
-//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
-//     required: [true, "End is required"],
-//   },
-// });
-
 const EducationalSpaceSchema = new Schema(
   {
     name: {
@@ -37,10 +19,7 @@ const EducationalSpaceSchema = new Schema(
       type: Number,
       required: [true, "Capacity is required"],
     },
-    // hoursOfOperation: {
-    //   type: [HoursOfOperationSchema],
-    //   required: [true, "Hours operation is required"],
-    // },
+
     buildingId: {
       type: Schema.Types.ObjectId,
       ref: "Building",
@@ -67,6 +46,34 @@ const EducationalSpaceSchema = new Schema(
   }
 );
 
+export const EducationalSpaceModel = model(
+  "Educational-Space",
+  EducationalSpaceSchema
+);
+
+// hoursOfOperation: {
+//   type: [HoursOfOperationSchema],
+//   required: [true, "Hours operation is required"],
+// },
+
+// const HoursOfOperationSchema = new mongoose.Schema({
+//   dayOfWeek: {
+//     type: String,
+//     enum: Object.values(DAY_OF_WEEK),
+//     required: [true, "Day of week is required"],
+//   },
+//   startTime: {
+//     type: String,
+//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
+//     required: [true, "Start is required"],
+//   },
+//   endTime: {
+//     type: String,
+//     match: /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/,
+//     required: [true, "End is required"],
+//   },
+// });
+
 // BuildingSchema.pre("save", async function (next) {
 //   const building = this;
 //   if (!building.hoursOperation.length) {
@@ -78,8 +85,3 @@ const EducationalSpaceSchema = new Schema(
 //   }
 //   next();
 // });
-
-export const EducationalSpaceModel = model(
-  "Educational-Space",
-  EducationalSpaceSchema
-);

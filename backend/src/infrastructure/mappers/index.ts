@@ -18,3 +18,6 @@ export * from "./educational-space.mapper";
 
 //Booking
 export * from "./booking.mapper";
+
+//FileUpload
+export * from "./file-upload.mapper";

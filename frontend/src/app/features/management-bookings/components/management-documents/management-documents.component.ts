@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -20,20 +20,28 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileUploadModule } from '@iplab/ngx-file-upload';
-import { map, Observable, of, tap } from 'rxjs';
+import { finalize, map, Observable, of, tap } from 'rxjs';
 import {
   ACTION_BUTTON_ADD,
+  ACTION_BUTTON_DOWNLOAD,
   DEFAULT_PAGE_SIZE,
 } from '../../../../core/constants/component.constant';
 import { TABLE_ACTIONS } from '../../../../core/enums/component.enum';
 import {
   IFiles,
-  IFilesTable,
   ITableAction,
 } from '../../../../core/interfaces/component.interface';
 import { PopupContainerService } from '../../../../core/services/popup-container.service';
 import { CustomizerSettingsService } from '../../../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../../../shared/directives/max-char.directive';
+import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
+import {
+  IFileUpload,
+  IFileUploadTable,
+} from '../../../../core/interfaces/file-upload.interface';
+import { IApiResponse } from '../../../../core/interfaces/api-response.interface';
+import { FileSizePipe } from '../../../../shared/pipes/file-size.pipe';
+import { FileDownloadService } from '../../../../core/services/file-download.service';
 
 @Component({
   selector: 'app-management-documents',
@@ -41,6 +49,7 @@ import { MaxCharDirective } from '../../../../shared/directives/max-char.directi
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
+    JsonPipe,
 
     MatButtonModule,
     MatProgressBarModule,
@@ -52,6 +61,8 @@ import { MaxCharDirective } from '../../../../shared/directives/max-char.directi
     FileUploadModule,
 
     MaxCharDirective,
+
+    FileSizePipe,
   ],
   templateUrl: './management-documents.component.html',
 })
@@ -63,10 +74,10 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
 
   // TABLE
   public isLoading: boolean = false;
-  public dataSource$: Observable<MatTableDataSource<IFilesTable>> = of(
-    new MatTableDataSource<IFilesTable>([])
+  public dataSource$: Observable<MatTableDataSource<IFileUploadTable>> = of(
+    new MatTableDataSource<IFileUploadTable>([])
   );
-  public displayedColumns = ['name', 'size', 'actions'];
+  public displayedColumns = ['originalName', 'size', 'actions'];
 
   // PAGINATION
   @ViewChild(MatPaginator)
@@ -81,12 +92,14 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
 
   // FORM
   public filesForm: FormGroup;
-  public selectedFile: IFilesTable | null = null;
+  public selectedFile: IFileUploadTable | null = null;
 
   constructor(
     public themeService: CustomizerSettingsService,
     private _popupContainerService: PopupContainerService,
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    private _eduSpaceService: ManagementEducationalSpacesService,
+    private _fileDownloadService: FileDownloadService
   ) {}
 
   ngOnInit(): void {
@@ -101,51 +114,63 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   }
 
   // TABLE
-  private fetchFiles(): Observable<MatTableDataSource<IFilesTable>> {
-    // this.isLoading = true;
-    return of(filesData).pipe(
-      map((res) => {
-        this.totalCount = res.length;
-        const files = res.map((file) => ({
-          ...file,
-          actions: [
-            { label: 'Descargar', name: TABLE_ACTIONS.DOWNLOAD },
-            { label: 'Eliminar', name: TABLE_ACTIONS.DELETE },
-          ],
-        }));
-        return new MatTableDataSource<IFilesTable>(files);
-      }),
-      tap((dataSource) => (dataSource.paginator = this.paginator))
-      // finalize(() => (this.isLoading = false))
+  private fetchFiles(): Observable<MatTableDataSource<IFileUploadTable>> {
+    this.isLoading = true;
+    return this._eduSpaceService.listPdf().pipe(
+      map((res) => this.transformFilesResponse(res)),
+      finalize(() => (this.isLoading = false))
     );
+  }
+
+  private transformFilesResponse(
+    res: IApiResponse<IFileUpload[]>
+  ): MatTableDataSource<IFileUploadTable> {
+    this.totalCount = res.data?.totalCount || 0;
+    const files = res.data?.result || [];
+    const filesTable = files.map((file) => ({
+      ...file,
+      actions: [ACTION_BUTTON_DOWNLOAD],
+    }));
+
+    return new MatTableDataSource<IFileUploadTable>(filesTable);
   }
 
   // BUTTONS
   public onActionButton(
     actionButton: ITableAction,
-    rowSelected: IFilesTable | null
+    rowSelected: IFileUploadTable | null
   ): void {
-    this.processAction(actionButton);
     this.initializeForm(actionButton, rowSelected);
+    this.processAction(actionButton);
   }
 
   private processAction(actionButton: ITableAction): void {
     if (
       actionButton.name === TABLE_ACTIONS.ADD ||
-      actionButton.name === TABLE_ACTIONS.DELETE
+      actionButton.name === TABLE_ACTIONS.DELETE ||
+      !this.selectedFile
     ) {
       this.showPopup();
+      return;
     }
     if (actionButton.name === TABLE_ACTIONS.DOWNLOAD) {
-      console.log('DOWNLOAD FILE ...');
+      console.log(this.selectedFile);
+      const { originalName, path } = this.selectedFile;
+      this.onDownloadFile(path, originalName);
     }
     return;
+  }
+
+  private onDownloadFile(filePath: string, fileName: string) {
+    this._fileDownloadService.downloadFile(filePath).subscribe((blob) => {
+      this._fileDownloadService.triggerDownload(blob, fileName);
+    });
   }
 
   // FORM
   private initializeForm(
     actionButton: ITableAction,
-    rowSelected: IFilesTable | null
+    rowSelected: IFileUploadTable | null
   ): void {
     this.activeActionButton = actionButton;
     this.titlePopup = actionButton.label;
@@ -158,7 +183,7 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
       return this._formBuilder.group({});
     }
     return this._formBuilder.group({
-      name: ['', [Validators.required]],
+      name: [''],
       size: [''],
     });
   }

@@ -1,10 +1,14 @@
 import { EducationalSpaceDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
+  ListFileUploadDto,
   RegisterEducationalSpaceDto,
   UpdateEducationalSpaceDto,
 } from "../../domain/dtos";
-import { EducationalSpaceEntity } from "../../domain/entities";
+import {
+  EducationalSpaceEntity,
+  FileUploadEntity,
+} from "../../domain/entities";
 import { EducationalSpaceRepository } from "../../domain/repositories";
 
 export class EducationalSpaceRepositoryImpl
@@ -42,5 +46,18 @@ export class EducationalSpaceRepositoryImpl
 
   listByUserId(userId: IdBaseDto): Promise<EducationalSpaceEntity[]> {
     return this.educationalSpaceDataSource.listByUserId(userId);
+  }
+
+  uploadPdf(
+    educationalSpaceId: IdBaseDto,
+    file: Express.Multer.File
+  ): Promise<FileUploadEntity> {
+    return this.educationalSpaceDataSource.uploadPdf(educationalSpaceId, file);
+  }
+
+  listPdf(
+    listFileUploadDto: ListFileUploadDto
+  ): Promise<{ files: FileUploadEntity[]; total: number }> {
+    return this.educationalSpaceDataSource.listPdf(listFileUploadDto);
   }
 }

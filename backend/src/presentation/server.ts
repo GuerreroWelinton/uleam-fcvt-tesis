@@ -1,5 +1,7 @@
-import express, { Router } from "express";
 import cors from "cors";
+import express, { Router } from "express";
+import path from "path";
+import { API_VERSION_PATH, MAIN_ENDPOINTS } from "../constants/constants";
 
 interface IOptions {
   port?: number;
@@ -30,6 +32,7 @@ export class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`, express.static(path.join(__dirname, "../uploads")));
 
     //Routes
     this.app.use(this.routes);

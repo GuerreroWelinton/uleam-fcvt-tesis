@@ -44,7 +44,7 @@ import {
   IEducationalSpace,
   IEducationalSpaceTable,
 } from './interfaces/educational-spaces.interface';
-import { ManagementEducationalSpacesService } from './services/management-educational-spaces.service';
+import { ManagementEducationalSpacesService } from '../../core/services/management-educational-spaces.service';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import {

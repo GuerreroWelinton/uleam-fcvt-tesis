@@ -3,7 +3,7 @@ import {
   EducationalSpaceDataSourceImpl,
   EducationalSpaceRepositoryImpl,
 } from "../../infrastructure";
-import { AuthMiddleware } from "../middlewares";
+import { AuthMiddleware, FileUploadMiddleware } from "../middlewares";
 import { EducationalSpaceController } from "./controller";
 
 export class EducationalSpaceRoutes {
@@ -46,6 +46,18 @@ export class EducationalSpaceRoutes {
       "/list-by-user/:id",
       [AuthMiddleware.validateJWT],
       educationalSpaceController.listByUserId
+    );
+
+    router.post(
+      "/upload-pdf/:id",
+      [AuthMiddleware.validateJWT, FileUploadMiddleware.uploadPdfFile],
+      educationalSpaceController.uploadPdf
+    );
+
+    router.get(
+      "/list-pdf",
+      [AuthMiddleware.validateJWT],
+      educationalSpaceController.listPdf
     );
 
     return router;

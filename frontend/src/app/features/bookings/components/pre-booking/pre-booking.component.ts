@@ -5,7 +5,7 @@ import { map, Observable, of } from 'rxjs';
 import { PreBookingService } from '../../../../core/services/pre-booking.service';
 import { CardEducationalSpaceComponent } from '../../../../shared/components/card-educational-space/card-educational-space.component';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
-import { ManagementEducationalSpacesService } from '../../../management-educational-spaces/services/management-educational-spaces.service';
+import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
 
 @Component({
   selector: 'app-pre-booking',
