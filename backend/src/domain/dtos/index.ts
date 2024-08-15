@@ -36,3 +36,4 @@ export * from "./booking/update-booking.dto";
 export * from "./base/id-base.dto";
 export * from "./base/code-base.dto";
 export * from "./base/pagination-base.dto";
+export * from "./base/list-file-upload-base.dto";

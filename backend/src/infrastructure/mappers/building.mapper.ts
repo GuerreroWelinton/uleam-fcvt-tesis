@@ -43,9 +43,9 @@ export class BuildingMapper {
       throw CustomError.badRequest("Missing status");
     }
 
-    if (!createdAt) throw new Error("Missing createdAt");
+    if (!createdAt) CustomError.badRequest("Missing createdAt");
 
-    if (!updatedAt) throw new Error("Missing updatedAt");
+    if (!updatedAt) CustomError.badRequest("Missing updatedAt");
 
     return new BuildingEntity(
       _id || id,

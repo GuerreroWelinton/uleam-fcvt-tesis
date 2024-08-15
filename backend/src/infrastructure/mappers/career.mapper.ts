@@ -45,11 +45,11 @@ export class CareerMapper {
     }
 
     if (!createdAt) {
-      throw new Error("Missing createdAt");
+      throw CustomError.badRequest("Missing createdAt");
     }
 
     if (!updatedAt) {
-      throw new Error("Missing updatedAt");
+      throw CustomError.badRequest("Missing updatedAt");
     }
 
     return new CareerEntity(

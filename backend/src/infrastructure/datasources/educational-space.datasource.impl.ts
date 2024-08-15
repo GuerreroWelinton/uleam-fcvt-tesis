@@ -2,18 +2,23 @@ import { BASE_RECORD_STATES } from "../../constants/constants";
 import {
   BuildingModel,
   EducationalSpaceModel,
+  FileUploadModel,
   UserModel,
 } from "../../data/mongodb";
 import { EducationalSpaceDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
+  ListFileUploadDto,
   RegisterEducationalSpaceDto,
   UpdateEducationalSpaceDto,
 } from "../../domain/dtos";
-import { EducationalSpaceEntity } from "../../domain/entities";
+import {
+  EducationalSpaceEntity,
+  FileUploadEntity,
+} from "../../domain/entities";
 import { CustomError } from "../../domain/errors";
 import { handleTryCatch } from "../../utils";
-import { EducationalSpaceMapper } from "../mappers";
+import { EducationalSpaceMapper, FileUploadMapper } from "../mappers";
 
 export class EducationalSpaceDataSourceImpl
   implements EducationalSpaceDataSource
@@ -242,5 +247,74 @@ export class EducationalSpaceDataSourceImpl
         );
       });
     });
+  }
+
+  async uploadPdf(
+    educationalSpaceId: IdBaseDto,
+    file: Express.Multer.File
+  ): Promise<FileUploadEntity> {
+    return handleTryCatch<FileUploadEntity>(async () => {
+      const { id } = educationalSpaceId;
+      const { originalname, path, mimetype, size } = file;
+
+      const existingEducationalSpace = await EducationalSpaceModel.findOne({
+        _id: id,
+        status: { $ne: BASE_RECORD_STATES.DELETED },
+      }).exec();
+      if (!existingEducationalSpace) {
+        throw CustomError.notFound(
+          "El espacio educativo al que desea subir el archivo no existe"
+        );
+      }
+
+      const fileUploaded = await FileUploadModel.create({
+        originalName: originalname,
+        path,
+        mimetype,
+        size,
+        recordId: id,
+      });
+      await fileUploaded.save();
+
+      return FileUploadMapper.fileUploadEntityFromObject(fileUploaded);
+    });
+  }
+
+  async listPdf(
+    listFileUploadDto: ListFileUploadDto
+  ): Promise<{ files: FileUploadEntity[]; total: number }> {
+    return handleTryCatch<{ files: FileUploadEntity[]; total: number }>(
+      async () => {
+        const { recordId, limit, page, status } = listFileUploadDto;
+
+        let skip: number = 0;
+        let formattedLimit: number = 0;
+        if (limit && page) {
+          const formattedPage = +page;
+          formattedLimit = +limit;
+          skip = formattedLimit * (formattedPage - 1);
+        }
+
+        const query = {
+          ...(recordId && { recordId }),
+          ...(status && { status: { $in: status } }),
+        };
+
+        const files = await FileUploadModel.find(query)
+          .limit(formattedLimit)
+          .skip(skip)
+          .sort({ createdAt: -1 })
+          .exec();
+
+        const total = await FileUploadModel.countDocuments(query).exec();
+
+        return {
+          files: files.map((file) =>
+            FileUploadMapper.fileUploadEntityFromObject(file)
+          ),
+          total,
+        };
+      }
+    );
   }
 }

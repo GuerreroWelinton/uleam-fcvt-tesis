@@ -8,6 +8,7 @@ import { PeriodRoutes } from "./period/routes";
 import { BuildingRoutes } from "./building/routes";
 import { EducationalSpaceRoutes } from "./educational-space/routes";
 import { BookingRoutes } from "./booking/routes";
+import path from "path";
 
 export class AppRoutes {
   static get routes(): Router {

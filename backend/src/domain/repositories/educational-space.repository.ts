@@ -1,9 +1,10 @@
 import {
   IdBaseDto,
+  ListFileUploadDto,
   RegisterEducationalSpaceDto,
   UpdateEducationalSpaceDto,
 } from "../dtos";
-import { EducationalSpaceEntity } from "../entities";
+import { EducationalSpaceEntity, FileUploadEntity } from "../entities";
 
 export abstract class EducationalSpaceRepository {
   abstract list(): Promise<EducationalSpaceEntity[]>;
@@ -22,4 +23,14 @@ export abstract class EducationalSpaceRepository {
   ): Promise<EducationalSpaceEntity>;
 
   abstract listByUserId(userId: IdBaseDto): Promise<EducationalSpaceEntity[]>;
+
+  abstract uploadPdf(
+    educationalSpaceId: IdBaseDto,
+    file: Express.Multer.File
+  ): Promise<FileUploadEntity>;
+
+  abstract listPdf(listFileUploadDto: ListFileUploadDto): Promise<{
+    files: FileUploadEntity[];
+    total: number;
+  }>;
 }

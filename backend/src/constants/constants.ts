@@ -19,6 +19,7 @@ export enum MAIN_ENDPOINTS {
   EDUCATIONAL_SPACES = "/educational-spaces",
   BOOKINGS = "/bookings",
   PERIODS = "/periods",
+  UPLOADS = "/uploads",
 }
 
 export enum BASE_RECORD_STATES {
