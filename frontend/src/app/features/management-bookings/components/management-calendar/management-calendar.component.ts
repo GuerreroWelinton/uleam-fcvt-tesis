@@ -37,6 +37,7 @@ import { OnBookingService } from '../../../../core/services/on-booking.service';
 import { PopupContainerService } from '../../../../core/services/popup-container.service';
 import { PreBookingService } from '../../../../core/services/pre-booking.service';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
+import { InfoCalendarComponent } from '../../../../shared/components/info-calendar/info-calendar.component';
 
 //todo: refactor
 import 'moment/locale/es';
@@ -49,11 +50,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   standalone: true,
   imports: [
     ReactiveFormsModule,
-
     FullCalendarModule,
     MatCardModule,
     MatButtonModule,
     MatInputModule,
+    InfoCalendarComponent,
   ],
   templateUrl: './management-calendar.component.html',
 })
@@ -165,19 +166,22 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // FORM
   private initializeForm(): FormGroup {
     return this._formBuilder.group({
-      date: ['', [Validators.required]],
-      startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]],
-      teacher: ['', [Validators.required]],
-      building: ['', [Validators.required]],
-      eduSpace: ['', [Validators.required]],
-      career: ['', [Validators.required]],
-      subject: ['', [Validators.required]],
-      academicLevel: ['', [Validators.required]],
-      number_participants: ['', [Validators.required]],
-      topic: ['', [Validators.required]],
-      observation: ['', [Validators.required]],
-      status: ['', [Validators.required]],
+      date: [{ value: '', disabled: true }, , [Validators.required]],
+      startTime: [{ value: '', disabled: true }, , [Validators.required]],
+      endTime: [{ value: '', disabled: true }, , [Validators.required]],
+      teacher: [{ value: '', disabled: true }, , [Validators.required]],
+      building: [{ value: '', disabled: true }, , [Validators.required]],
+      eduSpace: [{ value: '', disabled: true }, , [Validators.required]],
+      career: [{ value: '', disabled: true }, , [Validators.required]],
+      subject: [{ value: '', disabled: true }, , [Validators.required]],
+      academicLevel: [{ value: '', disabled: true }, , [Validators.required]],
+      number_participants: [
+        { value: '', disabled: true },
+        [Validators.required],
+      ],
+      topic: [{ value: '', disabled: true }, , [Validators.required]],
+      observation: [{ value: '', disabled: true }, , [Validators.required]],
+      status: [{ value: '', disabled: true }, , [Validators.required]],
     });
   }
 
@@ -240,6 +244,8 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // REPORT
   //todo: refactor
   public generateReport() {
+    console.log(this.selectedBooking);
+
     let participants: any = [];
     let participants2: any = [
       { text: 'NOMBRES', style: 'tableHeader' },

@@ -1,4 +1,5 @@
 <div class="row">
+  @if (isManagamentRoute) {
   <div class="mb-20">
     <button
       mat-button
@@ -8,6 +9,7 @@
       + Agregar documento
     </button>
   </div>
+  }
 
   <div [class.component-dark-theme]="themeService.isDark()">
     @if (isLoading) {
@@ -88,17 +90,16 @@
         <div class="col-lg-12">
           <label class="main-label d-block lh-1 text-black">Nombre</label>
           <mat-form-field>
-            <mat-label>Nombre</mat-label>
+            <mat-label>Este campo es autogenerado</mat-label>
             <input
               matInput
               placeholder="Ej. Normas del espacio educativo"
               formControlName="name"
-              [sharedMaxChar]="50"
             />
           </mat-form-field>
         </div>
         <div class="col-lg-12">
-          <label class="main-label d-block lh-1 text-black">Tamaño</label>
+          <label class="main-label d-block lh-1 text-black">Tamaño (MB)</label>
           <mat-form-field>
             <mat-label>Este campo es autogenerado</mat-label>
             <input
@@ -116,6 +117,7 @@
               class="file-uploader"
               [multiple]="false"
               [control]="fileUploadControl"
+              [accept]="'.pdf'"
             ></file-upload>
           </div>
         </div>

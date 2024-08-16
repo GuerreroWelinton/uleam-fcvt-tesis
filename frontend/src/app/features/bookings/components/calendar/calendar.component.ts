@@ -57,22 +57,26 @@ import { IEducationalSpace } from '../../../management-educational-spaces/interf
 import { ISubject } from '../../../subjects/interfaces/subjects.interface';
 import { SubjectsService } from '../../../subjects/services/subjects.service';
 import { IUser } from '../../../users/interfaces/user.interface';
+import { InfoCalendarComponent } from '../../../../shared/components/info-calendar/info-calendar.component';
+import { MatListModule } from '@angular/material/list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-
     FullCalendarModule,
     MatCardModule,
     MatButtonModule,
     MatInputModule,
     MatSelectModule,
     FileUploadModule,
-
     DownloadFileDirective,
     JsonPipe,
+    InfoCalendarComponent,
+    MatListModule,
+    MatCheckboxModule,
   ],
   templateUrl: './calendar.component.html',
 })
@@ -115,7 +119,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
   public templateFileUrl: string = TEMPLATE_FILE_ROUTES;
   public fileName: string = 'Template_participants.xlsx';
   private participants: { name: string }[] = [];
-  public bookingParticipants: { name: string }[] = [];
+  public bookingParticipants: {
+    name: string;
+    attended: boolean;
+    _id: string;
+  }[] = [];
 
   constructor(
     private _popupContainerService: PopupContainerService,
@@ -174,7 +182,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.showPopup(this.assistanceTemplate);
   }
 
-  private setParticipants(participants: any[]): void {
+  private setParticipants(
+    participants: { name: string; attended: boolean; _id: string }[]
+  ): void {
     const participantsFormArray = this.assistenceForm.get(
       'participants'
     ) as FormArray;
@@ -254,16 +264,19 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private initializeForm(): FormGroup {
     return this._formBuilder.group({
-      date: ['', [Validators.required]],
-      startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]],
-      teacher: ['', [Validators.required]],
-      building: ['', [Validators.required]],
-      eduSpace: ['', [Validators.required]],
+      date: [{ value: '', disabled: true }, [Validators.required]],
+      startTime: [{ value: '', disabled: true }, [Validators.required]],
+      endTime: [{ value: '', disabled: true }, [Validators.required]],
+      teacher: [{ value: '', disabled: true }, [Validators.required]],
+      building: [{ value: '', disabled: true }, [Validators.required]],
+      eduSpace: [{ value: '', disabled: true }, [Validators.required]],
       career: ['', [Validators.required]],
       subject: ['', [Validators.required]],
-      academicLevel: ['', [Validators.required]],
-      number_participants: ['', [Validators.required]],
+      academicLevel: [{ value: '', disabled: true }, [Validators.required]],
+      number_participants: [
+        { value: '', disabled: true },
+        [Validators.required],
+      ],
       topic: ['', [Validators.required]],
       observation: ['', [Validators.required]],
     });

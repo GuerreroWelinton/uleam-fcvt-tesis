@@ -58,7 +58,7 @@ export class ManagementEducationalSpacesService {
     return this._httpClient.get<IApiResponse<IEducationalSpace[]>>(endpoint);
   }
 
-  public listPdf(filters?: IFilters): Observable<IApiResponse<IFileUpload[]>> {
+  public listPdf(filters: IFilters): Observable<IApiResponse<IFileUpload[]>> {
     const params = new HttpParams({ fromObject: filters });
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.LIST_PDF}`;
     return this._httpClient.get<IApiResponse<IFileUpload[]>>(endpoint, {

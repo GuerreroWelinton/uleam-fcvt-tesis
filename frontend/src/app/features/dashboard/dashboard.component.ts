@@ -51,7 +51,7 @@ export default class DashboardComponent {
     this.currentDate = new Date();
     this.formattedDate = moment(this.currentDate).format('DD/MM/YYYY HH:mm');
     this.chartOptions = {
-      series: [90],
+      series: [100],
       chart: {
         type: 'radialBar',
         height: 240,
