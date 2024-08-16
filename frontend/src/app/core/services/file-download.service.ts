@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { finalize, Observable, tap } from 'rxjs';
+import { catchError, finalize, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.dev';
 import { IApiResponse } from '../interfaces/api-response.interface';
 import { AlertService } from './alert.service';

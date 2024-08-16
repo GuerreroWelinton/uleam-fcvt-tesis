@@ -19,7 +19,11 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FileUploadModule } from '@iplab/ngx-file-upload';
+import {
+  FileUploadControl,
+  FileUploadModule,
+  FileUploadValidators,
+} from '@iplab/ngx-file-upload';
 import { finalize, map, Observable, of, tap } from 'rxjs';
 import {
   ACTION_BUTTON_ADD,
@@ -42,6 +46,8 @@ import {
 import { IApiResponse } from '../../../../core/interfaces/api-response.interface';
 import { FileSizePipe } from '../../../../shared/pipes/file-size.pipe';
 import { FileDownloadService } from '../../../../core/services/file-download.service';
+import { PreBookingService } from '../../../../core/services/pre-booking.service';
+import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
 
 @Component({
   selector: 'app-management-documents',
@@ -93,18 +99,33 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   // FORM
   public filesForm: FormGroup;
   public selectedFile: IFileUploadTable | null = null;
+  public selectedEduSpace: IEducationalSpace | null = null;
+
+  // FILE
+  public fileUploadControl: FileUploadControl;
 
   constructor(
     public themeService: CustomizerSettingsService,
     private _popupContainerService: PopupContainerService,
     private _formBuilder: FormBuilder,
     private _eduSpaceService: ManagementEducationalSpacesService,
-    private _fileDownloadService: FileDownloadService
+    private _fileDownloadService: FileDownloadService,
+    private _preBookingService: PreBookingService
   ) {}
 
   ngOnInit(): void {
     this.dataSource$ = this.fetchFiles();
     this.filesForm = this.setForm(this.activeActionButton);
+
+    this._preBookingService.getSelectedEduSpace().subscribe((eduSpace) => {
+      this.selectedEduSpace = eduSpace;
+    });
+
+    this.fileUploadControl = new FileUploadControl(undefined, [
+      FileUploadValidators.filesLimit(1),
+      FileUploadValidators.fileSize(1048576),
+      FileUploadValidators.accept(['.pdf']),
+    ]);
   }
 
   ngAfterViewInit(): void {
@@ -154,7 +175,6 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
       return;
     }
     if (actionButton.name === TABLE_ACTIONS.DOWNLOAD) {
-      console.log(this.selectedFile);
       const { originalName, path } = this.selectedFile;
       this.onDownloadFile(path, originalName);
     }
@@ -203,8 +223,13 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   }
 
   private addFile(): void {
-    console.log('ADD FILE ...');
-    this.afterSubmit();
+    if (this.fileUploadControl.value.length && this.selectedEduSpace) {
+      const { id } = this.selectedEduSpace;
+      const file = this.fileUploadControl.value[0];
+      this._eduSpaceService
+        .uploadPdf(id, file)
+        .subscribe(() => this.afterSubmit());
+    }
   }
 
   private deleteFile(): void {
@@ -228,34 +253,3 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
     this._popupContainerService.tooglePopup(false);
   }
 }
-
-const filesData: IFiles[] = [
-  {
-    name: 'Reglamento interno',
-    size: '1.3 MB',
-  },
-  {
-    name: 'Código de conducta',
-    size: '1.4 MB',
-  },
-  {
-    name: 'Guía de uso de instalaciones',
-    size: '1.6 MB',
-  },
-  {
-    name: 'Procedimientos de emergencia',
-    size: '1.7 MB',
-  },
-  {
-    name: 'Manual de usuario',
-    size: '1.8 MB',
-  },
-  {
-    name: 'Políticas de seguridad',
-    size: '1.9 MB',
-  },
-  {
-    name: 'Normas de convivencia',
-    size: '2.1 MB',
-  },
-];
