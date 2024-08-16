@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe, NgClass } from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -34,6 +34,7 @@ import {
   IMatSelectOption,
   ITableAction,
 } from '../../core/interfaces/component.interface';
+import { ManagementEducationalSpacesService } from '../../core/services/management-educational-spaces.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
 import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
@@ -44,7 +45,6 @@ import {
   IEducationalSpace,
   IEducationalSpaceTable,
 } from './interfaces/educational-spaces.interface';
-import { ManagementEducationalSpacesService } from '../../core/services/management-educational-spaces.service';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import {

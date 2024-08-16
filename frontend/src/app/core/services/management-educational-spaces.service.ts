@@ -66,7 +66,19 @@ export class ManagementEducationalSpacesService {
     });
   }
 
-  private showAlert(res: IApiResponse<IEducationalSpace>): void {
+  public uploadPdf(
+    id: string,
+    file: File
+  ): Observable<IApiResponse<IFileUpload>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.UPLOAD_PDF}/${id}`;
+    return this._httpClient
+      .post<IApiResponse<IFileUpload>>(endpoint, formData)
+      .pipe(tap((res) => this.showAlert(res)));
+  }
+
+  private showAlert(res: IApiResponse<IEducationalSpace | IFileUpload>): void {
     this._alertService.showAlert({
       type: 'success',
       message: res.message,

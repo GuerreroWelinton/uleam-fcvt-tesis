@@ -23,4 +23,5 @@ export enum BASE_ENDPOINTS {
   DELETE = '/delete',
   LIST_BY_USER = '/list-by-user',
   LIST_PDF = '/list-pdf',
+  UPLOAD_PDF = '/upload-pdf',
 }

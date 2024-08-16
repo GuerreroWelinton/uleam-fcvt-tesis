@@ -112,8 +112,11 @@
         <div class="col-md-12">
           <label class="main-label d-block lh-1 text-black"> Archivo </label>
           <div class="mb-20">
-            <!-- TODO: Configurar el [control] para archivos pdf -->
-            <file-upload class="file-uploader" [multiple]="false"></file-upload>
+            <file-upload
+              class="file-uploader"
+              [multiple]="false"
+              [control]="fileUploadControl"
+            ></file-upload>
           </div>
         </div>
         }
