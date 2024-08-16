@@ -24,8 +24,6 @@ services:
       MONGO_DB_NAME: uleam-fcvt
       JWT_SEED: 57ed230b88787a77d8e4a13a11378174bbf12c88f354669c8208b3b24e2e2b2b
       JWT_EXPIRES_IN: 24h
-    volumes:
-      - ./backend/uploads:/app/uploads
     restart: always
 
   frontend:
