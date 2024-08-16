@@ -32,7 +32,14 @@ export class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(`${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`, express.static(path.join(__dirname, "../uploads")));
+    
+    console.log(path.join(__dirname, "../uploads"));
+    console.log(`${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`);
+
+    this.app.use(
+      `${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`,
+      express.static(path.join(__dirname, "../uploads"))
+    );
 
     //Routes
     this.app.use(this.routes);
