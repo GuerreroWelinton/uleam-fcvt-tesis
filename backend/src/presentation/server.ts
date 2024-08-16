@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { Router } from "express";
 import path from "path";
+import fs from "fs";
 import { API_VERSION_PATH, MAIN_ENDPOINTS } from "../constants/constants";
 
 interface IOptions {
@@ -32,13 +33,20 @@ export class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    
-    console.log(path.join(__dirname, "../uploads"));
-    console.log(`${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`);
 
+    // Verificar y crear la carpeta 'uploads' si no existe
+    const uploadsDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log("Uploads directory created at:", uploadsDir);
+    } else {
+      console.log("Uploads directory already exists at:", uploadsDir);
+    }
+
+    // Servir archivos estáticos desde la carpeta 'uploads'
     this.app.use(
       `${API_VERSION_PATH}${MAIN_ENDPOINTS.UPLOADS}`,
-      express.static(path.join(__dirname, "../uploads"))
+      express.static(uploadsDir)
     );
 
     //Routes
