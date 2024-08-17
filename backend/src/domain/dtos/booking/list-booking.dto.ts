@@ -1,19 +1,20 @@
 import { Validators } from "../../../config";
 import { BOOKING_STATES } from "../../../constants/constants";
+import { UserEntity } from "../../entities";
 
 export class ListBookingDto {
   private constructor(
     public limit?: string,
     public page?: string,
     public id?: string,
-    public startTime?: string,
-    public endTime?: string,
+    public startTime?: Date,
+    public endTime?: Date,
     public topic?: string,
     public observation?: string,
     public teacherId?: string,
     public eduSpaceId?: string,
     public subjectId?: string,
-    public participants?: { name: string }[],
+    public participants?: { userId: UserEntity; attended: boolean }[],
     public status?: BOOKING_STATES[],
     public createdAt?: Date,
     public updatedAt?: Date
@@ -82,7 +83,7 @@ export class ListBookingDto {
         eduSpaceId,
         subjectId,
         participants,
-        statusArray,
+        status,
         createdAt,
         updatedAt
       ),

@@ -2,16 +2,12 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -19,35 +15,35 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import {
   FileUploadControl,
   FileUploadModule,
   FileUploadValidators,
 } from '@iplab/ngx-file-upload';
-import { finalize, map, Observable, of, tap } from 'rxjs';
+import { finalize, map, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import {
   ACTION_BUTTON_ADD,
+  ACTION_BUTTON_DELETE,
   ACTION_BUTTON_DOWNLOAD,
   DEFAULT_PAGE_SIZE,
 } from '../../../../core/constants/component.constant';
 import { TABLE_ACTIONS } from '../../../../core/enums/component.enum';
-import {
-  IFiles,
-  ITableAction,
-} from '../../../../core/interfaces/component.interface';
-import { PopupContainerService } from '../../../../core/services/popup-container.service';
-import { CustomizerSettingsService } from '../../../../shared/components/customizer-settings/customizer-settings.service';
-import { MaxCharDirective } from '../../../../shared/directives/max-char.directive';
-import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
+import { IApiResponse } from '../../../../core/interfaces/api-response.interface';
+import { ITableAction } from '../../../../core/interfaces/component.interface';
 import {
   IFileUpload,
   IFileUploadTable,
 } from '../../../../core/interfaces/file-upload.interface';
-import { IApiResponse } from '../../../../core/interfaces/api-response.interface';
-import { FileSizePipe } from '../../../../shared/pipes/file-size.pipe';
 import { FileDownloadService } from '../../../../core/services/file-download.service';
+import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
+import { PopupContainerService } from '../../../../core/services/popup-container.service';
 import { PreBookingService } from '../../../../core/services/pre-booking.service';
+import { CustomizerSettingsService } from '../../../../shared/components/customizer-settings/customizer-settings.service';
+import { MaxCharDirective } from '../../../../shared/directives/max-char.directive';
+import { FileSizePipe } from '../../../../shared/pipes/file-size.pipe';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
+import { BASE_RECORD_STATES } from '../../../../core/enums/general.enum';
 
 @Component({
   selector: 'app-management-documents',
@@ -72,7 +68,9 @@ import { IEducationalSpace } from '../../../management-educational-spaces/interf
   ],
   templateUrl: './management-documents.component.html',
 })
-export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
+export class ManagementDocumentsComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   // POPUP
   @ViewChild('popupTemplate', { static: true })
   public popupTemplate: TemplateRef<HTMLElement> | null = null;
@@ -94,6 +92,8 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   // BUTTONS
   public actionButtons = TABLE_ACTIONS;
   public actionButtonAdd = ACTION_BUTTON_ADD;
+  public actionButtonDownload = ACTION_BUTTON_DOWNLOAD;
+  public actionButtonDelete = ACTION_BUTTON_DELETE;
   public activeActionButton = ACTION_BUTTON_ADD;
 
   // FORM
@@ -104,28 +104,49 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   // FILE
   public fileUploadControl: FileUploadControl;
 
+  public isManagamentRoute: boolean = false;
+
+  private unsubscribe$: Subject<boolean> = new Subject<boolean>();
+
   constructor(
     public themeService: CustomizerSettingsService,
     private _popupContainerService: PopupContainerService,
     private _formBuilder: FormBuilder,
     private _eduSpaceService: ManagementEducationalSpacesService,
     private _fileDownloadService: FileDownloadService,
-    private _preBookingService: PreBookingService
+    private _preBookingService: PreBookingService,
+    private _router: Router
   ) {}
 
   ngOnInit(): void {
-    this.dataSource$ = this.fetchFiles();
-    this.filesForm = this.setForm(this.activeActionButton);
+    this.isManagamentRoute = this.checkManagementRoute();
 
     this._preBookingService.getSelectedEduSpace().subscribe((eduSpace) => {
       this.selectedEduSpace = eduSpace;
     });
+
+    this.dataSource$ = this.fetchFiles();
+    this.filesForm = this.setForm(this.activeActionButton);
 
     this.fileUploadControl = new FileUploadControl(undefined, [
       FileUploadValidators.filesLimit(1),
       FileUploadValidators.fileSize(1048576),
       FileUploadValidators.accept(['.pdf']),
     ]);
+
+    this.fileUploadControl.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        if (value.length) {
+          const file = value[0];
+          const { name, size } = file;
+          const mb = size / (1024 * 1024);
+          const formattedMb = `${mb.toFixed(2)} MB`;
+          this.filesForm.patchValue({ name, size: formattedMb });
+        } else {
+          this.filesForm.patchValue({ name: '', size: '' });
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -134,13 +155,29 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
     );
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
+  }
+
+  private checkManagementRoute(): boolean {
+    return this._router.url.includes('management-bookings');
+  }
+
   // TABLE
   private fetchFiles(): Observable<MatTableDataSource<IFileUploadTable>> {
+    if (!this.selectedEduSpace)
+      return of(new MatTableDataSource<IFileUploadTable>([]));
+
+    const { id } = this.selectedEduSpace;
+
     this.isLoading = true;
-    return this._eduSpaceService.listPdf().pipe(
-      map((res) => this.transformFilesResponse(res)),
-      finalize(() => (this.isLoading = false))
-    );
+    return this._eduSpaceService
+      .listPdf({ recordId: id, status: [BASE_RECORD_STATES.ACTIVE] })
+      .pipe(
+        map((res) => this.transformFilesResponse(res)),
+        finalize(() => (this.isLoading = false))
+      );
   }
 
   private transformFilesResponse(
@@ -150,7 +187,7 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
     const files = res.data?.result || [];
     const filesTable = files.map((file) => ({
       ...file,
-      actions: [ACTION_BUTTON_DOWNLOAD],
+      actions: [],
     }));
 
     return new MatTableDataSource<IFileUploadTable>(filesTable);
@@ -203,8 +240,8 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
       return this._formBuilder.group({});
     }
     return this._formBuilder.group({
-      name: [''],
-      size: [''],
+      name: [{ value: '', disabled: true }],
+      size: [{ value: '', disabled: true }],
     });
   }
 
@@ -233,8 +270,10 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   }
 
   private deleteFile(): void {
-    console.log('DELETE FILE ...');
-    this.afterSubmit();
+    if (this.selectedFile) {
+      const { id } = this.selectedFile;
+      this._eduSpaceService.deletePdf(id).subscribe(() => this.afterSubmit());
+    }
   }
 
   private afterSubmit(): void {
@@ -249,6 +288,7 @@ export class ManagementDocumentsComponent implements OnInit, AfterViewInit {
   }
 
   public hidePopup() {
+    this.fileUploadControl.clear();
     this._popupContainerService.showTemplate(null);
     this._popupContainerService.tooglePopup(false);
   }

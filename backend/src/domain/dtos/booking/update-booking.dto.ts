@@ -1,5 +1,6 @@
 import { Validators } from "../../../config";
 import { BOOKING_STATES } from "../../../constants/constants";
+import { UserEntity } from "../../entities";
 
 export class UpdateBookingDto {
   private constructor(
@@ -10,7 +11,7 @@ export class UpdateBookingDto {
     public teacherId?: string,
     public eduSpaceId?: string,
     public subjectId?: string,
-    public participants?: { name: string }[],
+    public participants?: { attended: boolean }[],
     public status?: BOOKING_STATES
   ) {}
 

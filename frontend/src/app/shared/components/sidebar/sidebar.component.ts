@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -36,5 +36,18 @@ export class SidebarComponent {
   // Burger Menu Toggle
   public toggle() {
     this._toggleService.toggle();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  private onResize(event: Event) {
+    this.checkScreenResolution();
+  }
+
+  public checkScreenResolution() {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth < 1200) {
+      this._toggleService.toggle();
+    }
   }
 }

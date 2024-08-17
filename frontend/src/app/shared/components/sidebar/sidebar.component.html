@@ -29,6 +29,7 @@
             class="sidebar-menu-link"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> dashboard </i>
             <span class="title"> Tablero </span>
@@ -47,6 +48,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.TEACHER]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> event </i>
             <span class="title"> Reservas </span>
@@ -56,6 +58,7 @@
           <span
             class="sub-title text-body"
             *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
+            (click)="checkScreenResolution()"
           >
             ADMINISTRACIÓN
           </span>
@@ -66,6 +69,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> view_timeline </i>
             <span class="title"> Períodos </span>
@@ -77,6 +81,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> topic </i>
             <span class="title"> Carreras </span>
@@ -88,6 +93,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> lab_profile </i>
             <span class="title"> Asignaturas </span>
@@ -99,6 +105,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> group </i>
             <span class="title"> Usuarios </span>
@@ -110,6 +117,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> apartment </i>
             <span class="title"> Edificios </span>
@@ -121,6 +129,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.ADMIN]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> roofing </i>
             <span class="title"> Espacios </span>
@@ -132,6 +141,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             *sharedShowForRoles="[USER_ROLES.SUPERVISOR]"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> event </i>
             <span class="title"> Reservas </span>
@@ -144,6 +154,7 @@
             class="sidebar-menu-link"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            (click)="checkScreenResolution()"
           >
             <i class="material-symbols-outlined"> play_circle </i>
             <span class="title"> Tutoriales </span>

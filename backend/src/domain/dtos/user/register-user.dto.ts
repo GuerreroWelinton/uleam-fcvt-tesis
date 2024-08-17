@@ -6,6 +6,7 @@ export class RegisterUserDto {
     public name: string,
     public lastName: string,
     public email: string,
+    public identityDocument: string,
     public password: string,
     public phoneNumber: string,
     public roles?: USER_ROLES[],
@@ -16,8 +17,16 @@ export class RegisterUserDto {
   }
 
   static create(object: { [key: string]: any }): [string?, RegisterUserDto?] {
-    const { name, lastName, email, password, phoneNumber, roles, status } =
-      object;
+    const {
+      name,
+      lastName,
+      email,
+      identityDocument,
+      password,
+      phoneNumber,
+      roles,
+      status,
+    } = object;
 
     if (!name) {
       return ["El nombre es requerido"];
@@ -27,6 +36,9 @@ export class RegisterUserDto {
     }
     if (!email) {
       return ["El correo electrónico es requerido"];
+    }
+    if (!identityDocument) {
+      return ["El número de identificación es requerido"];
     }
     if (!Validators.email.test(email)) {
       return ["El correo electrónico no es válido"];
@@ -54,6 +66,7 @@ export class RegisterUserDto {
         name,
         lastName,
         email,
+        identityDocument,
         password,
         phoneNumber,
         roles,

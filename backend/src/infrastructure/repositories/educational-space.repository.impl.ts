@@ -60,4 +60,8 @@ export class EducationalSpaceRepositoryImpl
   ): Promise<{ files: FileUploadEntity[]; total: number }> {
     return this.educationalSpaceDataSource.listPdf(listFileUploadDto);
   }
+
+  deletePdf(fileUploadId: IdBaseDto): Promise<FileUploadEntity> {
+    return this.educationalSpaceDataSource.deletePdf(fileUploadId);
+  }
 }

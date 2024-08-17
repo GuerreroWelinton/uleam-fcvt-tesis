@@ -37,6 +37,7 @@ import { OnBookingService } from '../../../../core/services/on-booking.service';
 import { PopupContainerService } from '../../../../core/services/popup-container.service';
 import { PreBookingService } from '../../../../core/services/pre-booking.service';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
+import { InfoCalendarComponent } from '../../../../shared/components/info-calendar/info-calendar.component';
 
 //todo: refactor
 import 'moment/locale/es';
@@ -49,11 +50,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   standalone: true,
   imports: [
     ReactiveFormsModule,
-
     FullCalendarModule,
     MatCardModule,
     MatButtonModule,
     MatInputModule,
+    InfoCalendarComponent,
   ],
   templateUrl: './management-calendar.component.html',
 })
@@ -165,19 +166,22 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // FORM
   private initializeForm(): FormGroup {
     return this._formBuilder.group({
-      date: ['', [Validators.required]],
-      startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]],
-      teacher: ['', [Validators.required]],
-      building: ['', [Validators.required]],
-      eduSpace: ['', [Validators.required]],
-      career: ['', [Validators.required]],
-      subject: ['', [Validators.required]],
-      academicLevel: ['', [Validators.required]],
-      number_participants: ['', [Validators.required]],
-      topic: ['', [Validators.required]],
-      observation: ['', [Validators.required]],
-      status: ['', [Validators.required]],
+      date: [{ value: '', disabled: true }, , [Validators.required]],
+      startTime: [{ value: '', disabled: true }, , [Validators.required]],
+      endTime: [{ value: '', disabled: true }, , [Validators.required]],
+      teacher: [{ value: '', disabled: true }, , [Validators.required]],
+      building: [{ value: '', disabled: true }, , [Validators.required]],
+      eduSpace: [{ value: '', disabled: true }, , [Validators.required]],
+      career: [{ value: '', disabled: true }, , [Validators.required]],
+      subject: [{ value: '', disabled: true }, , [Validators.required]],
+      academicLevel: [{ value: '', disabled: true }, , [Validators.required]],
+      number_participants: [
+        { value: '', disabled: true },
+        [Validators.required],
+      ],
+      topic: [{ value: '', disabled: true }, , [Validators.required]],
+      observation: [{ value: '', disabled: true }, , [Validators.required]],
+      status: [{ value: '', disabled: true }, , [Validators.required]],
     });
   }
 
@@ -240,134 +244,136 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // REPORT
   //todo: refactor
   public generateReport() {
-    let participants: any = [];
-    let participants2: any = [
-      { text: 'NOMBRES', style: 'tableHeader' },
-      { text: 'ASISTENCIA', style: 'tableHeader' },
-    ];
-    this.selectedBooking.participants.forEach((e) => {
-      participants.push(e.name + ' ' + (e.attended ? 'ASISTIO' : 'NO ASISTIO'));
-    });
+    console.log(this.selectedBooking);
 
-    const participantsData = this.selectedBooking.participants.map((e) => [
-      e.name,
-      e.attended ? 'ASISTIO' : 'NO ASISTIO',
-    ]);
+    // let participants: any = [];
+    // let participants2: any = [
+    //   { text: 'NOMBRES', style: 'tableHeader' },
+    //   { text: 'ASISTENCIA', style: 'tableHeader' },
+    // ];
+    // this.selectedBooking.participants.forEach((e) => {
+    //   participants.push(e.name + ' ' + (e.attended ? 'ASISTIO' : 'NO ASISTIO'));
+    // });
 
-    const documentDefinition: any = {
-      content: [
-        {
-          text: 'REGISTRO DE PRÁCTICAS DEL LABORATORIO DE BIOLOGÍA',
-          alignment: 'center',
-          style: 'subheader',
-        },
-        {
-          columns: [
-            {
-              text:
-                'Fecha de práctica: ' +
-                moment(this.selectedBooking.createdAt)
-                  .locale('es')
-                  .format('dddd, D [de] MMMM [de] YYYY'),
-            },
-          ],
-        },
-        {
-          columns: [
-            {
-              text:
-                'Hora de entrada: ' +
-                moment(this.selectedBooking.startTime).format('HH:mm A'),
-            },
-            {
-              text:
-                'Hora de salida: ' +
-                moment(this.selectedBooking.endTime).format('HH:mm A'),
-            },
-          ],
-        },
-        'Docente responsable: ',
-        {
-          columns: [
-            {
-              text: 'Carrera: ' + this.selectedBooking.subject.career.name,
-            },
-            {
-              text: 'Asignatura: ' + this.selectedBooking.subject.name,
-            },
-          ],
-        },
-        {
-          columns: [
-            {
-              text: 'Nivel: ' + this.selectedBooking.subject.academicLevel,
-            },
-            {
-              text:
-                'N° de estudiantes: ' +
-                this.selectedBooking.participants.length,
-            },
-          ],
-        },
-        'TEMA DE LA PRÁCTICA: ' + this.selectedBooking.topic,
+    // const participantsData = this.selectedBooking.participants.map((e) => [
+    //   e.name,
+    //   e.attended ? 'ASISTIO' : 'NO ASISTIO',
+    // ]);
 
-        // { text: 'PARTICIPANTES', style: 'subheader' },
-        {
-          style: 'tableExample',
-          table: {
-            headerRows: 1,
-            body: [
-              [
-                { text: 'NOMBRES', style: 'tableHeader' },
-                { text: 'ASISTENCIA', style: 'tableHeader' },
-              ],
-              ...participantsData,
-            ],
-          },
-          layout: 'noBorders',
-        },
-        {
-          alignment: 'justify',
-          columns: [
-            {
-              text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.',
-            },
-          ],
-        },
-        { text: 'OBSERVACIONES', style: 'title' },
-        { text: this.selectedBooking.observation },
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10],
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5],
-        },
-        title: {
-          fontSize: 12,
-          bold: true,
-          margin: [0, 5, 0, 0],
-        },
-        tableExample: {
-          fontSize: 12,
-          margin: [0, 5, 0, 15],
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black',
-        },
-      },
-    };
-    // pdfMake.createPdf(documentDefinition).download('sample.pdf');
-    const pdf = pdfMake.createPdf(documentDefinition);
-    pdf.open();
+    // const documentDefinition: any = {
+    //   content: [
+    //     {
+    //       text: 'REGISTRO DE PRÁCTICAS DEL LABORATORIO DE BIOLOGÍA',
+    //       alignment: 'center',
+    //       style: 'subheader',
+    //     },
+    //     {
+    //       columns: [
+    //         {
+    //           text:
+    //             'Fecha de práctica: ' +
+    //             moment(this.selectedBooking.createdAt)
+    //               .locale('es')
+    //               .format('dddd, D [de] MMMM [de] YYYY'),
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       columns: [
+    //         {
+    //           text:
+    //             'Hora de entrada: ' +
+    //             moment(this.selectedBooking.startTime).format('HH:mm A'),
+    //         },
+    //         {
+    //           text:
+    //             'Hora de salida: ' +
+    //             moment(this.selectedBooking.endTime).format('HH:mm A'),
+    //         },
+    //       ],
+    //     },
+    //     'Docente responsable: ',
+    //     {
+    //       columns: [
+    //         {
+    //           text: 'Carrera: ' + this.selectedBooking.subject.career.name,
+    //         },
+    //         {
+    //           text: 'Asignatura: ' + this.selectedBooking.subject.name,
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       columns: [
+    //         {
+    //           text: 'Nivel: ' + this.selectedBooking.subject.academicLevel,
+    //         },
+    //         {
+    //           text:
+    //             'N° de estudiantes: ' +
+    //             this.selectedBooking.participants.length,
+    //         },
+    //       ],
+    //     },
+    //     'TEMA DE LA PRÁCTICA: ' + this.selectedBooking.topic,
 
-    this.hidePopup();
+    //     // { text: 'PARTICIPANTES', style: 'subheader' },
+    //     {
+    //       style: 'tableExample',
+    //       table: {
+    //         headerRows: 1,
+    //         body: [
+    //           [
+    //             { text: 'NOMBRES', style: 'tableHeader' },
+    //             { text: 'ASISTENCIA', style: 'tableHeader' },
+    //           ],
+    //           ...participantsData,
+    //         ],
+    //       },
+    //       layout: 'noBorders',
+    //     },
+    //     {
+    //       alignment: 'justify',
+    //       columns: [
+    //         {
+    //           text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.',
+    //         },
+    //       ],
+    //     },
+    //     { text: 'OBSERVACIONES', style: 'title' },
+    //     { text: this.selectedBooking.observation },
+    //   ],
+    //   styles: {
+    //     header: {
+    //       fontSize: 18,
+    //       bold: true,
+    //       margin: [0, 0, 0, 10],
+    //     },
+    //     subheader: {
+    //       fontSize: 16,
+    //       bold: true,
+    //       margin: [0, 10, 0, 5],
+    //     },
+    //     title: {
+    //       fontSize: 12,
+    //       bold: true,
+    //       margin: [0, 5, 0, 0],
+    //     },
+    //     tableExample: {
+    //       fontSize: 12,
+    //       margin: [0, 5, 0, 15],
+    //     },
+    //     tableHeader: {
+    //       bold: true,
+    //       fontSize: 13,
+    //       color: 'black',
+    //     },
+    //   },
+    // };
+    // // pdfMake.createPdf(documentDefinition).download('sample.pdf');
+    // const pdf = pdfMake.createPdf(documentDefinition);
+    // pdf.open();
+
+    // this.hidePopup();
   }
 }

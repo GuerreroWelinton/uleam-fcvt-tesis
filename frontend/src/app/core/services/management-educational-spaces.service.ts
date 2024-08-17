@@ -58,7 +58,7 @@ export class ManagementEducationalSpacesService {
     return this._httpClient.get<IApiResponse<IEducationalSpace[]>>(endpoint);
   }
 
-  public listPdf(filters?: IFilters): Observable<IApiResponse<IFileUpload[]>> {
+  public listPdf(filters: IFilters): Observable<IApiResponse<IFileUpload[]>> {
     const params = new HttpParams({ fromObject: filters });
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.LIST_PDF}`;
     return this._httpClient.get<IApiResponse<IFileUpload[]>>(endpoint, {
@@ -75,6 +75,13 @@ export class ManagementEducationalSpacesService {
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.UPLOAD_PDF}/${id}`;
     return this._httpClient
       .post<IApiResponse<IFileUpload>>(endpoint, formData)
+      .pipe(tap((res) => this.showAlert(res)));
+  }
+
+  public deletePdf(id: string): Observable<IApiResponse<IFileUpload>> {
+    const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.DELETE_PDF}/${id}`;
+    return this._httpClient
+      .delete<IApiResponse<IFileUpload>>(endpoint)
       .pipe(tap((res) => this.showAlert(res)));
   }
 

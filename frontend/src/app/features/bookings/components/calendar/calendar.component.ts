@@ -1,4 +1,4 @@
-import { JsonPipe } from '@angular/common';
+import { CommonModule, JsonPipe } from '@angular/common';
 import {
   Component,
   OnDestroy,
@@ -57,22 +57,30 @@ import { IEducationalSpace } from '../../../management-educational-spaces/interf
 import { ISubject } from '../../../subjects/interfaces/subjects.interface';
 import { SubjectsService } from '../../../subjects/services/subjects.service';
 import { IUser } from '../../../users/interfaces/user.interface';
+import { InfoCalendarComponent } from '../../../../shared/components/info-calendar/info-calendar.component';
+import { MatListModule } from '@angular/material/list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTableModule } from '@angular/material/table';
+import { AlertService } from '../../../../core/services/alert.service';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
-
     FullCalendarModule,
     MatCardModule,
     MatButtonModule,
     MatInputModule,
     MatSelectModule,
+    MatTableModule,
     FileUploadModule,
-
     DownloadFileDirective,
     JsonPipe,
+    InfoCalendarComponent,
+    MatListModule,
+    MatCheckboxModule,
   ],
   templateUrl: './calendar.component.html',
 })
@@ -114,8 +122,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   public fileUploadControl: FileUploadControl;
   public templateFileUrl: string = TEMPLATE_FILE_ROUTES;
   public fileName: string = 'Template_participants.xlsx';
-  private participants: { name: string }[] = [];
-  public bookingParticipants: { name: string }[] = [];
+  private participants: { identityDocument: string }[] = [];
+  public bookingParticipants: { userId: IUser; attended: boolean }[] = [];
 
   constructor(
     private _popupContainerService: PopupContainerService,
@@ -126,7 +134,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     private _formBuilder: FormBuilder,
     private _excelService: ExcelService,
     private _fileUploadService: FileUploadService,
-    private _subjectsService: SubjectsService
+    private _subjectsService: SubjectsService,
+    private _alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -174,18 +183,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.showPopup(this.assistanceTemplate);
   }
 
-  private setParticipants(participants: any[]): void {
+  private setParticipants(
+    participants: { userId: IUser; attended: boolean }[]
+  ): void {
     const participantsFormArray = this.assistenceForm.get(
       'participants'
     ) as FormArray;
     participantsFormArray.clear();
-    participants.forEach((participant) => {
-      participantsFormArray.push(
-        this._formBuilder.group({
-          name: participant.name,
-          attended: participant.attended,
-        })
-      );
+    participants.forEach(({ userId, attended }) => {
+      participantsFormArray.push(this._formBuilder.group({ userId, attended }));
     });
   }
 
@@ -232,11 +238,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
       return;
     }
     this.filters = { eduSpaceId: this.selectedEduSpace.id, ...this.filters };
+
     this._onBookingService
       .list(this.filters)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((res) => {
         this.bookings = res.data?.result || [];
+
         this.calendarOptions.events = this.setEvents(this.bookings);
       });
   }
@@ -254,16 +262,19 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private initializeForm(): FormGroup {
     return this._formBuilder.group({
-      date: ['', [Validators.required]],
-      startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]],
-      teacher: ['', [Validators.required]],
-      building: ['', [Validators.required]],
-      eduSpace: ['', [Validators.required]],
+      date: [{ value: '', disabled: true }, [Validators.required]],
+      startTime: [{ value: '', disabled: true }, [Validators.required]],
+      endTime: [{ value: '', disabled: true }, [Validators.required]],
+      teacher: [{ value: '', disabled: true }, [Validators.required]],
+      building: [{ value: '', disabled: true }, [Validators.required]],
+      eduSpace: [{ value: '', disabled: true }, [Validators.required]],
       career: ['', [Validators.required]],
       subject: ['', [Validators.required]],
-      academicLevel: ['', [Validators.required]],
-      number_participants: ['', [Validators.required]],
+      academicLevel: [{ value: '', disabled: true }, [Validators.required]],
+      number_participants: [
+        { value: '', disabled: true },
+        [Validators.required],
+      ],
       topic: ['', [Validators.required]],
       observation: ['', [Validators.required]],
     });
@@ -338,9 +349,25 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this._excelService
           .readExcel<{ participants: string }>(value, ['participants'])
           .then((res) => {
-            res.forEach((participant) =>
-              this.participants.push({ name: participant.participants })
+            const newParticipants = res.map((participant) => ({
+              identityDocument: participant.participants,
+            }));
+
+            const identityDocuments = newParticipants.map(
+              (p) => p.identityDocument
             );
+            const uniqueIdentityDocuments = new Set(identityDocuments);
+
+            if (identityDocuments.length !== uniqueIdentityDocuments.size) {
+              this._alertService.showAlert({
+                type: 'info',
+                message:
+                  'Algunos participantes tienen documentos de identidad duplicados. Por favor, revisa el archivo y elimina los duplicados antes de volver a cargarlo.',
+              });
+              return;
+            }
+
+            this.participants = newParticipants;
             this.bookingForm.patchValue({
               number_participants: this.participants.length,
             });
@@ -410,6 +437,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   public hidePopup() {
+    this.fileUploadControl.clear();
+    this.bookingForm.reset();
     this._popupContainerService.showTemplate(null);
     this._popupContainerService.tooglePopup(false);
   }

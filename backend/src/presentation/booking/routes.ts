@@ -18,7 +18,7 @@ export class BookingRoutes {
 
     router.post(
       "/register",
-      [AuthMiddleware.validateJWT],
+      // [AuthMiddleware.validateJWT],
       bookingController.register
     );
 

@@ -12,6 +12,6 @@ export interface IBooking extends IBaseRecord {
   teacher: IUser;
   eduSpace: IEducationalSpace;
   subject: ISubject;
-  participants: { name: string; attended: boolean }[];
+  participants: { userId: IUser; attended: boolean }[];
   status: BOOKING_STATES;
 }

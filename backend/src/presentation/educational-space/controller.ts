@@ -8,6 +8,7 @@ import {
 import { EducationalSpaceRepository } from "../../domain/repositories";
 import {
   DeleteEducationalSpace,
+  DeletePdfEducationalSpace,
   ListByUserIdEducationalSpace,
   ListEducationalSpace,
   ListPdfEducationalSpace,
@@ -111,6 +112,18 @@ export class EducationalSpaceController {
     }
     new ListPdfEducationalSpace(this.educationalSpaceRepository)
       .execute(listFileUploadDto!)
+      .then((data) => handleSuccess(data, res))
+      .catch((err) => handleError(err, res));
+  };
+
+  deletePdf = (req: Request, res: Response) => {
+    const [error, fileUploadId] = IdBaseDto.create(req.params);
+    if (error) {
+      const response = createErrorResponse(400, error);
+      return res.status(400).json(response);
+    }
+    new DeletePdfEducationalSpace(this.educationalSpaceRepository)
+      .execute(fileUploadId!)
       .then((data) => handleSuccess(data, res))
       .catch((err) => handleError(err, res));
   };

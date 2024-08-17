@@ -1,5 +1,14 @@
-import { BOOKING_STATES } from "../../constants/constants";
-import { BookingModel } from "../../data/mongodb";
+import {
+  BASE_RECORD_STATES,
+  BOOKING_STATES,
+  USER_ROLES,
+} from "../../constants/constants";
+import {
+  BookingModel,
+  EducationalSpaceModel,
+  SubjectModel,
+  UserModel,
+} from "../../data/mongodb";
 import { BookingDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
@@ -68,6 +77,7 @@ export class BookingDataSourceImpl implements BookingDataSource {
               path: "eduSpaceId",
               populate: [{ path: "buildingId" }, { path: "usersId" }],
             },
+            { path: "participants.userId" },
           ])
           .limit(formattedLimit)
           .skip(skip)
@@ -100,14 +110,51 @@ export class BookingDataSourceImpl implements BookingDataSource {
         subjectId,
         participants,
       } = registerBookingDto;
+      console.log(
+        "🚀 ~ BookingDataSourceImpl ~ returnhandleTryCatch<BookingEntity> ~ registerBookingDto:",
+        registerBookingDto
+      );
 
+      // Extraer los identityDocuments de los participantes
+      const identityDocuments = participants.map((p) => p.identityDocument);
+
+      // Buscar usuarios por sus identityDocuments
+      const existingUsers = await UserModel.find({
+        identityDocument: { $in: identityDocuments },
+      }).exec();
+
+      // Crear un mapa de identityDocument a userId
+      const identityDocumentToUserId = new Map<string, string>();
+      existingUsers.forEach((user) => {
+        identityDocumentToUserId.set(
+          user.identityDocument,
+          user._id.toString()
+        );
+      });
+
+      // Determinar los identityDocuments que no están registrados
+      const missingIdentityDocuments = identityDocuments.filter(
+        (doc) => !identityDocumentToUserId.has(doc)
+      );
+
+      if (missingIdentityDocuments.length > 0) {
+        throw CustomError.notFound(
+          `Los siguientes números de cédula no están registrados en el sistema: ${missingIdentityDocuments.join(
+            ", "
+          )}. Por favor, verifica y corrige los números de cédula antes de continuar.`
+        );
+      }
+
+      // Usar los _id de los usuarios encontrados
+      const participantsWithUserIds = participants.map((p) => ({
+        userId: identityDocumentToUserId.get(p.identityDocument), // Usar el _id aquí
+        attended: false,
+      }));
+
+      // Verificar si ya existe una reserva en el mismo horario
       const queryExistingBooking = {
-        startTime: {
-          $lte: endTime,
-        },
-        endTime: {
-          $gte: startTime,
-        },
+        startTime: { $lte: endTime },
+        endTime: { $gte: startTime },
         eduSpaceId,
         status: { $ne: BOOKING_STATES.REJECTED },
       };
@@ -116,9 +163,64 @@ export class BookingDataSourceImpl implements BookingDataSource {
       }).exec();
 
       if (existingBooking) {
-        throw CustomError.conflict("Ya existe una reserva en ese horario");
+        const existingStartDate = new Date(existingBooking.startTime);
+        const existingEndDate = new Date(existingBooking.endTime);
+
+        // Formatear la fecha y las horas
+        const formattedDate = existingStartDate.toLocaleDateString([], {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const formattedStartTime = existingStartDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const formattedEndTime = existingEndDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        throw CustomError.conflict(
+          `Ya existe una reserva para el espacio educativo el ${formattedDate} entre las ${formattedStartTime} y las ${formattedEndTime}. Por favor, elige otro horario o espacio educativo.`
+        );
       }
 
+      // Verificar la existencia del profesor
+      const existingTeacher = await UserModel.findOne({
+        _id: teacherId,
+        roles: { $in: [USER_ROLES.TEACHER] },
+        status: BASE_RECORD_STATES.ACTIVE,
+      }).exec();
+      if (!existingTeacher) {
+        throw CustomError.notFound(
+          `El profesor especificado no existe o no está activo.`
+        );
+      }
+
+      // Verificar la existencia del espacio educativo
+      const existingEduSpace = await EducationalSpaceModel.findOne({
+        _id: eduSpaceId,
+        status: BASE_RECORD_STATES.ACTIVE,
+      }).exec();
+      if (!existingEduSpace) {
+        throw CustomError.notFound(
+          `El espacio educativo especificado no existe o no está activo.`
+        );
+      }
+
+      // Verificar la existencia de la materia
+      const existingSubject = await SubjectModel.findOne({
+        _id: subjectId,
+        status: BASE_RECORD_STATES.ACTIVE,
+      }).exec();
+      if (!existingSubject) {
+        throw CustomError.notFound(
+          `La materia especificada no existe o no está activa.`
+        );
+      }
+
+      // Crear la reserva
       const booking = await BookingModel.create({
         startTime,
         endTime,
@@ -127,10 +229,11 @@ export class BookingDataSourceImpl implements BookingDataSource {
         teacherId,
         eduSpaceId,
         subjectId,
-        participants,
+        participants: participantsWithUserIds,
       });
       await booking.save();
 
+      // Poblar la reserva con relaciones
       const populatedBooking = await BookingModel.findById(booking._id)
         .populate([
           { path: "teacherId" },

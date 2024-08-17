@@ -11,6 +11,7 @@ export class UserMapper {
       name,
       lastName,
       email,
+      identityDocument,
       password,
       phoneNumber,
       roles,
@@ -36,6 +37,10 @@ export class UserMapper {
 
     if (!email) {
       throw CustomError.badRequest("Missing email");
+    }
+
+    if (!identityDocument) {
+      throw CustomError.badRequest("Missing identityDocument");
     }
 
     if (!Validators.email.test(email)) {
@@ -71,6 +76,7 @@ export class UserMapper {
       name,
       lastName,
       email,
+      identityDocument,
       password,
       phoneNumber,
       roles,

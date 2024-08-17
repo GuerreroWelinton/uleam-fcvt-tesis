@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div
+      class="alert alert-outline-secondary w-100 d-flex align-items-center"
+      role="alert"
+      style="justify-content: space-evenly"
+    >
+      @for (item of BOOKING_STATES_OPTIONS; track $index) {
+      <span class="badge" [ngStyle]="{ 'background-color': item.color }">
+        {{ item.label }}
+      </span>
+      }
+    </div>
+  </div>
+</div>

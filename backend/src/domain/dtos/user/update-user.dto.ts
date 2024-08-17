@@ -5,13 +5,22 @@ export class UpdateUserDto {
     public name?: string,
     public lastName?: string,
     public email?: string,
+    public identityDocument?: string,
     public phoneNumber?: string,
     public roles?: USER_ROLES[],
     public status?: BASE_RECORD_STATES
   ) {}
 
   static create(object: { [key: string]: any }): [string?, UpdateUserDto?] {
-    const { name, lastName, email, phoneNumber, roles, status } = object;
+    const {
+      name,
+      lastName,
+      email,
+      identityDocument,
+      phoneNumber,
+      roles,
+      status,
+    } = object;
 
     if (
       roles &&
@@ -26,7 +35,15 @@ export class UpdateUserDto {
 
     return [
       undefined,
-      new UpdateUserDto(name, lastName, email, phoneNumber, roles, status),
+      new UpdateUserDto(
+        name,
+        lastName,
+        email,
+        identityDocument,
+        phoneNumber,
+        roles,
+        status
+      ),
     ];
   }
 }

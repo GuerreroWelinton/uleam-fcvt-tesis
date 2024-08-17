@@ -39,10 +39,6 @@ export class ListFileUploadDto {
       return ["El tamaño del archivo es inválido."];
     }
 
-    if (recordId && !Validators.id.test(id)) {
-      return ["El id del registro asociado no es válido."];
-    }
-
     let statusArray: BASE_RECORD_STATES[] = [];
     if (status) {
       if (Array.isArray(status)) {

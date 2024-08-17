@@ -41,8 +41,6 @@ export class FileUploadMiddleware {
     allowedMimeTypes?: string[]
   ) => {
     upload.single("file")(req, res, (err: any) => {
-      console.log(req.file);
-
       if (!req.file) {
         return res
           .status(400)
