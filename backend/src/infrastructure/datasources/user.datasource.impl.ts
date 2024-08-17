@@ -30,6 +30,7 @@ export class UserDataSourceImpl implements UserDataSource {
         name,
         lastName,
         email,
+        identityDocument,
         phoneNumber,
         roles,
         status,
@@ -43,6 +44,9 @@ export class UserDataSourceImpl implements UserDataSource {
         ...(name && { name: { $regex: name, $options: "i" } }),
         ...(lastName && { lastName: { $regex: lastName, $options: "i" } }),
         ...(email && { email: { $regex: email, $options: "i" } }),
+        ...(identityDocument && {
+          identityDocument: { $regex: identityDocument, $options: "i" },
+        }),
         ...(phoneNumber && {
           phoneNumber: { $regex: phoneNumber, $options: "i" },
         }),
@@ -98,8 +102,16 @@ export class UserDataSourceImpl implements UserDataSource {
 
   async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
     return handleTryCatch<UserEntity>(async () => {
-      const { name, lastName, email, password, phoneNumber, roles, status } =
-        registerUserDto;
+      const {
+        name,
+        lastName,
+        email,
+        identityDocument,
+        password,
+        phoneNumber,
+        roles,
+        status,
+      } = registerUserDto;
 
       const existingEmail = await UserModel.findOne({
         email,
@@ -112,10 +124,21 @@ export class UserDataSourceImpl implements UserDataSource {
         );
       }
 
+      const existingIdentityDocument = await UserModel.findOne({
+        identityDocument,
+        status: { $ne: BASE_RECORD_STATES.DELETED },
+      }).exec();
+      if (existingIdentityDocument) {
+        throw CustomError.badRequest(
+          `Ya existe un usuario con el número de identificación ${identityDocument}`
+        );
+      }
+
       const user = await UserModel.create({
         name,
         lastName,
         email,
+        identityDocument,
         password: this.hashPassword(password),
         phoneNumber,
         roles,
@@ -139,10 +162,28 @@ export class UserDataSourceImpl implements UserDataSource {
         );
       }
 
+      const identityDocuments = registerUserDto.map(
+        (user) => user.identityDocument
+      );
+      const uniqueIdentityDocuments = new Set(identityDocuments);
+      if (uniqueIdentityDocuments.size !== registerUserDto.length) {
+        throw CustomError.badRequest(
+          "Hay números de identificación duplicados en la lista proporcionada."
+        );
+      }
+
       const usersToRegister = [];
       for (const user of registerUserDto) {
-        const { name, lastName, email, password, phoneNumber, roles, status } =
-          user;
+        const {
+          name,
+          lastName,
+          email,
+          identityDocument,
+          password,
+          phoneNumber,
+          roles,
+          status,
+        } = user;
 
         const existingEmail = await UserModel.findOne({
           email,
@@ -155,10 +196,21 @@ export class UserDataSourceImpl implements UserDataSource {
           );
         }
 
+        const existingIdentityDocument = await UserModel.findOne({
+          identityDocument,
+          status: { $ne: BASE_RECORD_STATES.DELETED },
+        }).exec();
+        if (existingIdentityDocument) {
+          throw CustomError.badRequest(
+            `Ya existe un usuario con el número de identificación ${identityDocument}`
+          );
+        }
+
         usersToRegister.push({
           name,
           lastName,
           email,
+          identityDocument,
           password: this.hashPassword(password),
           phoneNumber,
           roles,
@@ -207,17 +259,34 @@ export class UserDataSourceImpl implements UserDataSource {
       }
 
       const { id } = userId;
-      const { name, lastName, email, phoneNumber, roles, status } =
-        updateUserDto;
+      const {
+        name,
+        lastName,
+        email,
+        identityDocument,
+        phoneNumber,
+        roles,
+        status,
+      } = updateUserDto;
 
-      const existingUser = await UserModel.findOne({
+      const existingEmail = await UserModel.findOne({
         email,
         status: { $ne: BASE_RECORD_STATES.DELETED },
       }).exec();
 
-      if (existingUser) {
-        throw CustomError.conflict(
-          "Ya existe un usuario con el mismo correo electrónico"
+      if (existingEmail) {
+        throw CustomError.badRequest(
+          `Ya existe un usuario con el correo electrónico ${email}`
+        );
+      }
+
+      const existingIdentityDocument = await UserModel.findOne({
+        identityDocument,
+        status: { $ne: BASE_RECORD_STATES.DELETED },
+      }).exec();
+      if (existingIdentityDocument) {
+        throw CustomError.badRequest(
+          `Ya existe un usuario con el número de identificación ${identityDocument}`
         );
       }
 
@@ -227,6 +296,7 @@ export class UserDataSourceImpl implements UserDataSource {
           ...(name && { name }),
           ...(lastName && { lastName }),
           ...(email && { email }),
+          ...(identityDocument && { identityDocument }),
           ...(phoneNumber && { phoneNumber }),
           ...(roles && { roles }),
           ...(status && { status }),

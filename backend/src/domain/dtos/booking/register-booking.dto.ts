@@ -9,7 +9,7 @@ export class RegisterBookingDto {
     public teacherId: string,
     public eduSpaceId: string,
     public subjectId: string,
-    public participants: { name: string }[]
+    public participants: { identityDocument: string }[]
   ) {}
 
   static create(object: {
@@ -61,6 +61,14 @@ export class RegisterBookingDto {
     }
     if (!Array.isArray(participants)) {
       return ["Los participantes no son válidos"];
+    }
+    if (!participants.length) {
+      return ["Los participantes son requeridos"];
+    }
+    const identityDocuments = participants.map((p) => p.identityDocument);
+    const uniqueIdentityDocuments = new Set(identityDocuments);
+    if (identityDocuments.length !== uniqueIdentityDocuments.size) {
+      return ["Los participantes no deben repetirse"];
     }
 
     return [

@@ -30,6 +30,11 @@ export const BASE_STATES_OPTIONS: IStatusOption = {
 };
 
 export const BOOKING_STATES_OPTIONS: IBookingStatusOption = {
+  [BOOKING_STATES.PENDING]: {
+    label: 'Pendiente',
+    color: '#ffb264',
+    class: 'pending',
+  },
   [BOOKING_STATES.APPROVED]: {
     label: 'Aprobado',
     color: '#2ed47e',
@@ -39,11 +44,6 @@ export const BOOKING_STATES_OPTIONS: IBookingStatusOption = {
     label: 'Completado',
     color: '#00cae3',
     class: 'confirmed',
-  },
-  [BOOKING_STATES.PENDING]: {
-    label: 'Pendiente',
-    color: '#ffb264',
-    class: 'pending',
   },
   [BOOKING_STATES.REJECTED]: {
     label: 'Rechazado',
@@ -67,6 +67,11 @@ export const ACTION_BUTTON_ADD_GROUP: ITableAction = {
 export const ACTION_BUTTON_DOWNLOAD: ITableAction = {
   label: 'Descargar',
   name: TABLE_ACTIONS.DOWNLOAD,
+};
+
+export const ACTION_BUTTON_DELETE: ITableAction = {
+  label: 'Eliminar',
+  name: TABLE_ACTIONS.DELETE,
 };
 
 export const COMMON_TABLE_ACTIONS: {
@@ -102,12 +107,12 @@ export const USER_ROLES_OPTIONS: {
     enabled: true,
     showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
   },
-  // {
-  //   value: USER_ROLES.STUDENT,
-  //   viewValue: 'Estudiante',
-  //   enabled: true,
-  //   showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
-  // },
+  {
+    value: USER_ROLES.STUDENT,
+    viewValue: 'Estudiante',
+    enabled: true,
+    showForRoles: [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR],
+  },
 ];
 
 import { CalendarOptions } from '@fullcalendar/core';

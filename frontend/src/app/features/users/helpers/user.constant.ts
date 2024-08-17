@@ -4,6 +4,7 @@ export const DISPLAYED_COLUMNS_USERS: (keyof IUserTable)[] = [
   'name',
   'lastName',
   'email',
+  'identityDocument',
   'phoneNumber',
   'roles',
   'status',
@@ -17,6 +18,7 @@ export const EXPECTED_HEADERS_XLSX_USERS: (keyof IUser)[] = [
   'lastName',
   'password',
   'email',
+  'identityDocument',
   'phoneNumber',
 ];
 
@@ -25,6 +27,7 @@ export const USER_SCHEMA = {
   lastName: 'string',
   password: 'string',
   email: 'string',
+  identityDocument: 'string',
   phoneNumber: 'string',
 };
 
@@ -32,6 +35,8 @@ export const KEYS_TO_UPDATE_USER: (keyof IUser)[] = [
   'name',
   'lastName',
   'password',
+  'email',
+  'identityDocument',
   'phoneNumber',
   'roles',
   'status',

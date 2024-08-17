@@ -317,4 +317,22 @@ export class EducationalSpaceDataSourceImpl
       }
     );
   }
+
+  async deletePdf(fileUploadId: IdBaseDto): Promise<FileUploadEntity> {
+    return handleTryCatch<FileUploadEntity>(async () => {
+      const { id } = fileUploadId;
+
+      const deletedFile = await FileUploadModel.findByIdAndUpdate(
+        { _id: id, status: { $ne: BASE_RECORD_STATES.DELETED } },
+        { status: BASE_RECORD_STATES.DELETED },
+        { new: true }
+      );
+
+      if (!deletedFile) {
+        throw CustomError.notFound(`El archivo que desea eliminar no existe`);
+      }
+
+      return FileUploadMapper.fileUploadEntityFromObject(deletedFile);
+    });
+  }
 }

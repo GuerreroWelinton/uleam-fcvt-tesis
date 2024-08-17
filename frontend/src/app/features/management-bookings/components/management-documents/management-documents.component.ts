@@ -15,6 +15,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import {
   FileUploadControl,
   FileUploadModule,
@@ -23,6 +24,7 @@ import {
 import { finalize, map, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import {
   ACTION_BUTTON_ADD,
+  ACTION_BUTTON_DELETE,
   ACTION_BUTTON_DOWNLOAD,
   DEFAULT_PAGE_SIZE,
 } from '../../../../core/constants/component.constant';
@@ -41,12 +43,7 @@ import { CustomizerSettingsService } from '../../../../shared/components/customi
 import { MaxCharDirective } from '../../../../shared/directives/max-char.directive';
 import { FileSizePipe } from '../../../../shared/pipes/file-size.pipe';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
-import { IUser } from '../../../users/interfaces/user.interface';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../core/store';
-import { selectAuthUser } from '../../../../core/store/user/user.selectors';
-import { USER_ROLES } from '../../../../core/enums/general.enum';
-import { Router } from '@angular/router';
+import { BASE_RECORD_STATES } from '../../../../core/enums/general.enum';
 
 @Component({
   selector: 'app-management-documents',
@@ -95,6 +92,8 @@ export class ManagementDocumentsComponent
   // BUTTONS
   public actionButtons = TABLE_ACTIONS;
   public actionButtonAdd = ACTION_BUTTON_ADD;
+  public actionButtonDownload = ACTION_BUTTON_DOWNLOAD;
+  public actionButtonDelete = ACTION_BUTTON_DELETE;
   public activeActionButton = ACTION_BUTTON_ADD;
 
   // FORM
@@ -120,7 +119,7 @@ export class ManagementDocumentsComponent
   ) {}
 
   ngOnInit(): void {
-    const isManagamentRoute = this.checkRouteExists('management-bookings');
+    this.isManagamentRoute = this.checkManagementRoute();
 
     this._preBookingService.getSelectedEduSpace().subscribe((eduSpace) => {
       this.selectedEduSpace = eduSpace;
@@ -161,21 +160,8 @@ export class ManagementDocumentsComponent
     this.unsubscribe$.complete();
   }
 
-  private checkRouteExists(routePath: string): boolean {
-    const routes = this._router.config;
-    return routes.some((route) => this.doesRouteMatch(route, routePath));
-  }
-
-  private doesRouteMatch(route: any, path: string): boolean {
-    if (route.path === path) {
-      return true;
-    }
-    if (route.children) {
-      return route.children.some((childRoute: any) =>
-        this.doesRouteMatch(childRoute, path)
-      );
-    }
-    return false;
+  private checkManagementRoute(): boolean {
+    return this._router.url.includes('management-bookings');
   }
 
   // TABLE
@@ -186,10 +172,12 @@ export class ManagementDocumentsComponent
     const { id } = this.selectedEduSpace;
 
     this.isLoading = true;
-    return this._eduSpaceService.listPdf({ recordId: id }).pipe(
-      map((res) => this.transformFilesResponse(res)),
-      finalize(() => (this.isLoading = false))
-    );
+    return this._eduSpaceService
+      .listPdf({ recordId: id, status: [BASE_RECORD_STATES.ACTIVE] })
+      .pipe(
+        map((res) => this.transformFilesResponse(res)),
+        finalize(() => (this.isLoading = false))
+      );
   }
 
   private transformFilesResponse(
@@ -199,7 +187,7 @@ export class ManagementDocumentsComponent
     const files = res.data?.result || [];
     const filesTable = files.map((file) => ({
       ...file,
-      actions: [ACTION_BUTTON_DOWNLOAD],
+      actions: [],
     }));
 
     return new MatTableDataSource<IFileUploadTable>(filesTable);
@@ -282,8 +270,10 @@ export class ManagementDocumentsComponent
   }
 
   private deleteFile(): void {
-    console.log('DELETE FILE ...');
-    this.afterSubmit();
+    if (this.selectedFile) {
+      const { id } = this.selectedFile;
+      this._eduSpaceService.deletePdf(id).subscribe(() => this.afterSubmit());
+    }
   }
 
   private afterSubmit(): void {

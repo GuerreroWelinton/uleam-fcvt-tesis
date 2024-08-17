@@ -78,6 +78,13 @@ export class ManagementEducationalSpacesService {
       .pipe(tap((res) => this.showAlert(res)));
   }
 
+  public deletePdf(id: string): Observable<IApiResponse<IFileUpload>> {
+    const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.DELETE_PDF}/${id}`;
+    return this._httpClient
+      .delete<IApiResponse<IFileUpload>>(endpoint)
+      .pipe(tap((res) => this.showAlert(res)));
+  }
+
   private showAlert(res: IApiResponse<IEducationalSpace | IFileUpload>): void {
     this._alertService.showAlert({
       type: 'success',

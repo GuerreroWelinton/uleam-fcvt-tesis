@@ -38,16 +38,27 @@
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-info">
-              @for (actionButton of element.actions; track $index) {
               <button
                 type="button"
                 mat-button
-                [matTooltip]="actionButton.label"
+                [matTooltip]="actionButtonDownload.label"
                 matTooltipPosition="above"
-                (click)="onActionButton(actionButton, element)"
+                (click)="onActionButton(actionButtonDownload, element)"
               >
                 <i class="material-symbols-outlined">
-                  {{ actionButton.name }}
+                  {{ actionButtonDownload.name }}
+                </i>
+              </button>
+              @if (isManagamentRoute) {
+              <button
+                type="button"
+                mat-button
+                [matTooltip]="actionButtonDelete.label"
+                matTooltipPosition="above"
+                (click)="onActionButton(actionButtonDelete, element)"
+              >
+                <i class="material-symbols-outlined">
+                  {{ actionButtonDelete.name }}
                 </i>
               </button>
               }

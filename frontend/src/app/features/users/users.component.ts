@@ -256,6 +256,7 @@ export default class UsersComponent implements OnInit, AfterViewInit {
       name: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      identityDocument: ['', [Validators.required]],
       phoneNumber: ['', [Validators.required, Validators.maxLength(10)]],
       roles: ['', [Validators.required]],
     };
@@ -297,11 +298,21 @@ export default class UsersComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const { name, lastName, email, phoneNumber, roles, status } = rowSelected;
+    const {
+      name,
+      lastName,
+      email,
+      identityDocument,
+      phoneNumber,
+      roles,
+      status,
+    } = rowSelected;
+
     this.userForm.patchValue({
       name,
       lastName,
       email,
+      identityDocument,
       phoneNumber,
       roles,
       status,
@@ -317,9 +328,9 @@ export default class UsersComponent implements OnInit, AfterViewInit {
       ? this.userForm.disable()
       : this.userForm.enable();
 
-    if (buttonActive.name === TABLE_ACTIONS.EDIT) {
-      this.userForm.get('email')?.disable();
-    }
+    // if (buttonActive.name === TABLE_ACTIONS.EDIT) {
+    //   this.userForm.get('email')?.disable();
+    // }
   }
 
   private updateRoleOptionsBasedOnSelection(roles: USER_ROLES[]): void {
@@ -387,13 +398,21 @@ export default class UsersComponent implements OnInit, AfterViewInit {
   }
 
   private onAddUser(): void {
-    const { name, lastName, email, password, phoneNumber, roles } =
-      this.userForm.value;
+    const {
+      name,
+      lastName,
+      email,
+      identityDocument,
+      password,
+      phoneNumber,
+      roles,
+    } = this.userForm.value;
 
     const newUser: Partial<IUser> = {
       name,
       lastName,
       email,
+      identityDocument,
       password,
       phoneNumber,
       roles,
@@ -433,13 +452,23 @@ export default class UsersComponent implements OnInit, AfterViewInit {
 
   private onEditUser(): void {
     if (!this.selectedUser) return;
-    const { id, name, lastName, phoneNumber, roles, status } =
-      this.selectedUser;
+    const {
+      id,
+      name,
+      lastName,
+      phoneNumber,
+      email,
+      identityDocument,
+      roles,
+      status,
+    } = this.selectedUser;
     const formValues: Partial<IUser> = this.userForm.value;
     const userSelectedValues: Partial<IUser> = {
       name,
       lastName,
       phoneNumber,
+      email,
+      identityDocument,
       roles,
       status,
     };

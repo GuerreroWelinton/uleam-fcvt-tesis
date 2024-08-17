@@ -45,7 +45,12 @@ export class ListBooking implements ListBookingUseCase {
             teacher,
             eduSpace,
             subject,
-            participants,
+            participants: participants.map(({ userId, attended }) => {
+              return {
+                userId,
+                attended,
+              };
+            }),
             status,
             createdAt,
             updatedAt,

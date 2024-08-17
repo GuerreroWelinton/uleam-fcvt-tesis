@@ -37,9 +37,10 @@ export const BookingSchema = new Schema(
     participants: {
       type: [
         {
-          name: {
-            type: String,
-            required: [true, "Name is required"],
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: [true, "User ID is required"],
           },
           attended: {
             type: Boolean,

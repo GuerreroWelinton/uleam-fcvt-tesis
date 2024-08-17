@@ -34,5 +34,5 @@ export abstract class EducationalSpaceDataSource {
     total: number;
   }>;
 
-  // abstract deletePdf(fileUploadId: IdBaseDto): Promise<FileUploadEntity>;
+  abstract deletePdf(fileUploadId: IdBaseDto): Promise<FileUploadEntity>;
 }

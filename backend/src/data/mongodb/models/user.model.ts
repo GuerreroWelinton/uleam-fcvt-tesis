@@ -16,6 +16,10 @@ const userSchema = new Schema(
       required: [true, "Email is required"],
       // unique: [true, "Email is already taken"],
     },
+    identityDocument: {
+      type: String,
+      required: [true, "ID number is required"],
+    },
     password: {
       type: String,
       required: [true, "Password is required"],

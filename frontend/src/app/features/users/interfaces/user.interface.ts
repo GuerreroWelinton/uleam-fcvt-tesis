@@ -9,6 +9,7 @@ export interface IUser extends IBaseRecord {
   name: string;
   lastName: string;
   email: string;
+  identityDocument: string;
   password: string;
   phoneNumber: string;
   roles: USER_ROLES[];

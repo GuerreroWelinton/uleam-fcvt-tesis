@@ -6,6 +6,7 @@ export class UserEntity {
     public name: string,
     public lastName: string,
     public email: string,
+    public identityDocument: string,
     public password: string,
     public phoneNumber: string,
     public roles: USER_ROLES[],

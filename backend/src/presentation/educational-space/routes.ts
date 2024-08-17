@@ -60,6 +60,12 @@ export class EducationalSpaceRoutes {
       educationalSpaceController.listPdf
     );
 
+    router.delete(
+      "/delete-pdf/:id",
+      [AuthMiddleware.validateJWT],
+      educationalSpaceController.deletePdf
+    );
+
     return router;
   }
 }

@@ -13,7 +13,7 @@ export class BookingEntity {
     public teacher: UserEntity,
     public eduSpace: EducationalSpaceEntity,
     public subject: SubjectEntity,
-    public participants: { name: string; attended: boolean }[],
+    public participants: { userId: UserEntity; attended: boolean }[],
     public status: BOOKING_STATES,
     public createdAt: Date,
     public updatedAt: Date
