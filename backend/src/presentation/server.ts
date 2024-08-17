@@ -38,9 +38,9 @@ export class Server {
     const uploadsDir = path.join(__dirname, "../uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log("Uploads directory created at:", uploadsDir);
+      // console.log("Uploads directory created at:", uploadsDir);
     } else {
-      console.log("Uploads directory already exists at:", uploadsDir);
+      // console.log("Uploads directory already exists at:", uploadsDir);
     }
 
     // Servir archivos estáticos desde la carpeta 'uploads'
