@@ -1,14 +1,16 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter, map, Observable, of, switchMap } from 'rxjs';
+import { EDU_SPACE_ACTIONS } from '../../../../core/enums/component.enum';
+import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
 import { PreBookingService } from '../../../../core/services/pre-booking.service';
 import { AppState } from '../../../../core/store';
 import { selectUserId } from '../../../../core/store/user/user.selectors';
 import { CardEducationalSpaceComponent } from '../../../../shared/components/card-educational-space/card-educational-space.component';
 import { IEducationalSpace } from '../../../management-educational-spaces/interfaces/educational-spaces.interface';
-import { ManagementEducationalSpacesService } from '../../../../core/services/management-educational-spaces.service';
 
 @Component({
   selector: 'app-management-pre-booking',
@@ -18,12 +20,14 @@ import { ManagementEducationalSpacesService } from '../../../../core/services/ma
 })
 export class ManagementPreBookingComponent implements OnInit {
   public eduSpaces$: Observable<IEducationalSpace[]> = of([]);
+  public eduSpaceActions = EDU_SPACE_ACTIONS;
   private userId$ = this._store.select(selectUserId);
 
   constructor(
     private _store: Store<AppState>,
     private _preBookingService: PreBookingService,
-    private _eduSpacesService: ManagementEducationalSpacesService
+    private _eduSpacesService: ManagementEducationalSpacesService,
+    private _router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,11 +47,24 @@ export class ManagementPreBookingComponent implements OnInit {
     );
   }
 
-  public onSelectedEduSpace(eduSpace: IEducationalSpace): void {
-    this.updateSelectedEduSpace(eduSpace);
+  public onSelectedEduSpace(
+    eduSpace: IEducationalSpace,
+    action: EDU_SPACE_ACTIONS
+  ): void {
+    if (action === EDU_SPACE_ACTIONS.SEE_CALENDAR) {
+      this.updateSelectedEduSpace(eduSpace);
+    }
+
+    if (action === EDU_SPACE_ACTIONS.SEE_STATISTICS) {
+      this.openEduSpaceStats(eduSpace);
+    }
   }
 
   private updateSelectedEduSpace(eduSpace: IEducationalSpace): void {
     this._preBookingService.updateSelectedEduSpace(eduSpace);
+  }
+
+  private openEduSpaceStats(eduSpace: IEducationalSpace): void {
+    this._router.navigate(['/management-educational-spaces', eduSpace.id]);
   }
 }

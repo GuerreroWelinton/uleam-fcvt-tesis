@@ -6,7 +6,7 @@ export interface IApiResponse<T> {
   token?: string; // Token opcional, solo cuando sea necesario
 }
 
-interface IApiData<T> {
+export interface IApiData<T> {
   result: T;
   totalCount?: number;
 }

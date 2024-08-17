@@ -1,0 +1,36 @@
+<mat-card
+  class="daxa-card welcome-card mb-25 border-radius position-relative bg-gradient border-none d-block"
+>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="content">
+          <span class="d-block text-white">
+            {{ formattedDate }}
+          </span>
+          <h3 class="text-white">Bienvenido!</h3>
+          <p class="text-white">
+            Este sistema te permitirá gestionar reservas.
+          </p>
+          <span class="d-block text-white fw-medium">
+            Avance del período actual
+          </span>
+          <div class="chart">
+            <apx-chart
+              [series]="chartOptions.series!"
+              [colors]="chartOptions.colors!"
+              [chart]="chartOptions.chart!"
+              [plotOptions]="chartOptions.plotOptions!"
+              [fill]="chartOptions.fill!"
+            ></apx-chart>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="image">
+          <img src="assets/images/welcome.svg" alt="welcome-image" />
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

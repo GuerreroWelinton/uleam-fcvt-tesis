@@ -22,11 +22,11 @@ export class UsersService {
   ) {}
 
   public list(
-    filters: Partial<IUser>,
+    filters: object,
     pagination: IPagination
   ): Observable<IApiResponse<IUser[]>> {
     const endpoint: string = `${this.baseUrl}${BASE_ENDPOINTS.LIST}`;
-    const queryParams: string = buildQueryParams<Partial<IUser>>({
+    const queryParams: string = buildQueryParams<object>({
       ...filters,
       ...pagination,
     });

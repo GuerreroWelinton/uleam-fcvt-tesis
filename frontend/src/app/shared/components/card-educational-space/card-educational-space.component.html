@@ -7,9 +7,14 @@
       <p>Código: {{ eduSpaceData.code }}</p>
       <p>Capacidad: {{ eduSpaceData.capacity }}</p>
       <p>Piso: {{ eduSpaceData.floor }}</p>
-      <button mat-raised-button class="daxa mt-2" (click)="emitSelected()">
-        Seleccionar
-      </button>
+      <div class="d-flex align-items-center justify-content-center gap-20">
+        <button mat-raised-button class="daxa mt-2" (click)="emitSelected()">
+          Ver calendario
+        </button>
+        <button mat-raised-button color="primary" (click)="emitStatistics()">
+          Ver estadísticas
+        </button>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>

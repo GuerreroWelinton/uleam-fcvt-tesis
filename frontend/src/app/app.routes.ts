@@ -72,7 +72,7 @@ export const routes: Routes = [
   },
   {
     path: 'management-educational-spaces',
-    canActivate: [AuthGuard, HasRole([USER_ROLES.ADMIN])],
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './features/management-educational-spaces/management-educational-spaces.routes'
