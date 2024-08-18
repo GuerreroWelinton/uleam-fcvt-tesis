@@ -49,6 +49,7 @@ export class RegisterUserDto {
     if (!phoneNumber) {
       return ["El teléfono es requerido"];
     }
+
     if (
       roles &&
       (!Array.isArray(roles) ||

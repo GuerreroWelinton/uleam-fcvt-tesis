@@ -1,0 +1,81 @@
+<mat-card
+  class="daxa-card most-leads-card mb-25 border-radius bg-white border-none d-block"
+  [class.component-dark-theme]="themeService.isDark()"
+>
+  <mat-card-header>
+    <mat-card-title>
+      <h5 class="mb-0">Administración de reservas</h5>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <apx-chart
+      [series]="chartOptions.series!"
+      [chart]="chartOptions.chart!"
+      [legend]="chartOptions.legend!"
+      [dataLabels]="chartOptions.dataLabels!"
+      [stroke]="chartOptions.stroke!"
+      [tooltip]="chartOptions.tooltip!"
+      [colors]="chartOptions.colors!"
+      [labels]="chartOptions.labels!"
+    ></apx-chart>
+
+    <ul class="leads-list list-unstyled pl-0 mb-0">
+      <li class="d-flex align-items-center justify-content-between">
+        <div class="title d-flex align-items-center fw-medium">
+          <div
+            class="icon bg-gray text-center rounded-circle position-relative"
+          >
+            <i class="material-symbols-outlined"> calendar_clock </i>
+          </div>
+          Pendientes
+        </div>
+        <span class="d-block text-body">
+          {{ (bookingsPending$ | async)?.totalCount || 0 }}
+        </span>
+        <!-- <span class="d-block text-body"> 30% </span> -->
+      </li>
+      <li class="d-flex align-items-center justify-content-between">
+        <div class="title d-flex align-items-center fw-medium">
+          <div
+            class="icon bg-gray text-center rounded-circle position-relative"
+          >
+            <i class="material-symbols-outlined"> event_busy </i>
+          </div>
+          Rechazadas
+        </div>
+        <span class="d-block text-body">
+          {{ (bookingsRejected$ | async)?.totalCount || 0 }}
+        </span>
+        <!-- <span class="d-block text-body"> 55% </span> -->
+      </li>
+      <li class="d-flex align-items-center justify-content-between">
+        <div class="title d-flex align-items-center fw-medium">
+          <div
+            class="icon bg-gray text-center rounded-circle position-relative"
+          >
+            <i class="material-symbols-outlined"> event_available </i>
+          </div>
+          Aprobadas
+        </div>
+        <span class="d-block text-body">
+          {{ (bookingsApproved$ | async)?.totalCount || 0 }}
+        </span>
+        <!-- <span class="d-block text-body"> 10% </span> -->
+      </li>
+      <li class="d-flex align-items-center justify-content-between">
+        <div class="title d-flex align-items-center fw-medium">
+          <div
+            class="icon bg-gray text-center rounded-circle position-relative"
+          >
+            <i class="material-symbols-outlined"> calendar_add_on </i>
+          </div>
+          Confirmadas
+        </div>
+        <span class="d-block text-body">
+          {{ (bookingsConfirmed$ | async)?.totalCount || 0 }}
+        </span>
+        <!-- <span class="d-block text-body"> 5% </span> -->
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

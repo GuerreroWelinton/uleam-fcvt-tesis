@@ -52,8 +52,8 @@ export class UserDataSourceImpl implements UserDataSource {
         }),
         status: { $ne: BASE_RECORD_STATES.DELETED },
         ...(status && { status }),
-        ...(createdAt && { createdAt: { $gte: createdAt, $lte: createdAt } }),
-        ...(updatedAt && { updatedAt: { $gte: updatedAt, $lte: updatedAt } }),
+        ...(createdAt && { createdAt: { $gte: new Date(createdAt) } }),
+        ...(updatedAt && { updatedAt: { $lte: new Date(updatedAt) } }),
       };
 
       if (userRolesList.includes(USER_ROLES.ADMIN)) {

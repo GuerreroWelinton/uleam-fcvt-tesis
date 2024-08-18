@@ -1,0 +1,29 @@
+<!-- <div class="row">
+  <mat-card
+    class="daxa-card top-customers-card mb-25 border-radius bg-white border-none d-block"
+  >
+    <mat-card-header>
+      <mat-card-title>
+        <h5 class="mb-0">Profesores con más reservas</h5>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="splitter-table-container" tabindex="0">
+        <table mat-table [dataSource]="(dataSource$ | async)!">
+          <ng-container matColumnDef="originalName">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.originalName }}
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> -->

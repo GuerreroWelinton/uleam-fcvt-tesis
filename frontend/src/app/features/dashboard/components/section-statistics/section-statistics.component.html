@@ -1,0 +1,98 @@
+<div class="row">
+  <div class="col-md-3 col-lg-6">
+    <mat-card
+      class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <div class="d-flex justify-content-between">
+          <div class="title">
+            <h5>Edificios</h5>
+            <div class="number fw-medium lh-1">
+              {{ (buildings$ | async)?.result?.length || 0 }}
+            </div>
+          </div>
+          <div
+            class="icon text-center bg-daxa rounded-circle text-white position-relative"
+          >
+            <i class="material-symbols-outlined"> apartment </i>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="col-md-3 col-lg-6">
+    <mat-card
+      class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <div class="d-flex justify-content-between">
+          <div class="title">
+            <h5>Carreras</h5>
+            <div class="number fw-medium lh-1">
+              {{ (careers$ | async)?.result?.length || 0 }}
+            </div>
+          </div>
+          <div
+            class="icon text-center bg-warning rounded-circle text-white position-relative"
+          >
+            <i class="material-symbols-outlined"> topic </i>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="col-md-3 col-lg-6">
+    <mat-card
+      class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <div class="d-flex justify-content-between">
+          <div class="title">
+            <h5>Espacios educativos</h5>
+            <div class="number fw-medium lh-1">
+              {{ (eduSpaces$ | async)?.result?.length || 0 }}
+            </div>
+          </div>
+          <div
+            class="icon text-center bg-info rounded-circle text-white position-relative"
+          >
+            <i class="material-symbols-outlined"> roofing </i>
+          </div>
+        </div>
+        <!-- <div class="info d-flex align-items-center justify-content-between">
+          <span class="sub-title d-block text-body">
+            4.75% increase in orders last week
+          </span>
+          <span class="daxa-up-down-badge position-relative">
+            <i class="material-symbols-outlined"> trending_up </i>
+            4.75%
+          </span>
+        </div> -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="col-md-3 col-lg-6">
+    <mat-card
+      class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
+    >
+      <mat-card-content>
+        <div class="d-flex justify-content-between">
+          <div class="title">
+            <h5>Reservas</h5>
+            <div class="number fw-medium lh-1">
+              {{ (bookings$ | async)?.totalCount || 0 }}
+            </div>
+          </div>
+          <div
+            class="icon text-center bg-primary rounded-circle text-white position-relative"
+          >
+            <i class="material-symbols-outlined"> event </i>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

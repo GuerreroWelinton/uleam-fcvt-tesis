@@ -110,10 +110,6 @@ export class BookingDataSourceImpl implements BookingDataSource {
         subjectId,
         participants,
       } = registerBookingDto;
-      console.log(
-        "🚀 ~ BookingDataSourceImpl ~ returnhandleTryCatch<BookingEntity> ~ registerBookingDto:",
-        registerBookingDto
-      );
 
       // Extraer los identityDocuments de los participantes
       const identityDocuments = participants.map((p) => p.identityDocument);
@@ -133,9 +129,9 @@ export class BookingDataSourceImpl implements BookingDataSource {
       });
 
       // Determinar los identityDocuments que no están registrados
-      const missingIdentityDocuments = identityDocuments.filter(
-        (doc) => !identityDocumentToUserId.has(doc)
-      );
+      const missingIdentityDocuments = identityDocuments.filter((doc) => {
+        return !identityDocumentToUserId.has(doc);
+      });
 
       if (missingIdentityDocuments.length > 0) {
         throw CustomError.notFound(

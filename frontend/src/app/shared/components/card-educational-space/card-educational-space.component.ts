@@ -14,10 +14,16 @@ export class CardEducationalSpaceComponent {
   public eduSpaceData: IEducationalSpace;
 
   @Output()
-  public selectedEduSpace: EventEmitter<IEducationalSpace> =
-    new EventEmitter<IEducationalSpace>();
+  public seeCalendar: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output()
+  public seeStatistics: EventEmitter<void> = new EventEmitter<void>();
 
   public emitSelected(): void {
-    this.selectedEduSpace.emit(this.eduSpaceData);
+    this.seeCalendar.emit();
+  }
+
+  public emitStatistics(): void {
+    this.seeStatistics.emit();
   }
 }
