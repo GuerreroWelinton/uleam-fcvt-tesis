@@ -70,11 +70,6 @@ export class UserDataSourceImpl implements UserDataSource {
         };
       }
 
-      console.log(
-        "🚀 ~ UserDataSourceImpl ~ returnhandleTryCatch<{users:UserEntity[];total:number}> ~ query:",
-        query
-      );
-
       const usersPromise = UserModel.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)

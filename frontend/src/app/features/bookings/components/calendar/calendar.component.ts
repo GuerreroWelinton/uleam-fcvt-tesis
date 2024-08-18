@@ -347,10 +347,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
           return;
         }
         this._excelService
-          .readExcel<{ participants: string }>(value, ['participants'])
+          .readExcel<{ participants: string | number }>(value, ['participants'])
           .then((res) => {
             const newParticipants = res.map((participant) => ({
-              identityDocument: participant.participants,
+              identityDocument: participant.participants.toString(),
             }));
 
             const identityDocuments = newParticipants.map(

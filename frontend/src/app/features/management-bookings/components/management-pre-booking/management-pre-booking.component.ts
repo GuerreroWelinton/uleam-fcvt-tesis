@@ -65,6 +65,7 @@ export class ManagementPreBookingComponent implements OnInit {
   }
 
   private openEduSpaceStats(eduSpace: IEducationalSpace): void {
-    this._router.navigate(['/management-educational-spaces', eduSpace.id]);
+    const { id, name } = eduSpace;
+    this._router.navigate(['/management-educational-spaces', id, name]);
   }
 }

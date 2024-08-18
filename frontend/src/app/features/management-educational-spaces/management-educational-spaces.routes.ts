@@ -9,7 +9,7 @@ export const MANAGEMENT_EDUCATIONAL_SPACES_ROUTES: Routes = [
     loadComponent: () => import('./management-educational-spaces.component'),
   },
   {
-    path: ':id',
+    path: ':id/:name',
     loadComponent: () => import('./components/statistics/statistics.component'),
   },
 ];

@@ -246,134 +246,136 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   public generateReport() {
     console.log(this.selectedBooking);
 
-    // let participants: any = [];
-    // let participants2: any = [
-    //   { text: 'NOMBRES', style: 'tableHeader' },
-    //   { text: 'ASISTENCIA', style: 'tableHeader' },
-    // ];
-    // this.selectedBooking.participants.forEach((e) => {
-    //   participants.push(e.name + ' ' + (e.attended ? 'ASISTIO' : 'NO ASISTIO'));
-    // });
+    let participants: any = [];
+    let participants2: any = [
+      { text: 'NOMBRES', style: 'tableHeader' },
+      { text: 'ASISTENCIA', style: 'tableHeader' },
+    ];
+    this.selectedBooking.participants.forEach((e) => {
+      participants.push(
+        e.userId.name + ' ' + (e.attended ? 'ASISTIO' : 'NO ASISTIO')
+      );
+    });
 
-    // const participantsData = this.selectedBooking.participants.map((e) => [
-    //   e.name,
-    //   e.attended ? 'ASISTIO' : 'NO ASISTIO',
-    // ]);
+    const participantsData = this.selectedBooking.participants.map((e) => [
+      e.userId.name,
+      e.attended ? 'ASISTIO' : 'NO ASISTIO',
+    ]);
 
-    // const documentDefinition: any = {
-    //   content: [
-    //     {
-    //       text: 'REGISTRO DE PRÁCTICAS DEL LABORATORIO DE BIOLOGÍA',
-    //       alignment: 'center',
-    //       style: 'subheader',
-    //     },
-    //     {
-    //       columns: [
-    //         {
-    //           text:
-    //             'Fecha de práctica: ' +
-    //             moment(this.selectedBooking.createdAt)
-    //               .locale('es')
-    //               .format('dddd, D [de] MMMM [de] YYYY'),
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       columns: [
-    //         {
-    //           text:
-    //             'Hora de entrada: ' +
-    //             moment(this.selectedBooking.startTime).format('HH:mm A'),
-    //         },
-    //         {
-    //           text:
-    //             'Hora de salida: ' +
-    //             moment(this.selectedBooking.endTime).format('HH:mm A'),
-    //         },
-    //       ],
-    //     },
-    //     'Docente responsable: ',
-    //     {
-    //       columns: [
-    //         {
-    //           text: 'Carrera: ' + this.selectedBooking.subject.career.name,
-    //         },
-    //         {
-    //           text: 'Asignatura: ' + this.selectedBooking.subject.name,
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       columns: [
-    //         {
-    //           text: 'Nivel: ' + this.selectedBooking.subject.academicLevel,
-    //         },
-    //         {
-    //           text:
-    //             'N° de estudiantes: ' +
-    //             this.selectedBooking.participants.length,
-    //         },
-    //       ],
-    //     },
-    //     'TEMA DE LA PRÁCTICA: ' + this.selectedBooking.topic,
+    const documentDefinition: any = {
+      content: [
+        {
+          text: 'REGISTRO DE PRÁCTICAS DEL LABORATORIO DE BIOLOGÍA',
+          alignment: 'center',
+          style: 'subheader',
+        },
+        {
+          columns: [
+            {
+              text:
+                'Fecha de práctica: ' +
+                moment(this.selectedBooking.createdAt)
+                  .locale('es')
+                  .format('dddd, D [de] MMMM [de] YYYY'),
+            },
+          ],
+        },
+        {
+          columns: [
+            {
+              text:
+                'Hora de entrada: ' +
+                moment(this.selectedBooking.startTime).format('HH:mm A'),
+            },
+            {
+              text:
+                'Hora de salida: ' +
+                moment(this.selectedBooking.endTime).format('HH:mm A'),
+            },
+          ],
+        },
+        'Docente responsable: ',
+        {
+          columns: [
+            {
+              text: 'Carrera: ' + this.selectedBooking.subject.career.name,
+            },
+            {
+              text: 'Asignatura: ' + this.selectedBooking.subject.name,
+            },
+          ],
+        },
+        {
+          columns: [
+            {
+              text: 'Nivel: ' + this.selectedBooking.subject.academicLevel,
+            },
+            {
+              text:
+                'N° de estudiantes: ' +
+                this.selectedBooking.participants.length,
+            },
+          ],
+        },
+        'TEMA DE LA PRÁCTICA: ' + this.selectedBooking.topic,
 
-    //     // { text: 'PARTICIPANTES', style: 'subheader' },
-    //     {
-    //       style: 'tableExample',
-    //       table: {
-    //         headerRows: 1,
-    //         body: [
-    //           [
-    //             { text: 'NOMBRES', style: 'tableHeader' },
-    //             { text: 'ASISTENCIA', style: 'tableHeader' },
-    //           ],
-    //           ...participantsData,
-    //         ],
-    //       },
-    //       layout: 'noBorders',
-    //     },
-    //     {
-    //       alignment: 'justify',
-    //       columns: [
-    //         {
-    //           text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.',
-    //         },
-    //       ],
-    //     },
-    //     { text: 'OBSERVACIONES', style: 'title' },
-    //     { text: this.selectedBooking.observation },
-    //   ],
-    //   styles: {
-    //     header: {
-    //       fontSize: 18,
-    //       bold: true,
-    //       margin: [0, 0, 0, 10],
-    //     },
-    //     subheader: {
-    //       fontSize: 16,
-    //       bold: true,
-    //       margin: [0, 10, 0, 5],
-    //     },
-    //     title: {
-    //       fontSize: 12,
-    //       bold: true,
-    //       margin: [0, 5, 0, 0],
-    //     },
-    //     tableExample: {
-    //       fontSize: 12,
-    //       margin: [0, 5, 0, 15],
-    //     },
-    //     tableHeader: {
-    //       bold: true,
-    //       fontSize: 13,
-    //       color: 'black',
-    //     },
-    //   },
-    // };
-    // // pdfMake.createPdf(documentDefinition).download('sample.pdf');
-    // const pdf = pdfMake.createPdf(documentDefinition);
-    // pdf.open();
+        // { text: 'PARTICIPANTES', style: 'subheader' },
+        {
+          style: 'tableExample',
+          table: {
+            headerRows: 1,
+            body: [
+              [
+                { text: 'NOMBRES', style: 'tableHeader' },
+                { text: 'ASISTENCIA', style: 'tableHeader' },
+              ],
+              ...participantsData,
+            ],
+          },
+          layout: 'noBorders',
+        },
+        {
+          alignment: 'justify',
+          columns: [
+            {
+              text: 'NOTA: Para la utilizacion de los laboratorios deberá ser entregado este documento totalmente lleno y con tre dias de anticipación previ a la utilizacion de los mismos.',
+            },
+          ],
+        },
+        { text: 'OBSERVACIONES', style: 'title' },
+        { text: this.selectedBooking.observation },
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5],
+        },
+        title: {
+          fontSize: 12,
+          bold: true,
+          margin: [0, 5, 0, 0],
+        },
+        tableExample: {
+          fontSize: 12,
+          margin: [0, 5, 0, 15],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'black',
+        },
+      },
+    };
+    // pdfMake.createPdf(documentDefinition).download('sample.pdf');
+    const pdf = pdfMake.createPdf(documentDefinition);
+    pdf.open();
 
-    // this.hidePopup();
+    this.hidePopup();
   }
 }
