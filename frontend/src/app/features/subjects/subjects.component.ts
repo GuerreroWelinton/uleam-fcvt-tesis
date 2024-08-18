@@ -117,7 +117,7 @@ export default class SubjectsComponent implements OnInit {
     this._subjectsService
       .list()
       .pipe(first())
-      .subscribe((res) => this.setDataSource(res.data?.result));
+      .subscribe((res) => this.setDataSource(res.data?.result ?? []));
   }
 
   private setDataSource(subjects?: ISubject[]): void {

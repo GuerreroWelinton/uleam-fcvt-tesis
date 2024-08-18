@@ -1,6 +1,6 @@
-import { PaginationDto } from "..";
 import { BASE_RECORD_STATES, USER_ROLES } from "../../../constants/constants";
 import { UserEntity } from "../../entities";
+import { PaginationDto } from "../base/pagination-base.dto";
 
 export class ListUserDto {
   private constructor(
@@ -34,13 +34,23 @@ export class ListUserDto {
       updatedAt,
     } = object;
 
+    // Convertir roles a un array si es un string
+    const rolesArray: USER_ROLES[] =
+      typeof roles === "string"
+        ? [roles as USER_ROLES]
+        : Array.isArray(roles)
+        ? roles
+        : [];
+
+    // Validar los roles
     if (
-      roles &&
-      (!Array.isArray(roles) ||
-        roles.some((role) => !Object.values(USER_ROLES).includes(role)))
+      rolesArray.length > 0 &&
+      rolesArray.some((role) => !Object.values(USER_ROLES).includes(role))
     ) {
       return ["Los roles no son válidos"];
     }
+
+    // Validar el estado
     if (status && !Object.values(BASE_RECORD_STATES).includes(status)) {
       return ["El estado no es válido"];
     }
@@ -55,7 +65,7 @@ export class ListUserDto {
         email,
         identityDocument,
         phoneNumber,
-        roles,
+        rolesArray,
         status,
         createdAt,
         updatedAt

@@ -65,7 +65,8 @@ export class UserDataSourceImpl implements UserDataSource {
         query = {
           ...query,
           ...(roles && {
-            roles: { $in: roles, $nin: [...userRolesList, USER_ROLES.ADMIN] },
+            // roles: { $in: roles, $nin: [...userRolesList, USER_ROLES.ADMIN] },
+            roles: { $in: roles, $nin: [USER_ROLES.ADMIN] },
           }),
         };
       }

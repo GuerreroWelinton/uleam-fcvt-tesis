@@ -16,6 +16,13 @@ export const BASE_STATES_MAT_SELECT: IMatSelectOption<string>[] = [
   { value: 'inactive', viewValue: 'Inactivo' },
 ];
 
+export const BOOKING_STATES_MAT_SELECT: IMatSelectOption<string>[] = [
+  { value: 'pending', viewValue: 'Pendiente' },
+  { value: 'approved', viewValue: 'Aprobado' },
+  { value: 'confirmed', viewValue: 'Completado' },
+  { value: 'rejected', viewValue: 'Rechazado' },
+];
+
 export const ROLE_TEXTS: { [key in USER_ROLES]: string } = {
   [USER_ROLES.ADMIN]: 'Administrador',
   [USER_ROLES.SUPERVISOR]: 'Supervisor',

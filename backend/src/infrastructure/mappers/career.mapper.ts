@@ -19,7 +19,6 @@ export class CareerMapper {
     if (!_id || !id) {
       throw CustomError.badRequest("Missing id");
     }
-
     if (!Validators.id.test(_id || id)) {
       throw CustomError.badRequest("Id is not valid");
     }

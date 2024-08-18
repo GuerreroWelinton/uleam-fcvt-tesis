@@ -35,6 +35,7 @@ export class SubjectMapper {
     if (!academicLevel) {
       throw CustomError.badRequest("Missing academicLevel");
     }
+
     const careerEntity = CareerMapper.careerEntityFromObject(careerId);
     if (!Object.values(BASE_RECORD_STATES).includes(status)) {
       throw CustomError.badRequest("Invalid status");

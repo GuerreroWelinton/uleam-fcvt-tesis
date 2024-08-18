@@ -35,7 +35,7 @@ import { DataComparisonService } from '../../core/services/data-comparison.servi
 import { PeriodService } from '../../core/services/period.service';
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
-import { StatusFormatterPipe } from '../../shared/pipes/status-formatter.pipe';
+import { BaseStatusFormatterPipe } from '../../shared/pipes/base-status-formatter.pipe';
 import { DISPLAYED_COLUMNS_PERIODS } from './helpers/period.constant';
 
 @Component({
@@ -59,7 +59,7 @@ import { DISPLAYED_COLUMNS_PERIODS } from './helpers/period.constant';
     MatTableModule,
     MatTooltipModule,
 
-    StatusFormatterPipe,
+    BaseStatusFormatterPipe,
 
     MaxCharDirective,
   ],

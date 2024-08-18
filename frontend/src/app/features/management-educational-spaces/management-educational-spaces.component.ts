@@ -38,7 +38,7 @@ import { ManagementEducationalSpacesService } from '../../core/services/manageme
 import { CustomizerSettingsService } from '../../shared/components/customizer-settings/customizer-settings.service';
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
 import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
-import { StatusFormatterPipe } from '../../shared/pipes/status-formatter.pipe';
+import { BaseStatusFormatterPipe } from '../../shared/pipes/base-status-formatter.pipe';
 import { BuildingService } from '../buildings/services/building.service';
 import { DISPLAYED_COLUMNS_EDUCATIONAL_SPACES } from './helpers/educational-spaces.constant';
 import {
@@ -76,7 +76,7 @@ import { UsersService } from '../users/services/users.service';
     MatChipsModule,
     MatIconModule,
 
-    StatusFormatterPipe,
+    BaseStatusFormatterPipe,
 
     MaxCharDirective,
     OnlyNumbersDirective,
