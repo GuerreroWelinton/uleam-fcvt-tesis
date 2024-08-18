@@ -244,8 +244,6 @@ export class ManagementCalendarComponent implements OnInit, OnDestroy {
   // REPORT
   //todo: refactor
   public generateReport() {
-    console.log(this.selectedBooking);
-
     let participants: any = [];
     let participants2: any = [
       { text: 'NOMBRES', style: 'tableHeader' },

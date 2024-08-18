@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -27,7 +27,6 @@ import {
   BOOKING_STATES_OPTIONS,
   DEFAULT_PAGE_SIZE,
 } from '../../../../core/constants/component.constant';
-import { USER_ROLES } from '../../../../core/enums/general.enum';
 import { IBooking } from '../../../../core/interfaces/booking.interface';
 import { IFilters } from '../../../../core/interfaces/general.interface';
 import { ExcelService } from '../../../../core/services/excel.service';
@@ -38,12 +37,10 @@ import { CustomizerSettingsService } from '../../../../shared/components/customi
 import { BookingStatusFormatterPipe } from '../../../../shared/pipes/booking-status-formatter.pipe';
 import { ISubject } from '../../../subjects/interfaces/subjects.interface';
 import { SubjectsService } from '../../../subjects/services/subjects.service';
-import { IUser } from '../../../users/interfaces/user.interface';
 import { UsersService } from '../../../users/services/users.service';
-import { DISPLAYED_COLUMNS_EDUCATIONAL_SPACES_STATISTICS } from '../../helpers/educational-spaces.constant';
 
 @Component({
-  selector: 'app-statistics',
+  selector: 'app-statistics-personal-bookings',
   standalone: true,
   imports: [
     NgClass,
@@ -60,10 +57,10 @@ import { DISPLAYED_COLUMNS_EDUCATIONAL_SPACES_STATISTICS } from '../../helpers/e
     MatNativeDateModule,
     MatSelectModule,
   ],
-  templateUrl: './statistics.component.html',
-  styleUrl: './statistics.component.scss',
+  templateUrl: './statistics-personal-bookings.component.html',
+  styleUrl: './statistics-personal-bookings.component.scss',
 })
-export default class StatisticsComponent implements OnInit, AfterViewInit {
+export default class StatisticsPersonalBookingsComponent {
   private eduSpaceId: string | null = null;
   public eduSpaceName: string | null = null;
 
@@ -73,8 +70,17 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
   public dataSource$: Observable<MatTableDataSource<any>> = of(
     new MatTableDataSource<any>([])
   );
-  public displayedColumns: string[] =
-    DISPLAYED_COLUMNS_EDUCATIONAL_SPACES_STATISTICS;
+  public displayedColumns: string[] = [
+    'date',
+    'startTime',
+    'endTime',
+    'career',
+    'subject',
+    'number_participants',
+    'attended_count',
+    'not_attended_count',
+    'status',
+  ];
 
   private dataByExport: any[] = [];
 
@@ -90,8 +96,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
 
   public filterForm: FormGroup;
   public subjects$: Observable<ISubject[]> = of([]);
-
-  public teachers$: Observable<IUser[]> = of([]);
 
   public baseStatesOptions = BOOKING_STATES_MAT_SELECT;
 
@@ -110,7 +114,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.filterForm = this.initForm();
     this.subjects$ = this.fetchSubjects();
-    this.teachers$ = this.fetchTeachers();
     this.dataSource$ = this.fetchBookingStatistics();
   }
 
@@ -125,7 +128,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
       startTime: [''],
       endTime: [''],
       subjectId: [''],
-      teacherId: [''],
       status: [''],
     });
   }
@@ -134,12 +136,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
     return this._subjectService
       .list()
       .pipe(map((subjects) => subjects.data?.result || []));
-  }
-
-  private fetchTeachers(): Observable<IUser[]> {
-    return this._userService
-      .list({ roles: [USER_ROLES.TEACHER] }, { page: 1, limit: 100 })
-      .pipe(map((teachers) => teachers.data?.result || []));
   }
 
   private fetchBookingStatistics(): Observable<MatTableDataSource<any>> {
@@ -152,8 +148,12 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
         this.eduSpaceId = params.get('id');
         this.eduSpaceName = params.get('name');
 
-        if (this.eduSpaceId) {
-          this.filter = { ...this.filter, eduSpaceId: this.eduSpaceId };
+        if (this.eduSpaceId && user) {
+          this.filter = {
+            ...this.filter,
+            eduSpaceId: this.eduSpaceId,
+            teacherId: user.id,
+          };
         }
         return this._onBookingService.list(this.filter).pipe(
           map((res) => {
@@ -169,7 +169,7 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
   private transformBookingData(bookings: IBooking[]): MatTableDataSource<any> {
     this.isLoading = false;
     const bookingMap = bookings.map(
-      ({ startTime, endTime, status, subject, teacher, participants }) => {
+      ({ startTime, endTime, status, subject, participants }) => {
         const date = moment(startTime).format('DD-MM-YYYY');
         const fStartTime = moment(startTime).format('HH:mm A');
         const fEndTime = moment(endTime).format('HH:mm A');
@@ -182,7 +182,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
           endTime: fEndTime,
           career: subject.career.name,
           subject: subject.name,
-          teacher: `${teacher.name} ${teacher.lastName}`,
           number_participants: participants.length,
           attended_count: attendedCount,
           not_attended_count: notAttendedCount,
@@ -214,7 +213,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
       endTime: 'Hora de fin',
       career: 'Carrera',
       subject: 'Materia',
-      teacher: 'Profesor',
       number_participants: 'Participantes',
       attended_count: 'Asistieron',
       not_attended_count: 'No asistieron',
@@ -227,7 +225,7 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
   }
 
   public onBack(): void {
-    this._router.navigate(['/management-bookings']);
+    this._router.navigate(['/bookings']);
   }
 
   public togglePopup(): void {
@@ -239,7 +237,6 @@ export default class StatisticsComponent implements OnInit, AfterViewInit {
       startTime: '',
       endTime: '',
       subjectId: '',
-      teacherId: '',
       status: '',
     });
     this.filter = { page: 1, limit: DEFAULT_PAGE_SIZE[0] };

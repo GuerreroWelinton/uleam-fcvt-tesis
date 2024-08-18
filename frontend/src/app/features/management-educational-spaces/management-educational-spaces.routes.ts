@@ -12,4 +12,11 @@ export const MANAGEMENT_EDUCATIONAL_SPACES_ROUTES: Routes = [
     path: ':id/:name',
     loadComponent: () => import('./components/statistics/statistics.component'),
   },
+  {
+    path: 'service/:id/:name',
+    loadComponent: () =>
+      import(
+        './components/statistics-personal-bookings/statistics-personal-bookings.component'
+      ),
+  },
 ];

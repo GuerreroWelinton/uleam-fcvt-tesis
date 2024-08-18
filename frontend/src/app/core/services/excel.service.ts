@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import * as XLSX from 'xlsx';
 import { AlertService } from './alert.service';
 
+interface GenericObject {
+  [key: string]: any;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -86,5 +90,58 @@ export class ExcelService {
     expectedHeaders: string[]
   ): boolean {
     return expectedHeaders.every((header) => headers.includes(header));
+  }
+
+  downloadExcel<T extends GenericObject>(
+    data: T[],
+    columnNames: { [key: string]: string },
+    fileName: string
+  ): void {
+    if (data.length === 0) {
+      this.alertService.showAlert({
+        type: 'warning',
+        message: 'No hay datos para descargar',
+      });
+      return;
+    }
+
+    // Obtener las claves del primer objeto (si existe)
+    const keys = Object.keys(data[0]);
+
+    // Filtrar claves que estén en columnNames
+    const filteredKeys = keys.filter((key) => columnNames[key] !== undefined);
+
+    // Transformar los datos para incluir solo las columnas deseadas
+    const transformedData = data.map((item) => {
+      const row: any = {};
+      filteredKeys.forEach((key) => {
+        const columnName = columnNames[key];
+        // Si la columna especificada en columnNames es un campo anidado
+        if (typeof columnName === 'string' && columnName.includes('.')) {
+          row[columnName] = this.getNestedValue(item, key);
+        } else {
+          row[columnName || key] = item[key];
+        }
+      });
+      return row;
+    });
+
+    // Crear una hoja de cálculo y un libro
+    const ws = XLSX.utils.json_to_sheet(transformedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Data');
+
+    // Descargar el archivo
+    XLSX.writeFile(wb, fileName);
+
+    // Mostrar alerta de éxito
+    this.alertService.showAlert({
+      type: 'success',
+      message: `Archivo ${fileName} descargado exitosamente`,
+    });
+  }
+
+  private getNestedValue(obj: GenericObject, path: string): any {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
   }
 }

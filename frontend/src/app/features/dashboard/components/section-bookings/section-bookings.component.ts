@@ -101,7 +101,7 @@ export class SectionBookingsComponent implements OnInit {
         (this.totalApproved / this.totalBookings) * 100,
         (this.totalConfirmed / this.totalBookings) * 100,
       ]);
-    }, 1000);
+    }, 2000);
   }
 
   private fetchBookingsPending(): Observable<IApiData<IBooking[]>> {

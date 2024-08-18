@@ -40,7 +40,7 @@ import { DownloadFileDirective } from '../../shared/directives/download-file.dir
 import { MaxCharDirective } from '../../shared/directives/max-char.directive';
 import { OnlyNumbersDirective } from '../../shared/directives/only-numbers.directive';
 import { ShowForRolesDirective } from '../../shared/directives/show-for-roles.directive';
-import { StatusFormatterPipe } from '../../shared/pipes/status-formatter.pipe';
+import { BaseStatusFormatterPipe } from '../../shared/pipes/base-status-formatter.pipe';
 import {
   DISPLAYED_COLUMNS_USERS,
   EXPECTED_HEADERS_XLSX_USERS,
@@ -84,7 +84,7 @@ import { RoleFormatterPipe } from '../../shared/pipes/role-formatter.pipe';
     MaxWidthEllipsisDirective,
 
     RoleFormatterPipe,
-    StatusFormatterPipe,
+    BaseStatusFormatterPipe,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',

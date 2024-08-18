@@ -149,8 +149,8 @@ export class BookingDataSourceImpl implements BookingDataSource {
 
       // Verificar si ya existe una reserva en el mismo horario
       const queryExistingBooking = {
-        startTime: { $lte: endTime },
-        endTime: { $gte: startTime },
+        startTime: { $lt: endTime },
+        endTime: { $gt: startTime },
         eduSpaceId,
         status: { $ne: BOOKING_STATES.REJECTED },
       };
