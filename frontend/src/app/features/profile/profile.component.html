@@ -1,0 +1,128 @@
+<!-- Breadcrumb -->
+<div
+  class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-between"
+>
+  <h5 class="mb-0">Perfil</h5>
+  <ol class="breadcrumb list-unstyled mt-0 mb-0 pl-0">
+    <li class="breadcrumb-item position-relative">
+      <a routerLink="/" class="d-inline-block position-relative">
+        <i class="ri-user-line"></i>
+        Usuario
+      </a>
+    </li>
+    <li class="breadcrumb-item position-relative">Perfil</li>
+  </ol>
+</div>
+
+<!-- Profile -->
+<mat-card
+  class="daxa-card profile-card mb-25 p-0 border-radius bg-white border-none d-block"
+  [class.component-dark-theme]="themeService.isDark()"
+  [class.rtl-enabled]="themeService.isRTLEnabled()"
+>
+  <mat-card-content>
+    <div class="cover-image position-relative border-top-radius">
+      <img
+        src="assets/images/profile-big-cover.jpg"
+        class="border-top-radius"
+        alt="cover-image"
+      />
+      <!-- <button
+        type="button"
+        mat-button
+        class="edit-btn"
+        [matMenuTriggerFor]="editCoverPhotoMenu"
+      >
+        Edit Cover Photo
+      </button>
+      <mat-menu
+        #editCoverPhotoMenu="matMenu"
+        class="card-header-menu"
+        xPosition="after"
+      >
+        <button mat-menu-item>Upload Photo</button>
+        <button mat-menu-item>Reposition</button>
+        <button mat-menu-item>Remove</button>
+      </mat-menu> -->
+    </div>
+    <div class="profile-content">
+      <div class="d-md-flex align-items-end justify-content-between">
+        <div class="d-md-flex align-items-end">
+          <div class="image position-relative">
+            <img
+              src="assets/images/admin1.png"
+              class="rounded-circle"
+              alt="profile-image"
+            />
+            <!-- <button
+              type="button"
+              mat-button
+              class="edit-btn"
+              [matMenuTriggerFor]="editProfilePhotoMenu"
+            >
+              <i class="material-symbols-outlined"> photo_camera </i>
+            </button>
+            <mat-menu
+              #editProfilePhotoMenu="matMenu"
+              class="card-header-menu"
+              xPosition="after"
+            >
+              <button mat-menu-item>See Photo</button>
+              <button mat-menu-item>Upload Photo</button>
+              <button mat-menu-item>Remove</button>
+            </mat-menu> -->
+          </div>
+          <div class="title">
+            <span class="d-block fw-medium">
+              {{ (profile$ | async)?.name }} {{ (profile$ | async)?.lastName }}
+            </span>
+            <span class="d-block text-body">
+              {{ (profile$ | async)?.email }}
+            </span>
+          </div>
+        </div>
+        <div class="btn-box">
+          <button mat-button>Editar perfil</button>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card
+  class="daxa-card profile-card mb-25 border-radius bg-white border-none d-block"
+>
+  <mat-card-header>
+    <mat-card-title>
+      <h5 class="mt-0 mb-0">Información del perfil</h5>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <ul class="info-list pr-0 pl-0 mb-0 mt-0 list-unstyled">
+      <li>
+        <span class="text-body">Nombres completos:</span>
+        {{ (profile$ | async)?.name }} {{ (profile$ | async)?.lastName }}
+      </li>
+      <li>
+        <span class="text-body">Email:</span>
+        {{ (profile$ | async)?.email }}
+      </li>
+      <li>
+        <span class="text-body">Número de identidad:</span>
+        {{ (profile$ | async)?.identityDocument }}
+      </li>
+      <li>
+        <span class="text-body">Teléfono móvil:</span>
+        {{ (profile$ | async)?.phoneNumber }}
+      </li>
+      <li>
+        <span class="text-body">Roles:</span>
+        @for (role of (profile$ | async)?.roles; track $index) {
+        {{ role | roleFormatter }} - }
+      </li>
+      <li>
+        <span class="text-body">Registrado:</span>
+        {{ (profile$ | async)?.createdAt | date : "dd/MM/yyyy" }}
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

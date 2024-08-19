@@ -759,6 +759,10 @@ blockquote {
                         color: var(--dangerColor);
                         background: rgba(231, 76, 60, 0.10);
                     }
+                    &.completed {
+                        color: var(--infoColor);
+                        background: rgba(0, 202, 227, 0.10);
+                    }
                 }
                 &.expandable-rows {
                     .mat-mdc-cell {

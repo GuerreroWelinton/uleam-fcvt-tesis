@@ -12,7 +12,7 @@ export class ListBookingDto {
     public topic?: string,
     public observation?: string,
     public teacherId?: string,
-    public eduSpaceId?: string,
+    public eduSpaceId?: string | string[],
     public subjectId?: string,
     public participants?: { userId: UserEntity; attended: boolean }[],
     public status?: BOOKING_STATES[],
@@ -44,9 +44,20 @@ export class ListBookingDto {
     if (teacherId && !Validators.id.test(teacherId)) {
       return ["El profesor no es válido"];
     }
-    if (eduSpaceId && !Validators.id.test(eduSpaceId)) {
-      return ["El espacio educativo no es válido"];
+
+    const eduSpaceIdArray: string[] =
+      typeof eduSpaceId === "string"
+        ? [eduSpaceId]
+        : Array.isArray(eduSpaceId)
+        ? eduSpaceId
+        : [];
+
+    for (const e of eduSpaceIdArray) {
+      if (!Validators.id.test(e)) {
+        return ["Uno de los espacios educativos no es válido"];
+      }
     }
+
     if (subjectId && !Validators.id.test(subjectId)) {
       return ["La asignatura no es válida"];
     }
@@ -80,7 +91,7 @@ export class ListBookingDto {
         topic,
         observation,
         teacherId,
-        eduSpaceId,
+        eduSpaceIdArray.length > 0 ? eduSpaceIdArray : undefined,
         subjectId,
         participants,
         status,

@@ -45,12 +45,12 @@ export const BOOKING_STATES_OPTIONS: IBookingStatusOption = {
   [BOOKING_STATES.APPROVED]: {
     label: 'Aprobado',
     color: '#2ed47e',
-    class: 'pending',
+    class: 'confirmed',
   },
   [BOOKING_STATES.CONFIRMED]: {
     label: 'Completado',
     color: '#00cae3',
-    class: 'confirmed',
+    class: 'completed',
   },
   [BOOKING_STATES.REJECTED]: {
     label: 'Rechazado',
