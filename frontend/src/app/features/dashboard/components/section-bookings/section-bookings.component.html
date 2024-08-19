@@ -4,20 +4,76 @@
 >
   <mat-card-header>
     <mat-card-title>
-      <h5 class="mb-0">Administración de reservas</h5>
+      <h5 class="mb-0">Reservas</h5>
     </mat-card-title>
+    <mat-card-subtitle>
+      <button
+        type="button"
+        mat-button
+        class="card-header-menu-btn"
+        [matMenuTriggerFor]="cardHeaderMenu"
+      >
+        {{ selectedMenuOption.label }}
+      </button>
+      <mat-menu
+        #cardHeaderMenu="matMenu"
+        class="card-header-menu"
+        xPosition="before"
+      >
+        @for (item of menuOptions; track $index) {
+        <button mat-menu-item (click)="onMenuOptionSelect(item)">
+          {{ item.label }}
+        </button>
+        }
+      </mat-menu>
+    </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <apx-chart
-      [series]="chartOptions.series!"
-      [chart]="chartOptions.chart!"
-      [legend]="chartOptions.legend!"
-      [dataLabels]="chartOptions.dataLabels!"
-      [stroke]="chartOptions.stroke!"
-      [tooltip]="chartOptions.tooltip!"
-      [colors]="chartOptions.colors!"
-      [labels]="chartOptions.labels!"
-    ></apx-chart>
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-4 col-xxxl-4">
+        <apx-chart
+          #chartPie
+          [series]="chartPieOptions.series!"
+          [chart]="chartPieOptions.chart!"
+          [legend]="chartPieOptions.legend!"
+          [dataLabels]="chartPieOptions.dataLabels!"
+          [stroke]="chartPieOptions.stroke!"
+          [tooltip]="chartPieOptions.tooltip!"
+          [colors]="chartPieOptions.colors!"
+          [labels]="chartPieOptions.labels!"
+        ></apx-chart>
+      </div>
+
+      <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-4 col-xxxl-4">
+        <apx-chart
+          #chartBar
+          [series]="chartBarOptions.series!"
+          [chart]="chartBarOptions.chart!"
+          [dataLabels]="chartBarOptions.dataLabels!"
+          [plotOptions]="chartBarOptions.plotOptions!"
+          [yaxis]="chartBarOptions.yaxis!"
+          [xaxis]="chartBarOptions.xaxis!"
+          [legend]="chartBarOptions.legend!"
+          [colors]="chartBarOptions.colors!"
+          [grid]="chartBarOptions.grid!"
+        ></apx-chart>
+      </div>
+
+      <div class="col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-4 col-xxxl-4">
+        <apx-chart
+          #chartPie
+          [series]="chartDonutOptions.series!"
+          [chart]="chartDonutOptions.chart!"
+          [legend]="chartDonutOptions.legend!"
+          [dataLabels]="chartDonutOptions.dataLabels!"
+          [stroke]="chartDonutOptions.stroke!"
+          [tooltip]="chartDonutOptions.tooltip!"
+          [colors]="chartDonutOptions.colors!"
+          [labels]="chartDonutOptions.labels!"
+          style="min-height: 200px !important"
+        ></apx-chart>
+      </div>
+    </div>
 
     <ul class="leads-list list-unstyled pl-0 mb-0">
       <li class="d-flex align-items-center justify-content-between">
@@ -29,10 +85,10 @@
           </div>
           Pendientes
         </div>
+        <span class="d-block text-body"> {{ pendingPercentage }} % </span>
         <span class="d-block text-body">
-          {{ (bookingsPending$ | async)?.totalCount || 0 }}
+          {{ totalPending }}
         </span>
-        <!-- <span class="d-block text-body"> 30% </span> -->
       </li>
       <li class="d-flex align-items-center justify-content-between">
         <div class="title d-flex align-items-center fw-medium">
@@ -43,10 +99,10 @@
           </div>
           Rechazadas
         </div>
+        <span class="d-block text-body"> {{ rejectedPercentage }} % </span>
         <span class="d-block text-body">
-          {{ (bookingsRejected$ | async)?.totalCount || 0 }}
+          {{ totalRejected }}
         </span>
-        <!-- <span class="d-block text-body"> 55% </span> -->
       </li>
       <li class="d-flex align-items-center justify-content-between">
         <div class="title d-flex align-items-center fw-medium">
@@ -57,10 +113,10 @@
           </div>
           Aprobadas
         </div>
+        <span class="d-block text-body"> {{ approvedPercentage }} % </span>
         <span class="d-block text-body">
-          {{ (bookingsApproved$ | async)?.totalCount || 0 }}
+          {{ totalApproved }}
         </span>
-        <!-- <span class="d-block text-body"> 10% </span> -->
       </li>
       <li class="d-flex align-items-center justify-content-between">
         <div class="title d-flex align-items-center fw-medium">
@@ -71,10 +127,10 @@
           </div>
           Confirmadas
         </div>
+        <span class="d-block text-body"> {{ confirmedPercentage }} % </span>
         <span class="d-block text-body">
-          {{ (bookingsConfirmed$ | async)?.totalCount || 0 }}
+          {{ totalConfirmed }}
         </span>
-        <!-- <span class="d-block text-body"> 5% </span> -->
       </li>
     </ul>
   </mat-card-content>

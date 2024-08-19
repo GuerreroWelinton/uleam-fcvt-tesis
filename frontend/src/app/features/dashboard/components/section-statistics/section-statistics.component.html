@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-3 col-lg-6">
+  <div class="col-lg-12">
     <mat-card
       class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
     >
@@ -21,7 +21,7 @@
     </mat-card>
   </div>
 
-  <div class="col-md-3 col-lg-6">
+  <div class="col-lg-12">
     <mat-card
       class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
     >
@@ -43,14 +43,14 @@
     </mat-card>
   </div>
 
-  <div class="col-md-3 col-lg-6">
+  <div class="col-lg-12">
     <mat-card
       class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
     >
       <mat-card-content>
         <div class="d-flex justify-content-between">
           <div class="title">
-            <h5>Espacios educativos</h5>
+            <h5>Espacios</h5>
             <div class="number fw-medium lh-1">
               {{ (eduSpaces$ | async)?.result?.length || 0 }}
             </div>
@@ -74,7 +74,7 @@
     </mat-card>
   </div>
 
-  <div class="col-md-3 col-lg-6">
+  <div class="col-lg-12">
     <mat-card
       class="daxa-card total-orders-card mb-25 border-radius bg-white border-none d-block"
     >
@@ -83,7 +83,7 @@
           <div class="title">
             <h5>Reservas</h5>
             <div class="number fw-medium lh-1">
-              {{ (bookings$ | async)?.totalCount || 0 }}
+              {{ (bookings$ | async) || 0 }}
             </div>
           </div>
           <div

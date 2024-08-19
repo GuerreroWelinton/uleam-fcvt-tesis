@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,6 +46,7 @@ import { DISPLAYED_COLUMNS_EDUCATIONAL_SPACES_STATISTICS } from '../../helpers/e
   selector: 'app-statistics',
   standalone: true,
   imports: [
+    NgStyle,
     NgClass,
     BookingStatusFormatterPipe,
     MatCardModule,
