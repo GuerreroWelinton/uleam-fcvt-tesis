@@ -5,6 +5,7 @@ export * from "./auth/login-user.dto";
 export * from "./user/list-user.dto";
 export * from "./user/register-user.dto";
 export * from "./user/update-user.dto";
+export * from "./user/update-password-user.dto";
 
 //Career
 export * from "./career/register-career.dto";

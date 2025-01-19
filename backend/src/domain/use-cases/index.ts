@@ -8,6 +8,7 @@ export * from "./user/register-user.use-case";
 export * from "./user/register-group-user.use-case";
 export * from "./user/delete-user.use-case";
 export * from "./user/update-user.use-case";
+export * from "./user/update-password-user.use-case";
 
 //Career
 export * from "./career/list-career.use-case";

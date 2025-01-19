@@ -1,11 +1,12 @@
 import { BcryptAdapter } from "../../config";
-import { BASE_RECORD_STATES, USER_ROLES } from "../../constants/constants";
+import { BASE_RECORD_STATES } from "../../constants/constants";
 import { UserModel } from "../../data/mongodb";
 import { UserDataSource } from "../../domain/datasources";
 import {
   IdBaseDto,
   ListUserDto,
   RegisterUserDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
 } from "../../domain/dtos";
 import { UserEntity } from "../../domain/entities";
@@ -16,17 +17,14 @@ import { UserMapper } from "../mappers";
 type HashFunction = (password: string) => string;
 
 export class UserDataSourceImpl implements UserDataSource {
-  constructor(
-    private readonly hashPassword: HashFunction = BcryptAdapter.hash
-  ) {}
+  constructor(private readonly hashPassword: HashFunction = BcryptAdapter.hash) {}
 
-  async list(
-    filters: ListUserDto
-  ): Promise<{ users: UserEntity[]; total: number }> {
+  async list(listUserDto: ListUserDto): Promise<{ users: UserEntity[]; total: number }> {
     return handleTryCatch<{ users: UserEntity[]; total: number }>(async () => {
       const {
-        user,
-        pagination: { skip, limit },
+        limit,
+        page,
+        id,
         name,
         lastName,
         email,
@@ -36,50 +34,28 @@ export class UserDataSourceImpl implements UserDataSource {
         status,
         createdAt,
         updatedAt,
-      } = filters;
+      } = listUserDto;
 
-      const userRolesList = user.roles;
-
-      let query: Object = {
+      const query = {
+        ...(id && { _id: id }),
         ...(name && { name: { $regex: name, $options: "i" } }),
         ...(lastName && { lastName: { $regex: lastName, $options: "i" } }),
         ...(email && { email: { $regex: email, $options: "i" } }),
-        ...(identityDocument && {
-          identityDocument: { $regex: identityDocument, $options: "i" },
-        }),
-        ...(phoneNumber && {
-          phoneNumber: { $regex: phoneNumber, $options: "i" },
-        }),
-        status: { $ne: BASE_RECORD_STATES.DELETED },
-        ...(status && { status }),
+        ...(identityDocument && { identityDocument: { $regex: identityDocument, $options: "i" } }),
+        ...(phoneNumber && { phoneNumber: { $regex: phoneNumber, $options: "i" } }),
+        ...(roles && { roles: { $in: roles } }),
+        ...(status && { status: { $in: status } }),
         ...(createdAt && { createdAt: { $gte: new Date(createdAt) } }),
         ...(updatedAt && { updatedAt: { $lte: new Date(updatedAt) } }),
       };
 
-      if (userRolesList.includes(USER_ROLES.ADMIN)) {
-        query = {
-          ...query,
-          ...(roles && { roles: { $in: roles } }),
-        };
-      } else {
-        query = {
-          ...query,
-          ...(roles && {
-            // roles: { $in: roles, $nin: [...userRolesList, USER_ROLES.ADMIN] },
-            roles: { $in: roles, $nin: [USER_ROLES.ADMIN] },
-          }),
-        };
-      }
-
-      const usersPromise = UserModel.find(query)
+      const users = await UserModel.find(query)
         .sort({ createdAt: -1 })
-        .skip(skip)
+        .skip((page - 1) * limit)
         .limit(limit)
         .exec();
 
-      const totalPromise = UserModel.countDocuments(query);
-
-      const [users, total] = await Promise.all([usersPromise, totalPromise]);
+      const total = await UserModel.countDocuments(query);
 
       return {
         users: users.map((user) => UserMapper.userEntityFromObject(user)),
@@ -103,16 +79,8 @@ export class UserDataSourceImpl implements UserDataSource {
 
   async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
     return handleTryCatch<UserEntity>(async () => {
-      const {
-        name,
-        lastName,
-        email,
-        identityDocument,
-        password,
-        phoneNumber,
-        roles,
-        status,
-      } = registerUserDto;
+      const { name, lastName, email, identityDocument, password, phoneNumber, roles, status } =
+        registerUserDto;
 
       const existingEmail = await UserModel.findOne({
         email,
@@ -120,9 +88,7 @@ export class UserDataSourceImpl implements UserDataSource {
       }).exec();
 
       if (existingEmail) {
-        throw CustomError.badRequest(
-          `Ya existe un usuario con el correo electrónico ${email}`
-        );
+        throw CustomError.badRequest(`Ya existe un usuario con el correo electrónico ${email}`);
       }
 
       const existingIdentityDocument = await UserModel.findOne({
@@ -151,9 +117,7 @@ export class UserDataSourceImpl implements UserDataSource {
     });
   }
 
-  async registerGroup(
-    registerUserDto: RegisterUserDto[]
-  ): Promise<UserEntity[]> {
+  async registerGroup(registerUserDto: RegisterUserDto[]): Promise<UserEntity[]> {
     return handleTryCatch<UserEntity[]>(async () => {
       const emails = registerUserDto.map((user) => user.email);
       const uniqueEmails = new Set(emails);
@@ -163,9 +127,7 @@ export class UserDataSourceImpl implements UserDataSource {
         );
       }
 
-      const identityDocuments = registerUserDto.map(
-        (user) => user.identityDocument
-      );
+      const identityDocuments = registerUserDto.map((user) => user.identityDocument);
       const uniqueIdentityDocuments = new Set(identityDocuments);
       if (uniqueIdentityDocuments.size !== registerUserDto.length) {
         throw CustomError.badRequest(
@@ -175,16 +137,8 @@ export class UserDataSourceImpl implements UserDataSource {
 
       const usersToRegister = [];
       for (const user of registerUserDto) {
-        const {
-          name,
-          lastName,
-          email,
-          identityDocument,
-          password,
-          phoneNumber,
-          roles,
-          status,
-        } = user;
+        const { name, lastName, email, identityDocument, password, phoneNumber, roles, status } =
+          user;
 
         const existingEmail = await UserModel.findOne({
           email,
@@ -192,9 +146,7 @@ export class UserDataSourceImpl implements UserDataSource {
         }).exec();
 
         if (existingEmail) {
-          throw CustomError.badRequest(
-            `Ya existe un usuario con el correo electrónico ${email}`
-          );
+          throw CustomError.badRequest(`Ya existe un usuario con el correo electrónico ${email}`);
         }
 
         const existingIdentityDocument = await UserModel.findOne({
@@ -220,9 +172,7 @@ export class UserDataSourceImpl implements UserDataSource {
       }
 
       if (!usersToRegister.length) {
-        throw CustomError.badRequest(
-          "No se han proporcionado usuarios para registrar"
-        );
+        throw CustomError.badRequest("No se han proporcionado usuarios para registrar");
       }
 
       const users = await UserModel.insertMany(usersToRegister);
@@ -248,27 +198,14 @@ export class UserDataSourceImpl implements UserDataSource {
     });
   }
 
-  async update(
-    userId: IdBaseDto,
-    updateUserDto: UpdateUserDto
-  ): Promise<UserEntity> {
+  async update(userId: IdBaseDto, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     return handleTryCatch<UserEntity>(async () => {
       if (Object.values(updateUserDto).every((value) => value === undefined)) {
-        throw CustomError.badRequest(
-          "Debe enviar al menos un dato para actualizar el usuario"
-        );
+        throw CustomError.badRequest("Debe enviar al menos un dato para actualizar el usuario");
       }
 
       const { id } = userId;
-      const {
-        name,
-        lastName,
-        email,
-        identityDocument,
-        phoneNumber,
-        roles,
-        status,
-      } = updateUserDto;
+      const { name, lastName, email, identityDocument, phoneNumber, roles, status } = updateUserDto;
 
       const existingEmail = await UserModel.findOne({
         email,
@@ -276,9 +213,7 @@ export class UserDataSourceImpl implements UserDataSource {
       }).exec();
 
       if (existingEmail) {
-        throw CustomError.badRequest(
-          `Ya existe un usuario con el correo electrónico ${email}`
-        );
+        throw CustomError.badRequest(`Ya existe un usuario con el correo electrónico ${email}`);
       }
 
       const existingIdentityDocument = await UserModel.findOne({
@@ -310,6 +245,31 @@ export class UserDataSourceImpl implements UserDataSource {
       }
 
       return UserMapper.userEntityFromObject(updatedUser);
+    });
+  }
+
+  async updatePassword(data: UpdatePasswordUserDto): Promise<UserEntity> {
+    return handleTryCatch<UserEntity>(async () => {
+      const { id, password, newPassword } = data;
+
+      const user = await UserModel.findById(id).exec();
+
+      if (!user) {
+        throw CustomError.notFound("El usuario que desea actualizar no existe");
+      }
+
+      if (!BcryptAdapter.compare(password, user.password)) {
+        throw CustomError.badRequest("La contraseña actual es incorrecta");
+      }
+
+      if (password === newPassword) {
+        throw CustomError.badRequest("La nueva contraseña no puede ser igual a la actual");
+      }
+
+      user.password = this.hashPassword(newPassword);
+      await user.save();
+
+      return UserMapper.userEntityFromObject(user);
     });
   }
 }

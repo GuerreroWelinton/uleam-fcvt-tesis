@@ -1,8 +1,5 @@
 import { Router } from "express";
-import {
-  BookingDataSourceImpl,
-  BookingRepositoryImpl,
-} from "../../infrastructure";
+import { BookingDataSourceImpl, BookingRepositoryImpl } from "../../infrastructure";
 import { BookingController } from "./controller";
 import { AuthMiddleware } from "../middlewares";
 
@@ -16,17 +13,9 @@ export class BookingRoutes {
 
     router.get("/list", [AuthMiddleware.validateJWT], bookingController.list);
 
-    router.post(
-      "/register",
-      // [AuthMiddleware.validateJWT],
-      bookingController.register
-    );
+    router.post("/register", [AuthMiddleware.validateJWT], bookingController.register);
 
-    router.patch(
-      "/update/:id",
-      [AuthMiddleware.validateJWT],
-      bookingController.update
-    );
+    router.patch("/update/:id", [AuthMiddleware.validateJWT], bookingController.update);
 
     return router;
   }

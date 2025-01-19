@@ -3,14 +3,14 @@ import { IApiResponse, IUser } from "../../interfaces";
 import { UserRepository } from "../../repositories";
 
 interface ListUserUseCase {
-  execute(filters: ListUserDto): Promise<Partial<IApiResponse<IUser[]>>>;
+  execute(listUserDto: ListUserDto): Promise<Partial<IApiResponse<IUser[]>>>;
 }
 
 export class ListUser implements ListUserUseCase {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(filters: ListUserDto): Promise<Partial<IApiResponse<IUser[]>>> {
-    const { users, total } = await this.userRepository.list(filters);
+  async execute(listUserDto: ListUserDto): Promise<Partial<IApiResponse<IUser[]>>> {
+    const { users, total } = await this.userRepository.list(listUserDto);
     return {
       message: `Usuarios encontrados con éxito: ${total}`,
       data: {

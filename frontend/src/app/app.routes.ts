@@ -2,14 +2,14 @@ import { Routes } from '@angular/router';
 import { USER_ROLES } from './core/enums/general.enum';
 import { AuthGuard, NotAuthGuard } from './core/guards/auth.guard';
 import { HasRole } from './core/guards/has-role.guard';
+import { AUTH_ROUTES } from './features/auth/auth.routes';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/authentication', pathMatch: 'full' },
   {
     path: 'authentication',
     canActivate: [NotAuthGuard],
-    loadChildren: () =>
-      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    children: AUTH_ROUTES,
   },
   {
     path: 'profile',

@@ -41,3 +41,11 @@ export enum USER_ROLES {
   TEACHER = "teacher",
   STUDENT = "student",
 }
+
+export const ERROR_MESSAGES = {
+  REQUIRED: (key: string) => `El campo ${key} es requerido`,
+  INVALID: (key: string) => `El campo ${key} no es válido`,
+};
+
+export const DEFAULT_LIMIT = 10;
+export const DEFAULT_PAGE = 1;

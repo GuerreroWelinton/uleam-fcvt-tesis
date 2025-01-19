@@ -1,28 +1,33 @@
-import { BASE_RECORD_STATES, USER_ROLES } from "../../../constants/constants";
-import { UserEntity } from "../../entities";
-import { PaginationDto } from "../base/pagination-base.dto";
+import { Validators } from "../../../config";
+import {
+  BASE_RECORD_STATES,
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+  ERROR_MESSAGES,
+  USER_ROLES,
+} from "../../../constants/constants";
 
 export class ListUserDto {
   private constructor(
-    public user: UserEntity,
-    public pagination: PaginationDto,
+    public limit: number,
+    public page: number,
+    public id?: string,
     public name?: string,
     public lastName?: string,
     public email?: string,
     public identityDocument?: string,
     public phoneNumber?: string,
     public roles?: USER_ROLES[],
-    public status?: string,
+    public status?: BASE_RECORD_STATES[],
     public createdAt?: Date,
     public updatedAt?: Date
   ) {}
 
   static create(object: { [key: string]: any }): [string?, ListUserDto?] {
-    const [error, pagination] = PaginationDto.create(object);
-    if (error) return [error];
-
     const {
-      user,
+      limit = DEFAULT_LIMIT,
+      page = DEFAULT_PAGE,
+      id,
       name,
       lastName,
       email,
@@ -34,41 +39,38 @@ export class ListUserDto {
       updatedAt,
     } = object;
 
-    // Convertir roles a un array si es un string
-    const rolesArray: USER_ROLES[] =
-      typeof roles === "string"
-        ? [roles as USER_ROLES]
-        : Array.isArray(roles)
-        ? roles
-        : [];
+    if (id && !Validators.id.test(id)) return [ERROR_MESSAGES.INVALID("identificador")];
 
-    // Validar los roles
-    if (
-      rolesArray.length > 0 &&
-      rolesArray.some((role) => !Object.values(USER_ROLES).includes(role))
-    ) {
-      return ["Los roles no son válidos"];
-    }
+    if (email && !Validators.email.test(email))
+      return [ERROR_MESSAGES.INVALID("correo electrónico")];
 
-    // Validar el estado
-    if (status && !Object.values(BASE_RECORD_STATES).includes(status)) {
-      return ["El estado no es válido"];
-    }
+    if (roles && !Validators.isValidArrayElements(roles, Object.values(USER_ROLES)))
+      return [ERROR_MESSAGES.INVALID("roles")];
+
+    if (status && !Validators.isValidArrayElements(status, Object.values(BASE_RECORD_STATES)))
+      return [ERROR_MESSAGES.INVALID("estado")];
+
+    if (createdAt && !Validators.isValidDate(createdAt))
+      return [ERROR_MESSAGES.INVALID("fecha de creación")];
+
+    if (updatedAt && !Validators.isValidDate(updatedAt))
+      return [ERROR_MESSAGES.INVALID("fecha de actualización")];
 
     return [
       undefined,
       new ListUserDto(
-        user,
-        pagination!,
+        parseInt(limit),
+        parseInt(page),
+        id,
         name,
         lastName,
         email,
         identityDocument,
         phoneNumber,
-        rolesArray,
-        status,
-        createdAt,
-        updatedAt
+        roles ? (Array.isArray(roles) ? roles : [roles]) : undefined,
+        status ? (Array.isArray(status) ? status : [status]) : undefined,
+        createdAt ? new Date(createdAt) : undefined,
+        updatedAt ? new Date(updatedAt) : undefined
       ),
     ];
   }

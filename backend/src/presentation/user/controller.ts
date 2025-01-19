@@ -3,6 +3,7 @@ import {
   IdBaseDto,
   ListUserDto,
   RegisterUserDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
 } from "../../domain/dtos";
 import { UserRepository } from "../../domain/repositories";
@@ -12,6 +13,7 @@ import {
   ListUser,
   RegisterGroupUser,
   RegisterUser,
+  UpdatePasswordUser,
   UpdateUser,
 } from "../../domain/use-cases";
 import { createErrorResponse, handleError, handleSuccess } from "../../utils";
@@ -20,13 +22,13 @@ export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
 
   list = (req: Request, res: Response) => {
-    const [error, filters] = ListUserDto.create({ ...req.body, ...req.query });
+    const [error, listUserDto] = ListUserDto.create(req.query);
     if (error) {
       const response = createErrorResponse(400, error);
       return res.status(400).json(response);
     }
     new ListUser(this.userRepository)
-      .execute(filters!)
+      .execute(listUserDto!)
       .then((data) => handleSuccess(data, res))
       .catch((err) => handleError(err, res));
   };
@@ -88,6 +90,18 @@ export class UserController {
     }
     new UpdateUser(this.userRepository)
       .execute(userId!, updateUserDto!)
+      .then((data) => handleSuccess(data, res))
+      .catch((err) => handleError(err, res));
+  };
+
+  updatePassword = (req: Request, res: Response) => {
+    const [error, data] = UpdatePasswordUserDto.create(req.body);
+    if (error) {
+      const response = createErrorResponse(400, error);
+      return res.status(400).json(response);
+    }
+    new UpdatePasswordUser(this.userRepository)
+      .execute(data!)
       .then((data) => handleSuccess(data, res))
       .catch((err) => handleError(err, res));
   };

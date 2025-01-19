@@ -25,7 +25,7 @@ import { CustomizerSettingsService } from '../../../shared/components/customizer
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss',
 })
-export default class SignInComponent {
+export class SignInComponent {
   public passwordHidden: boolean = true;
   public signInForm!: FormGroup;
 

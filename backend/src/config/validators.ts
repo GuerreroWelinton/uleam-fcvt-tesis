@@ -1,4 +1,4 @@
-import { DAY_OF_WEEK } from "../constants/constants";
+import { DAY_OF_WEEK, ERROR_MESSAGES } from "../constants/constants";
 import { IHoursOfOperation } from "../domain/interfaces";
 
 export class Validators {
@@ -14,14 +14,28 @@ export class Validators {
     return /^(closed|^([0-1][0-9]|2[0-3]):([0-5][0-9]))$/;
   }
 
-  static isHoursOfOperationValid = (
-    hoursOperation: IHoursOfOperation[]
-  ): boolean => {
+  static isValidDate(date: string): boolean {
+    try {
+      const parsedDate = new Date(date);
+      return !isNaN(parsedDate.getTime());
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static isValidArrayElements(array: any, validValues: any[]): boolean {
+    try {
+      const values = Array.isArray(array) ? array : [array];
+      const invalidValues = values.filter((value) => !validValues.includes(value));
+      return invalidValues.length === 0;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static isHoursOfOperationValid = (hoursOperation: IHoursOfOperation[]): boolean => {
     return hoursOperation.every(({ startTime, endTime }) => {
-      return (
-        this.isValidHourRange.test(startTime) &&
-        this.isValidHourRange.test(endTime)
-      );
+      return this.isValidHourRange.test(startTime) && this.isValidHourRange.test(endTime);
     });
   };
 

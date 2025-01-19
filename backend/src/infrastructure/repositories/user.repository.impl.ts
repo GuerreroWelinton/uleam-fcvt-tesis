@@ -3,6 +3,7 @@ import {
   IdBaseDto,
   ListUserDto,
   RegisterUserDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
 } from "../../domain/dtos";
 import { UserEntity } from "../../domain/entities";
@@ -11,8 +12,8 @@ import { UserRepository } from "../../domain/repositories";
 export class UserRepositoryImpl implements UserRepository {
   constructor(private readonly userDataSource: UserDataSource) {}
 
-  list(filters: ListUserDto): Promise<{ users: UserEntity[]; total: number }> {
-    return this.userDataSource.list(filters);
+  list(listUserDto: ListUserDto): Promise<{ users: UserEntity[]; total: number }> {
+    return this.userDataSource.list(listUserDto);
   }
 
   findById(userId: IdBaseDto): Promise<UserEntity> {
@@ -33,5 +34,9 @@ export class UserRepositoryImpl implements UserRepository {
 
   update(userId: IdBaseDto, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     return this.userDataSource.update(userId, updateUserDto);
+  }
+
+  updatePassword(data: UpdatePasswordUserDto): Promise<UserEntity> {
+    return this.userDataSource.updatePassword(data);
   }
 }

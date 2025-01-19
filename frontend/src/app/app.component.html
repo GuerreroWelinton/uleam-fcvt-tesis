@@ -1,7 +1,5 @@
 <div
-  [ngClass]="{
-    'blank-page': router.url === '/authentication'
-  }"
+  [ngClass]="{ 'blank-page': router.url === '/authentication' }"
   [class.dark-theme]="themeService.isDark()"
 >
   <!-- Sidebar -->
